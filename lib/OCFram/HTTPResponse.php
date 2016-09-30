@@ -15,21 +15,15 @@ class HTTPResponse extends ApplicationComponent
     public function addHeader($header)
     // Ajoute le header spécifié en paramètre
     {
-        if (is_string($header))
-        {
-            header($header);
-        }
+        header($header);
     }
 
     public function redirect($location)
     // Crée une redirection vers la page $location
     {
-        if (is_string($location))
-        {
-            header('Location: '.$location);
-            // Toujours faire un exit après un header de redirect
-            exit;
-        }
+        header('Location: '.$location);
+        // Toujours faire un exit après un header de redirect
+        exit;
     }
 
     public function redirect404()
@@ -47,10 +41,7 @@ class HTTPResponse extends ApplicationComponent
     public function setCookie($name, $value = '', $expire = 0, $path = NULL, $domain = NULL, $secure = false, $httpOnly = true)
     // Crée ou update un cookie
     {
-        if (!empty($name) AND is_string($name))
-        {
-            setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
-        }
+        setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
 
     public function setPage($page)
