@@ -1,5 +1,7 @@
 <?php
 
+namespace OCFram;
+
 class HTTPRequest
 {
 	public function cookieData($key)
@@ -37,7 +39,11 @@ class HTTPRequest
 	public function method()
 	// Renvoie la méthode d'accès pour envoyer la requête
 	{
-		return $_SERVER['REQUEST_METHOD'];
+	    if isset($_SERVER['REQUEST_METHOD'])
+        {
+            return $_SERVER['REQUEST_METHOD'];
+        }
+        return NULL;
 	}
 
     public function postData($key)
@@ -57,8 +63,13 @@ class HTTPRequest
     }
 
     public function requestURI()
+    // Renvoie l'URI associée à la requête
     {
-        return $_SERVER['REQUEST_URI'];
+        if (isset($_SERVER['REQUEST_URI']))
+        {
+            return $_SERVER['REQUEST_URI'];
+        }
+        return NULL;
     }
 }
 
