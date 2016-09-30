@@ -2,7 +2,7 @@
 
 namespace OCFram;
 
-class HTTPRequest
+class HTTPRequest extends ApplicationComponent
 {
 	public function cookieData($key)
 	// Retourne le contenu d'un cookie, ou NULL s'il n'est pas défini

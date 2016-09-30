@@ -17,8 +17,8 @@ abstract class Application
     public function __construct()
     // Construit un objet application en initialisant httpRequest et httpResponse
     {
-        $this -> httpRequest = new HTTPRequest();
-        $this -> httpResponse = new HTTPResponse();
+        $this -> httpRequest = new HTTPRequest($this);
+        $this -> httpResponse = new HTTPResponse($this);
         // A assigner dans les classes filles
         $this -> name = '';
     }
