@@ -22,7 +22,7 @@ class Route
         $this -> setAction($action);
         $this -> setModule($module);
         $this -> setUrl($url);
-        $this -> setvarsNames($varsNames);
+        $this -> setVarsNames($varsNames);
         $this -> setVars(array());
     }
 

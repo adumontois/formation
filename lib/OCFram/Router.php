@@ -13,6 +13,8 @@ class Router
 {
     protected $routes;
 
+    const ROUTE_NOT_FOUND = 18;
+
     public function __construct()
     {
         $this -> routes = array();
@@ -53,6 +55,6 @@ class Router
         }
 
         // On n'a pas trouvé d'erreur
-        throw new \RuntimeException('Couldn\'t find route '.$url.', no such route exists !');
+        throw new \RuntimeException('Couldn\'t find route '.$url.', no such route exists !', Router::ROUTE_NOT_FOUND);
     }
 }
