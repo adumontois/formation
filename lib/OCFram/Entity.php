@@ -11,6 +11,7 @@ namespace OCFram;
 abstract class Entity implements \ArrayAccess
 // Classe représentant une classe type
 {
+    protected $erreurs;
     protected $id;
 
     public function  __construct(array $values)
@@ -19,6 +20,7 @@ abstract class Entity implements \ArrayAccess
         {
             $this -> hydrate($values);
         }
+        $this -> erreurs = array();
     }
 
     public function hydrate($values)
@@ -35,11 +37,7 @@ abstract class Entity implements \ArrayAccess
 
     public function object_new()
     {
-        if (empty($id))
-        {
-            return true;
-        }
-        return false;
+        return empty($this -> id);
     }
 
     // Implementation de l'interface
@@ -72,9 +70,14 @@ abstract class Entity implements \ArrayAccess
     }
 
     // Getters et setters
-    public function getId()
+    public function id()
     {
         return $this -> id;
+    }
+
+    public function erreurs()
+    {
+        return $this -> erreurs;
     }
 
     public function setId($id)
