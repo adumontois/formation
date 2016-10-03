@@ -14,7 +14,7 @@ abstract class Entity implements \ArrayAccess
     protected $erreurs;
     protected $id;
 
-    public function  __construct(array $values)
+    public function  __construct(array $values = array())
     {
         if (!empty($values))
         {

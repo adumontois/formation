@@ -8,6 +8,7 @@
 
 namespace App\Frontend\Modules\News;
 
+use Entity\Comment;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
 
@@ -53,7 +54,36 @@ class NewsController extends BackController
             exit;
         }
 
+        // Afficher les commentaires
+        $listeComments = $this -> managers -> getManagerOf('Comments') -> getListOf($news -> id());
+
         $this -> page -> addVar('titre', $news -> titre);
         $this -> page -> addVar('news', $news);
+        $this -> page -> addVar('listeComments', $listeComments);
+    }
+
+    public function executeInsertComment(HTTPRequest $request)
+    {
+        $this -> page -> addVar('title', 'Ajout d\'un commentaire');
+
+        $commentaire = new Comment();
+
+        $commentaire -> setNews($request -> getData('news'));
+        $commentaire -> setAuteur($request -> postData('pseudo'));
+        $commentaire -> setContenu($request -> postData('contenu'));
+        $commentaire -> setDate(new \DateTime());
+
+        if ($commentaire -> isValid())
+        {
+            $this -> managers -> getManagerOf('Comments') -> save($comment);
+            $this -> app -> user() -> setFlash('Votre commentaire a bien été ajouté.');
+            $this -> app -> httpResponse() -> redirect('news-'.$request -> getData('news').'.html');
+        }
+        else
+        {
+            $this -> page -> addVar('erreurs', $commentaire -> erreurs());
+        }
+
+        $this -> page -> addVar('comment', $commentaire);
     }
 }

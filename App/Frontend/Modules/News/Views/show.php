@@ -1,10 +1,11 @@
-
+<?php
 /**
  * Created by PhpStorm.
  * User: adumontois
  * Date: 03/10/2016
  * Time: 16:19
  */
+?>
 
 <p>
     Par <em><?= htmlspecialchars($news['auteur']) ?></em>, le <?= $news['dateAjout'] -> format('d/m/Y à H\hi') ?>
@@ -21,3 +22,36 @@ if ($news['dateAjout'] != $news['dateModif'])
 <?php
 }
 ?>
+
+<p>
+    <a href="commenter-<?= $news['id'] ?>.html">Ajouter un commentaire</a>
+</p>
+
+<?php
+if (empty($listeCommentaires))
+{
+    ?>
+    <p>
+        Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !
+    </p>
+    <?php
+}
+
+foreach ($listeCommentaires as $comment)
+{
+    ?>
+    <fieldset>
+        <legend>
+            Posté par <strong><?= htmlspecialchars($comment['auteur']) ?></strong> le <?= $comment['date'] -> format('d/m/Y à H\hi') ?>
+        </legend>
+        <p>
+            <?= nl2br(htmlspecialchars($comment['contenu'])) ?>
+        </p>
+    </fieldset>
+    <?php
+}
+?>
+
+<p>
+    <a href="commenter-<?= $news['id'] ?>.html">Ajouter un commentaire</a>
+</p>

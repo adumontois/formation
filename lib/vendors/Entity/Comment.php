@@ -24,7 +24,7 @@ class Comment extends Entity
 
     public function isValid()
     {
-        return !empty($this -> news) AND !empty($this -> auteur) AND !empty($this -> contenu);
+        return !empty($this -> auteur) AND !empty($this -> contenu);
     }
 
     public function news()
