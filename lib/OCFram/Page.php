@@ -35,6 +35,7 @@ class Page extends ApplicationComponent
         {
             throw new \RuntimeException('Specified view "'.$this -> contentFile.'" doesn\'t exists');
         }
+        $user = $this -> app -> user();
         extract($this -> vars);
 
         // Créer la page en bufferisation
