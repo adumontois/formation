@@ -9,7 +9,7 @@
 
 namespace Model;
 
-use \Entity\News;
+use Entity\News;
 
 class NewsManagerPDO extends NewsManager
 {
