@@ -41,7 +41,7 @@ class HTTPResponse extends ApplicationComponent
     public function setCookie($name, $value = '', $expire = 0, $path = NULL, $domain = NULL, $secure = false, $httpOnly = true)
     // Crée ou update un cookie
     {
-        setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
+        setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
 
     public function setPage($page)

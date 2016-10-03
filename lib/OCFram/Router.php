@@ -32,10 +32,10 @@ class Router
     public function getRoute($url)
     {
         // Trouver la route qui matche l'url fournie
-        foreach ($this -> routes as $iterator_route)
+        foreach ($this -> routes as $route)
         {
-            $varsValues = $iterator_route -> match($url)
-            if ($varsValues !== false AND $iterator_route -> hasVars())
+            $varsValues = $route -> match($url);
+            if ($varsValues !== false AND $route -> hasVars())
             // Si on a des variables, on doit les récupérer pour les faire transiter dans l'URL
             {
                 $varsNames = $route -> varsNames();

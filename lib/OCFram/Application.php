@@ -38,12 +38,12 @@ abstract class Application
         foreach ($route_list as $route) // Construire le routeur à partir de toutes les routes existantes
         {
             $vars = array();
-            if ($route->hasAttribute('vars')) // Récupérer les arguments nécessaires à la route
+            if ($route -> hasAttribute('vars')) // Récupérer les arguments nécessaires à la route
             {
-                $vars = explode(',', $route->getAttribute('vars'));
+                $vars = explode(',', $route -> getAttribute('vars'));
             }
-            // Ajouter la route au routeur  les arguments passés
-            $router->addRoute(new Route($route->getAttribute('action'), $route->getAttribute('module'), $route->getAttribute('url')), $vars);
+            // Ajouter la route au routeur les arguments passés
+            $router->addRoute(new Route($route -> getAttribute('action'), $route -> getAttribute('module'), $route -> getAttribute('url')), $vars);
         }
 
         // 2) Une fois toutes les routes créées, essayer de router l'URL reçue
