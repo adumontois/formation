@@ -6,9 +6,9 @@
  * Time: 14:48
  */
 
-namespace App\Frontend;
+namespace App\Frontend\Modules\News;
 
-use OCFram\BackController;
+use \OCFram\BackController;
 use \OCFram\HTTPRequest;
 
 class NewsController extends BackController
@@ -23,7 +23,7 @@ class NewsController extends BackController
         $this -> page -> addVar('title', 'List of '.$nombre_news.' last news');
 
         // Récupérer le manager des news
-        $this -> managers -> getManagerOf('News');
+        $manager = $this -> managers -> getManagerOf('News');
 
         // Récupérer la liste des news à afficher
         $listeNews = $manager -> getList(0, $nombre_news);
@@ -38,5 +38,22 @@ class NewsController extends BackController
             }
         }
         $this -> page -> addVar('listeNews', $listeNews);
+    }
+
+    public function executeShow(HTTPRequest $request)
+    {
+        $id = $request -> getData('id');
+        $manager = $this -> managers -> getManagerOf('News');
+        $news = $manager -> getUnique($id);
+
+        if (empty($news))
+        // Si la news n'existe pas on redirige
+        {
+            $this -> app -> httpResponse() -> redirect404();
+            exit;
+        }
+
+        $this -> page -> addVar('titre', $news -> titre);
+        $this -> page -> addVar('news', $news);
     }
 }
