@@ -13,14 +13,15 @@ abstract class Application
     protected $httpRequest;
     protected $httpResponse;
     protected $name;
+    protected $user;
 
     public function __construct()
     // Construit un objet application en initialisant httpRequest et httpResponse
     {
         $this -> httpRequest = new HTTPRequest($this);
         $this -> httpResponse = new HTTPResponse($this);
-        // A assigner dans les classes filles
-        $this -> name = '';
+        $this -> name = ''; // A assigner dans les classes filles
+        $this -> user = new User($this);
     }
 
     // Methode permettant de lancer une application
@@ -32,8 +33,8 @@ abstract class Application
         $router = new Router();
         // 1) Aller chercher dans la liste des routes toutes les routes existantes
         $xml = new \DOMDocument();
-        $xml->load(__DIR__ . '/../../App/' . $this->name() . '/Config/routes.xml');
-        $route_list = $xml->getElementsByTagName('route');
+        $xml -> load(__DIR__.'/../../App/'.$this->name().'/Config/routes.xml');
+        $route_list = $xml -> getElementsByTagName('route');
 
         foreach ($route_list as $route) // Construire le routeur à partir de toutes les routes existantes
         {
