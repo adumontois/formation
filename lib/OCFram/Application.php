@@ -14,6 +14,7 @@ abstract class Application
     protected $httpResponse;
     protected $name;
     protected $user;
+    protected $config;
 
     public function __construct()
     // Construit un objet application en initialisant httpRequest et httpResponse
@@ -22,6 +23,7 @@ abstract class Application
         $this -> httpResponse = new HTTPResponse($this);
         $this -> name = ''; // A assigner dans les classes filles
         $this -> user = new User($this);
+        $this -> config = new Config($this);
     }
 
     // Methode permettant de lancer une application
