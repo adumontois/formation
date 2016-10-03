@@ -69,5 +69,6 @@ abstract class BackController extends ApplicationComponent
             throw new \InvalidArgumentException('View must be a valid string');
         }
         $this -> view = $view;
+        $this -> page -> setContentFile(__DIR__.'/../../App/'.$this -> app -> name().'/Modules/'.$this -> module.'/Views/'.$this -> view.'.php');
     }
 }
