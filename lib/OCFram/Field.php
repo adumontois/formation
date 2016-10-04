@@ -17,9 +17,11 @@ abstract class Field
     protected $label;
     protected $name;
     protected $value;
+    protected $validators;
 
     public function __construct(array $options = array())
     {
+        $this -> setValidators(array());
         $this -> hydrate($options);
     }
 
@@ -28,8 +30,15 @@ abstract class Field
 
     public function isValid()
     {
-        return is_string($this -> label) AND !empty($this -> label)
-            AND is_string($this -> name) AND !empty($this -> name) AND substr($this -> name, 0, 1);
+        foreach ($this -> validators as $validator)
+        {
+            if (!$validator -> isvalid($this -> value))
+            {
+                $this -> errorMessage = $validator -> errorMessage();
+                return false;
+            }
+        }
+        return true;
     }
 
     public function label()
@@ -45,6 +54,11 @@ abstract class Field
     public function value()
     {
         return $this -> value;
+    }
+
+    public function validators()
+    {
+        return $this -> validators;
     }
 
     public function setLabel($label)
@@ -68,6 +82,18 @@ abstract class Field
         if (is_string($value))
         {
             $this -> value = $value;
+        }
+    }
+
+    public function setValidators(array $validators)
+    {
+        // Ajouter les validateurs suivants
+        foreach ($validators as $validator)
+        {
+            if (!in_array($validator, $this -> validators))
+            {
+                $this -> validators[] = $validators;
+            }
         }
     }
 }

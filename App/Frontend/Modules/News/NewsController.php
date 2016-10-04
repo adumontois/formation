@@ -11,6 +11,8 @@ namespace App\Frontend\Modules\News;
 use Entity\Comment;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
+use OCFram\MaxLengthValidator;
+use OCFram\NotNullValidator;
 use OCFram\StringField;
 use OCFram\TextField;
 
@@ -75,10 +77,14 @@ class NewsController extends BackController
         }
 
         // Création du formulaire dans le contrôleur
-        $form = new Form($comment);
+        $form = new Form($commentaire);
         $form -> add(new StringField(array('label' => 'Auteur',
                                             'name' => 'auteur',
-                                            'maxLength' => 50)));
+                                            'maxLength' => 50,
+                                            'validators' => array(
+                                                new MaxLengthValidator('Specified author is too long (max = 50 characters)', 50),
+                                                new NotNullValidator('Author can\'t be unknown')
+                                            ))));
         $form -> add(new TextField(array('label' => 'Contenu',
                                             'name' => 'contenu',
                                             'rows' => 7,
@@ -86,7 +92,7 @@ class NewsController extends BackController
 
         if ($form -> isValid())
         {
-            $this -> managers -> getManagerOf('Comments') -> save($comment);
+            $this -> managers -> getManagerOf('Comments') -> save($commentaire);
             $this -> app -> user() -> setFlash('Votre commentaire a bien été ajouté.');
             $this -> app -> httpResponse() -> redirect('news-'.$request -> getData('news').'.html');
         }
