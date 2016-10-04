@@ -43,4 +43,7 @@ abstract class CommentsManager extends Manager
     // Méthode qui renvoie les news d'id donné
     abstract public function getListOf($id);
 
+    // Méthode qui récupère un commentaire à partir de son id
+    abstract public function get($id);
+
 }

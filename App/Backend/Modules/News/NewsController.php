@@ -8,6 +8,7 @@
 
 namespace App\Backend\Modules\News;
 
+use Entity\Comment;
 use Entity\News;
 use OCFram\BackController;
 use OCFram\HTTPRequest;
@@ -83,7 +84,7 @@ class NewsController extends BackController
 
     public function executeDelete(HTTPRequest $request)
     {
-        if (!isset($request -> getExists('id')))
+        if ($request -> getExists('id'))
         {
             throw new \RuntimeException('Undefined news to delete');
         }
@@ -93,5 +94,31 @@ class NewsController extends BackController
         $this -> page -> addVar('title', 'Suppression d\'une news');
         $this -> app -> user() -> setFlash('La news '.$request -> getData('id').' a été correctement supprimée');
         $this -> app -> httpResponse() -> redirect('.');
+    }
+
+    public function executeUpdateComment(HTTPRequest $request)
+    {
+        $manager = $this -> managers -> getManagerOf('Comments');
+        $this -> page -> addVar('title', 'Edition d\'un commentaire');
+        if ($request -> postExists('auteur'))
+        {
+            $comment = new Comment(array('id' => $request -> getData('id'),
+                                            'auteur' => $request -> postData('auteur'),
+                                            'contenu' => $request -> postData('contenu')));
+            if (!$comment -> isValid())
+            {
+                $this -> page -> addVar('erreurs', $comment -> erreurs());
+            }
+            else
+            {
+                $manager -> save($comment);
+                $this -> app -> httpResponse() -> redirect('/news-'.$request -> getData('id').'.html');
+            }
+            $this -> page -> addVar('comment', $comment);
+        }
+        else
+        {
+            $this -> page -> addVar('comment', $manager -> get($request -> getData('id')));
+        }
     }
 }

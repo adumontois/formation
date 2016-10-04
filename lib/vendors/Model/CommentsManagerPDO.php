@@ -30,7 +30,7 @@ class CommentsManagerPDO extends CommentsManager
     protected function modify(Comment $comment)
     {
         $sql = 'UPDATE FROM comments
-                SET news = :news, auteur = :auteur, contenu = :contenu, date = NOW()
+                SET news = :news, auteur = :auteur, contenu = :contenu
                 WHERE id = :id';
 
         $query = $this -> dao -> prepare($sql);
@@ -56,12 +56,30 @@ class CommentsManagerPDO extends CommentsManager
         $query = $this -> dao -> prepare($sql);
         $query -> bindValue(':id', $id, \PDO::PARAM_INT);
         $query -> setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment');
-        $listeComments = $query -> fetchAll();
+        $listeComments = $query -> execute() -> fetchAll();
         foreach ($listeComments as $comment)
         {
             $comment -> setDate(new \DateTime($comment -> date()));
         }
         $query -> closeCursor();
         return $listeComments;
+    }
+
+    public function get($id)
+    {
+        if (!ctype_digit($id))
+        {
+            throw new \RuntimeException('Comment id must be an integer value');
+        }
+
+        $sql = 'SELECT id, news, auteur, contenu, date
+                FROM comments
+                WHERE id = :id';
+        $query = $this -> dao -> prepare($sql);
+        $query -> bindValue(':id', $id, \PDO::PARAM_INT);
+        $query -> setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment');
+        $comment = $query -> execute() -> fetch();
+        $query -> closeCursor();
+        return $comment;
     }
 }

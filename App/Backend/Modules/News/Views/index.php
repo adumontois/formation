@@ -25,10 +25,10 @@
         ?>
         <tr>
             <td>
-                <?= $news['auteur'] ?>
+                <?= htmlspecialchars($news['auteur']) ?>
             </td>
             <td>
-                <?= $news['titre'] ?>
+                <?= htmlspecialchars($news['titre']) ?>
             </td>
             <td>
                 le <?= $news['dateAjout'] -> format('d/m/Y à H\hi') ?>

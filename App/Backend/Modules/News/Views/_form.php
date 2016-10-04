@@ -16,7 +16,7 @@
         }
         ?>
         <label>Auteur</label>
-        <input type = "text" name = "auteur" value = "<?= isset($news) ? $news['auteur'] : '' ?>" />
+        <input type = "text" name = "auteur" value = "<?= isset($news) ? htmlspecialchars($news['auteur']) : '' ?>" />
         <br />
 
         <?php
@@ -26,7 +26,7 @@
         }
         ?>
         <label>Titre</label>
-        <input type = "text" name = "titre" value = "<?= isset($news) ? $news['titre'] : '' ?>" />
+        <input type = "text" name = "titre" value = "<?= isset($news) ? htmlspecialchars($news['titre']) : '' ?>" />
         <br />
 
         <?php
@@ -36,7 +36,7 @@
         }
         ?>
         <label>Contenu</label>
-        <textarea rows = "8" cols = "60" name = "contenu"><?= isset($news) ? $news['contenu'] : '' ?></textarea>
+        <textarea rows = "8" cols = "60" name = "contenu"><?= isset($news) ? nl2br(htmlspecialchars($news['contenu'])) : '' ?></textarea>
         <br />
         <?php
         if (isset($news) && !$news -> isNew())
