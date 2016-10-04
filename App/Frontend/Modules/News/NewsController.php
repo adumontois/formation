@@ -11,6 +11,8 @@ namespace App\Frontend\Modules\News;
 use Entity\Comment;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
+use OCFram\StringField;
+use OCFram\TextField;
 
 class NewsController extends BackController
 {
@@ -64,16 +66,25 @@ class NewsController extends BackController
 
     public function executeInsertComment(HTTPRequest $request)
     {
-        $this -> page -> addVar('title', 'Ajout d\'un commentaire');
-
         $commentaire = new Comment();
+        if ($request -> method() == 'POST')
+        {
+            $commentaire -> setNews($request -> getData('news'));
+            $commentaire -> setAuteur($request -> postData('pseudo'));
+            $commentaire -> setContenu($request -> postData('contenu'));
+        }
 
-        $commentaire -> setNews($request -> getData('news'));
-        $commentaire -> setAuteur($request -> postData('pseudo'));
-        $commentaire -> setContenu($request -> postData('contenu'));
-        $commentaire -> setDate(new \DateTime());
+        // Création du formulaire dans le contrôleur
+        $form = new Form($comment);
+        $form -> add(new StringField(array('label' => 'Auteur',
+                                            'name' => 'auteur',
+                                            'maxLength' => 50)));
+        $form -> add(new TextField(array('label' => 'Contenu',
+                                            'name' => 'contenu',
+                                            'rows' => 7,
+                                            'cols' => 50)));
 
-        if ($commentaire -> isValid())
+        if ($form -> isValid())
         {
             $this -> managers -> getManagerOf('Comments') -> save($comment);
             $this -> app -> user() -> setFlash('Votre commentaire a bien été ajouté.');
@@ -83,7 +94,9 @@ class NewsController extends BackController
         {
             $this -> page -> addVar('erreurs', $commentaire -> erreurs());
         }
-
+        $this -> page -> addVar('title', 'Ajout d\'un commentaire');
         $this -> page -> addVar('comment', $commentaire);
+        // Passer le formulaire à la vue
+        $this -> page -> addVar('form', $form -> createView());
     }
 }
