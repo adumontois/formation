@@ -11,6 +11,8 @@ namespace OCFram;
 abstract class Entity implements \ArrayAccess
 // Classe représentant une classe type
 {
+    use Hydrator;
+
     protected $erreurs;
     protected $id;
 
@@ -21,18 +23,6 @@ abstract class Entity implements \ArrayAccess
             $this -> hydrate($values);
         }
         $this -> erreurs = array();
-    }
-
-    public function hydrate($values)
-    {
-        foreach ($values as $key => $argument)
-        {
-            $method = 'set'.ucfirst($key);
-            if (method_exists($method, self::class))
-            {
-                $this -> $method($argument);
-            }
-        }
     }
 
     public function object_new()
