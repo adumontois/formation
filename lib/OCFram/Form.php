@@ -24,7 +24,11 @@ class Form
     {
         if ($field -> isValid())
         {
-            $this -> fields[$field -> name()] = $field;
+            $field_name = $field -> name(); // Récupérer le nom du champ
+            $field -> setValue($this -> entity -> $field_name());
+            // La value du field est initialisée à la valeur détenue par l'entité
+            $this -> fields[] = $field;
+            return $this;
         }
         else
         {
@@ -36,13 +40,14 @@ class Form
     {
         if ($this -> isValid())
         {
-            $view = '<form method = "POST" action = "">';
+            $view = ''
             // Construire tous les fields
-            foreach ($fields as $field)
+            foreach ($this -> fields as $field)
             {
                 $view .= $field -> buildWidget();
+                $view .= '<br />';
             }
-            return $view.'</form>';
+            return $view;
         }
         else
         {
@@ -52,7 +57,15 @@ class Form
 
     public function isValid()
     {
-        return !empty($fields);
+        $valid = true;
+        foreach ($this -> fields as $field)
+        {
+            if (!($valid = $valid AND $field -> isValid()))
+            {
+                break;
+            }
+        }
+        return $valid;
     }
 
     public function entity()
