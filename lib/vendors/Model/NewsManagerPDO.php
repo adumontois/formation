@@ -13,6 +13,13 @@ use Entity\News;
 
 class NewsManagerPDO extends NewsManager
 {
+    /**
+     * Récupère une liste de $count news, commençant par la news n° $start
+     *
+     * @param $offset
+     * @param $limit
+     * @return News[] Renvoi un tableau de news
+     */
     public function getList($offset, $limit)
     {
         if ($offset < 0 OR $limit <= 0)

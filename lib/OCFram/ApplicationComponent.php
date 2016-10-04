@@ -9,18 +9,20 @@
 namespace OCFram;
 
 
-abstract class ApplicationComponent
-{
-    protected $app;
-
-    public function __construct(Application $app)
-    {
-        $this -> app = $app;
-    }
-
-    public function app()
-    {
-        return $this -> app;
-    }
-
+abstract class ApplicationComponent {
+	protected $app;
+	
+	/**
+	 * @param Application $app
+	 */
+	public function __construct( Application $app ) {
+		$this->app = $app;
+	}
+	
+	/**
+	 * @return Application
+	 */
+	public function app() {
+		return $this->app;
+	}
 }

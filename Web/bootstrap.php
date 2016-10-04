@@ -6,32 +6,36 @@
  * Time: 14:22
  */
 
-    // Charger les autoloads
-    const DEFAULT_APP = 'Frontend';
+/**
+ * @var $app OCFram\Application
+ * Représente l'application à lancer
+ */
 
-    if (!isset($_GET['app']) OR !file_exists(__DIR__.'/../App/'.$_GET['app'].'/'.$_GET['app'].'Application.php'))
-    {
-        $_GET['app'] = DEFAULT_APP;
-    }
+// Charger les autoloads
+const DEFAULT_APP = 'Frontend';
 
-    require __DIR__.'/../lib/OCFram/SplClassLoader.php';
+if ( !isset( $_GET[ 'app' ] ) OR !file_exists( __DIR__ . '/../App/' . $_GET[ 'app' ] . '/' . $_GET[ 'app' ] . 'Application.php' ) ) {
+	$_GET[ 'app' ] = DEFAULT_APP;
+}
 
-    $OCFramLoader = new SplClassLoader('OCFram', __DIR__.'/../lib');
-    $OCFramLoader -> register();
+require __DIR__ . '/../lib/OCFram/SplClassLoader.php';
 
-    $appLoader = new SplClassLoader('App', __DIR__.'/..');
-    $appLoader -> register();
+$OCFramLoader = new SplClassLoader( 'OCFram', __DIR__ . '/../lib' );
+$OCFramLoader->register();
 
-    $modelLoader = new SplClassLoader('Model', _DIR__.'/../lib/vendors');
-    $modelLoader -> register();
+$appLoader = new SplClassLoader( 'App', __DIR__ . '/..' );
+$appLoader->register();
 
-    $entityLoader = new SplClassLoader('Entity', __DIR__.'/../lib/vendors');
-    $entityLoader -> register();
+$modelLoader = new SplClassLoader( 'Model', __DIR__ . '/../lib/vendors' );
+$modelLoader->register();
 
-    $formBuilderLoader = new SplClassLoader('FormBuilder', __DIR__.'/../lib/vendors');
-    $formBuilderLoader -> register();
+$entityLoader = new SplClassLoader( 'Entity', __DIR__ . '/../lib/vendors' );
+$entityLoader->register();
 
-    // Instanciation de l'application demandée
-    $appClass = 'App\\'.$_GET['app'].'\\'.$_GET['app'].'Application';
-    $app = new $appClass;
-    $app -> run();
+$formBuilderLoader = new SplClassLoader( 'FormBuilder', __DIR__ . '/../lib/vendors' );
+$formBuilderLoader->register();
+
+
+$appClass = 'App\\' . $_GET[ 'app' ] . '\\' . $_GET[ 'app' ] . 'Application';
+$app      = new $appClass;
+$app->run();

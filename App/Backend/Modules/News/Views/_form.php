@@ -7,22 +7,20 @@
  */
 ?>
 
-<form action = "" method = "post">
-    <p>
-        <?php
-        if (isset($news) && !$news -> isNew())
-        {
-            ?>
-            <input type = "hidden" name = "id" value = "<?= $news['id'] ?>" />
-            <input type = "submit" value = "Modifier" name = "modifier" />
-            <?php
-        }
-        else
-        {
-            ?>
-            <input type = "submit" value = "Ajouter" />
-            <?php
-        }
-        ?>
-    </p>
+<form action="" method="post">
+	<p>
+		<?php
+		if ( isset( $news ) && !$news->isNew() ) {
+			?>
+			<input type="hidden" name="id" value="<?= $news[ 'id' ] ?>" />
+			<input type="submit" value="Modifier" name="modifier" />
+			<?php
+		}
+		else {
+			?>
+			<input type="submit" value="Ajouter" />
+			<?php
+		}
+		?>
+	</p>
 </form>

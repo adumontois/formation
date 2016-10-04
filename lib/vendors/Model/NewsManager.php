@@ -14,8 +14,13 @@ use OCFram\Manager;
 
 abstract class NewsManager extends Manager
 {
-    // Récupère une liste de $count news, commençant par la news n° $start
-    // Renvoie un tableau de news
+    /**
+     * Récupère une liste de $count news, commençant par la news n° $start
+     *
+     * @param $offset
+     * @param $limit
+     * @return News[] Renvoi un tableau de news
+     */
     abstract public function getList($start, $count);
 
     // Récupère la news correspondant à un id donné

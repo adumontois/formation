@@ -52,7 +52,7 @@ class News extends Entity
         }
     }
 
-    public function setContenu()
+    public function setContenu($contenu)
     {
         if (!empty($contenu) AND is_string($contenu))
         {
