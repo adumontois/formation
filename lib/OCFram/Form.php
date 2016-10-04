@@ -40,7 +40,7 @@ class Form
     {
         if ($this -> isValid())
         {
-            $view = ''
+            $view = '';
             // Construire tous les fields
             foreach ($this -> fields as $field)
             {
