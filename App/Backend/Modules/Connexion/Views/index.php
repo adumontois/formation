@@ -14,7 +14,7 @@
     <br />
 
     <label>Mot de passe</label>
-    <input type="password" name="password" /
+    <input type="password" name="password" />
     <br />
     <br />
 
