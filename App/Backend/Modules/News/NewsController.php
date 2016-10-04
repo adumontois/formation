@@ -67,11 +67,31 @@ class NewsController extends BackController
 
     public function executeUpdate(HTTPRequest $request)
     {
-
+        if ($request -> postExists('auteur'))
+        {
+            $this -> processForm($request);
+        }
+        else
+        {
+            // Aller récupérer la news en DB
+            $manager = $this -> managers -> getManagerOf('News');
+            $news = $manager -> getUnique($request -> getData('id'));
+            $this -> page -> addVar('news', $news);
+        }
+        $this -> page -> addVar('title', 'Modification d\'une news');
     }
 
     public function executeDelete(HTTPRequest $request)
     {
-
+        if (!isset($request -> getExists('id')))
+        {
+            throw new \RuntimeException('Undefined news to delete');
+        }
+        $manager = $this -> managers -> getManagerOf('News');
+        $news = $manager -> getUnique($request -> getData('id'));
+        $manager -> delete($news);
+        $this -> page -> addVar('title', 'Suppression d\'une news');
+        $this -> app -> user() -> setFlash('La news '.$request -> getData('id').' a été correctement supprimée');
+        $this -> app -> httpResponse() -> redirect('.');
     }
 }

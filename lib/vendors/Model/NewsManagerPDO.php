@@ -47,8 +47,8 @@ class NewsManagerPDO extends NewsManager
             return NULL;
         }
         $sql = 'SELECT id, auteur, titre, contenu, dateAjout, dateModif
-            FROM news
-            WHERE id = :id';
+                FROM news
+                WHERE id = :id';
         $query = $this -> dao -> prepare($sql);
         $query -> bindValue(':id', $id, \PDO::PARAM_INT);
         $query -> setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News');
@@ -61,5 +61,45 @@ class NewsManagerPDO extends NewsManager
             return $news;
         }
         return NULL;
+    }
+
+    public function count()
+    {
+        $sql = 'SELECT COUNT(*)
+                FROM news';
+        return $this -> dao -> query($sql) -> fetchColumn();
+    }
+
+    public function add(News $news)
+    {
+        $sql = 'INSERT INTO news (auteur, titre, contenu, dateAjout, dateModif)
+                    VALUES (:auteur, :titre, :contenu, NOW(), NOW())';
+        $query = $this -> dao -> prepare($sql);
+        $query -> bindValue(':auteur', $news -> auteur(), \PDO::PARAM_STR);
+        $query -> bindValue(':titre', $news -> titre(), \PDO::PARAM_STR);
+        $query -> bindValue(':contenu', $news -> contenu(), \PDO::PARAM_STR);
+        $query -> execute($sql);
+    }
+
+    public function modify(News $news)
+    {
+        $sql = 'UPDATE news
+                SET auteur = :auteur, titre = :titre, contenu = :contenu, dateModif = NOW()
+                WHERE id = :id';
+        $query = $this -> dao -> prepare($sql);
+        $query -> bindValue(':id', $news -> id(), \PDO::PARAM_INT);
+        $query -> bindValue(':auteur', $news -> auteur(), \PDO::PARAM_STR);
+        $query -> bindValue(':titre', $news -> titre(), \PDO::PARAM_STR);
+        $query -> bindValue(':contenu', $news -> contenu(), \PDO::PARAM_STR);
+        $query -> execute($sql);
+    }
+
+    public function delete($id)
+    {
+        $sql = 'DELETE FROM news
+                WHERE id = :id';
+        $query = $this -> dao -> prepare($sql);
+        $query -> bindValue(':id', (int) $id, \PDO::PARAM_INT);
+        $query -> execute();
     }
 }
