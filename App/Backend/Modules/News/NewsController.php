@@ -90,9 +90,12 @@ class NewsController extends BackController
         }
         $manager = $this -> managers -> getManagerOf('News');
         $news = $manager -> getUnique($request -> getData('id'));
+        // Suppression des commentaires associés à la news
+        $manager -> deleteFromNews($request -> getExists('id'));
+        // Suppression de la news
         $manager -> delete($news);
         $this -> page -> addVar('title', 'Suppression d\'une news');
-        $this -> app -> user() -> setFlash('La news '.$request -> getData('id').' a été correctement supprimée');
+        $this -> app -> user() -> setFlash('La news a été correctement supprimée');
         $this -> app -> httpResponse() -> redirect('.');
     }
 
@@ -120,5 +123,19 @@ class NewsController extends BackController
         {
             $this -> page -> addVar('comment', $manager -> get($request -> getData('id')));
         }
+    }
+
+    public function executeDeleteComment(HTTPRequest $request)
+    {
+        $manager = $this -> managers -> getManagerOf('Comment');
+        $this -> page -> addVar('title', 'Suppression d\'un commentaire');
+        if ($request -> getExists('id'))
+        {
+            throw new \RuntimeException('Undefined comment to delete');
+        }
+        $comment = $manager -> get($request -> getExists('id'));
+        $manager -> delete($comment);
+        $this -> app -> user() -> getFlash('Le commentaire a été correctement supprimée');
+        $this -> app -> httpResponse() -> redirect('.');
     }
 }

@@ -82,4 +82,22 @@ class CommentsManagerPDO extends CommentsManager
         $query -> closeCursor();
         return $comment;
     }
+
+    public function delete($id)
+    {
+        $sql = 'DELETE FROM comments
+                WHERE id = :id';
+        $query = $this -> dao -> prepare($sql);
+        $query -> bindValue(':id', (int) $id, \PDO::PARAM_INT);
+        $query -> execute();
+    }
+
+    public function deleteFromNews($id)
+    {
+        $sql = 'DELETE FROM comments
+                WHERE news = :id';
+        $query = $this -> dao -> prepare($sql);
+        $query -> bindValue(':id', (int) $id, \PDO::PARAM_INT);
+        $query -> execute();
+    }
 }

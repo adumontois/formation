@@ -46,7 +46,8 @@ foreach ($listeCommentaires as $comment)
             <?php if ($user -> isAuthenticated())
             {
                 ?>
-                - <a href="admin/comment-update-<?= $comment['id'] ?>.html">Modifier</a>
+                - <a href="admin/comment-update-<?= $comment['id'] ?>.html">Modifier</a> |
+                <a href="admin/comment-delete-<?= $comment['id'] ?>.html">Supprimer</a>
                 <?php
             }
             ?>

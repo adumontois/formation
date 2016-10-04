@@ -46,4 +46,10 @@ abstract class CommentsManager extends Manager
     // Méthode qui récupère un commentaire à partir de son id
     abstract public function get($id);
 
+    // Méthode qui supprime dans la DB
+    abstract public function delete($id);
+
+    // Supprime les commentaires liés à la news d'id donné
+    abstract public function deleteFromNews($id);
+
 }
