@@ -35,7 +35,7 @@ abstract class Application
         $router = new Router();
         // 1) Aller chercher dans la liste des routes toutes les routes existantes
         $xml = new \DOMDocument();
-        $xml -> load(__DIR__.'/../../App/'.$this->name().'/Config/routes.xml');
+        $xml -> load(__DIR__.'/../../App/'.$this -> name().'/Config/routes.xml');
         $route_list = $xml -> getElementsByTagName('route');
 
         foreach ($route_list as $route) // Construire le routeur à partir de toutes les routes existantes
@@ -46,7 +46,7 @@ abstract class Application
                 $vars = explode(',', $route -> getAttribute('vars'));
             }
             // Ajouter la route au routeur les arguments passés
-            $router->addRoute(new Route($route -> getAttribute('action'), $route -> getAttribute('module'), $route -> getAttribute('url')), $vars);
+            $router -> addRoute(new Route($route -> getAttribute('action'), $route -> getAttribute('module'), $route -> getAttribute('url')), $vars);
         }
 
         // 2) Une fois toutes les routes créées, essayer de router l'URL reçue
