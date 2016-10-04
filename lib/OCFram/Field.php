@@ -90,7 +90,7 @@ abstract class Field
         // Ajouter les validateurs suivants
         foreach ($validators as $validator)
         {
-            if (!in_array($validator, $this -> validators))
+            if ($validator instanceof Validator AND !in_array($validator, $this -> validators))
             {
                 $this -> validators[] = $validators;
             }

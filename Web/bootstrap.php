@@ -28,6 +28,9 @@
     $entityLoader = new SplClassLoader('Entity', __DIR__.'/../lib/vendors');
     $entityLoader -> register();
 
+    $formBuilderLoader = new SplClassLoader('FormBuilder', __DIR__.'/../lib/vendors');
+    $formBuilderLoader -> register();
+
     // Instanciation de l'application demandée
     $appClass = 'App\\'.$_GET['app'].'\\'.$_GET['app'].'Application';
     $app = new $appClass;

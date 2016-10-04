@@ -77,18 +77,7 @@ class NewsController extends BackController
         }
 
         // Création du formulaire dans le contrôleur
-        $form = new Form($commentaire);
-        $form -> add(new StringField(array('label' => 'Auteur',
-                                            'name' => 'auteur',
-                                            'maxLength' => 50,
-                                            'validators' => array(
-                                                new MaxLengthValidator('Specified author is too long (max = 50 characters)', 50),
-                                                new NotNullValidator('Author can\'t be unknown')
-                                            ))));
-        $form -> add(new TextField(array('label' => 'Contenu',
-                                            'name' => 'contenu',
-                                            'rows' => 7,
-                                            'cols' => 50)));
+
 
         if ($form -> isValid())
         {
