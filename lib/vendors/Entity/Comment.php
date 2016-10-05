@@ -45,7 +45,7 @@ class Comment extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !empty( $this->auteur ) AND !empty( $this->contenu );
+		return !empty($this -> news) AND !empty( $this->auteur ) AND !empty( $this->contenu );
 	}
 	
 	/**
