@@ -8,6 +8,7 @@
 
 namespace FormBuilder;
 
+use OCFram\Entity;
 use OCFram\FormBuilder;
 use OCFram\MaxLengthValidator;
 use OCFram\NotNullValidator;
@@ -26,6 +27,15 @@ class NewsFormBuilder extends FormBuilder {
 	const TEXTAREA_COLS     = 50;
 	const TEXTAREA_ROWS     = 7;
 	const TITLE_MAX_LENGTH  = 255;
+	
+	/**
+	 * NewsFormBuilder constructor.
+	 *
+	 * @param Entity $entity
+	 */
+	public function __construct( Entity $entity ) {
+		parent::__construct( $entity );
+	}
 	
 	/**
 	 * Construit le formulaire de news.

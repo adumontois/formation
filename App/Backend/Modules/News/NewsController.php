@@ -10,6 +10,8 @@ namespace App\Backend\Modules\News;
 
 use Entity\Comment;
 use Entity\News;
+use FormBuilder\CommentFormBuilder;
+use FormBuilder\NewsFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
 use OCFram\BackController;
@@ -42,38 +44,48 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function processForm( HTTPRequest $request ) {
-		if ( $request->method() ) {
+		/**
+		 * @var $manager NewsManager
+		 */
+		$manager = $this->managers->getManagerOf();
+		if ( $request->method() == 'POST' ) {
 			$news = new News( array(
 				'auteur'  => $request->postData( 'auteur' ),
 				'titre'   => $request->postData( 'titre' ),
 				'contenu' => $request->postData( 'contenu' ),
 			) );
+			// S'il s'agit d'un update, il faut connaître l'id de la news qui est donné dans l'url
+			if ( $request->getExists( 'id' ) ) {
+				$news->setId( $request->getData( 'id' ) );
+			}
 		}
 		else {
-			$news = new News();
+			if ($request -> getExists('id'))
+			{
+				// Afficher le commentaire en update
+				$news = $manager->getUnique('id');
+			}
+			else {
+				$news = new News();
+			}
 		}
-		// S'il s'agit d'un update, il faut connaître l'id de la news qui est donné dans l'url
-		if ( $request->postExists( 'id' ) ) {
-			$news->setId( $request->postData( 'id' ) );
-		}
-		if ( !$news->isValid() ) {
-			$this->page->addVar( 'erreurs', $news->erreurs() );
-			// On ajoute un message au user pour lui dire que la news a bien été ajoutée/modifiée
+		
+		// Construction du formulaire
+		$FormBuilder = new NewsFormBuilder($news);
+		$FormBuilder->build();
+		$form = $FormBuilder->form();
+		
+		if ( $request->method() == 'POST' AND $form->isValid() ) {
 			if ( $news->object_new() ) {
 				$this->app->user()->setFlash( 'La news a été correctement ajoutée' );
 			}
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée' );
-			}
-		}
-		else {
-			/**
-			 * @var $manager NewsManager
-			 */
-			$manager = $this->managers->getManagerOf();
+			};
 			$manager->save( $news );
+			$this->app->httpResponse()->redirect('/admin');
 		}
-		$this->page->addVar( 'news', $news );
+		$this->page->addVar('form', $form -> createView());
 	}
 	
 	/**
@@ -82,9 +94,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeInsert( HTTPRequest $request ) {
-		if ( $request->postExists( 'auteur' ) ) {
-			$this->processForm( $request );
-		}
+		$this->processForm( $request );
 		$this->page->addVar( 'title', 'Insertion d\'une news' );
 	}
 	
@@ -94,18 +104,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeUpdate( HTTPRequest $request ) {
-		/**
-		 * @var $manager NewsManager
-		 */
-		if ( $request->postExists( 'auteur' ) ) {
-			$this->processForm( $request );
-		}
-		else {
-			// Aller récupérer la news en DB
-			$manager = $this->managers->getManagerOf();
-			$news    = $manager->getUnique( $request->getData( 'id' ) );
-			$this->page->addVar( 'news', $news );
-		}
+		$this->processForm( $request );
 		$this->page->addVar( 'title', 'Modification d\'une news' );
 	}
 	
@@ -123,7 +122,6 @@ class NewsController extends BackController {
 			throw new \RuntimeException( 'Undefined news to delete' );
 		}
 		$news_manager = $this->managers->getManagerOf();
-		$news         = $news_manager->getUnique( $request->getData( 'id' ) );
 		// Suppression des commentaires associés à la news
 		$comments_manager = $this->managers->getManagerOf( 'Comments' );
 		$comments_manager->deleteFromNews( $request->getData( 'id' ) );
@@ -145,25 +143,30 @@ class NewsController extends BackController {
 		 */
 		$manager = $this->managers->getManagerOf( 'Comments' );
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
-		if ( $request->postExists( 'auteur' ) ) {
+		if ($request->method() == 'POST') {
 			$comment = new Comment( array(
 				'id'      => $request->getData( 'id' ),
 				'auteur'  => $request->postData( 'auteur' ),
 				'contenu' => $request->postData( 'contenu' ),
 			) );
-			if ( !$comment->isValid() ) {
-				$this->page->addVar( 'erreurs', $comment->erreurs() );
-			}
-			else {
-				$manager->save( $comment );
-				$this->app->httpResponse()->redirect( '/news-' . $request->getData( 'id' ) . '.html' );
-			}
-			$this->page->addVar( 'comment', $comment );
 		}
 		else {
-			$this->page->addVar( 'comment', $manager->get( $request->getData( 'id' ) ) );
+			// Récupérer le commentaire en DB
+			$comment = $manager->get( $request->getData( 'id' ) );
 		}
-	}
+		
+		// Construire le formulaire
+		$formBuilder = new CommentFormBuilder($comment);
+		$formBuilder ->build();
+		$form = $formBuilder->form();
+		if ( $request->method() == 'POST' AND $form->isValid() ) {
+			$manager->save( $comment );
+			$this->app->user()->setFlash('Le commentaire a été correctement modifié');
+			// Redirection vers l'accueil d'administration
+			$this->app->httpResponse()->redirect( '/admin' );
+		}
+		$this->page->addVar( 'form', $form ->createView() );
+}
 	
 	/**
 	 * Supprime un commentaire.
@@ -182,26 +185,5 @@ class NewsController extends BackController {
 		$manager->delete( $request->getData( 'id' ) );
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé' );
 		$this->app->httpResponse()->redirect( '.' );
-	}
-	
-	/**
-	 * Modifie un commentaire.
-	 *
-	 * @param HTTPRequest $request
-	 */
-	public function executeModifyComment( HTTPRequest $request ) {
-		/**
-		 * @var $manager CommentsManager
-		 */
-		$manager = $this->managers->getManagerOf( 'Comment' );
-		$this->page->addVar( 'title', 'Modification d\'un commentaire' );
-		if ( !$request->getExists( 'id' ) ) {
-			throw new \RuntimeException( 'Undefined comment to edit' );
-		}
-		$comment = $manager->get( $request->getData( 'id' ) );
-		$manager->save( $comment );
-		$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
-		// Redirection vers la news
-		$this->app->httpResponse()->redirect( 'news-' . $comment->news() . '.html' );
 	}
 }
