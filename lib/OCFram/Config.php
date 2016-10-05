@@ -9,6 +9,9 @@
 namespace OCFram;
 
 class Config extends ApplicationComponent {
+	/**
+	 * @var $vars array Liste des variables de configuration
+	 */
 	protected $vars;
 	
 	/**
@@ -22,9 +25,9 @@ class Config extends ApplicationComponent {
 	/**
 	 * Récupère les variables de configuration associées au module.
 	 *
-	 * @param $var
+	 * @param $var string
 	 *
-	 * @return array
+	 * @return mixed|null
 	 */
 	public function get( $var ) {
 		if ( empty( $vars ) ) // Fulfill $vars by parsing XML

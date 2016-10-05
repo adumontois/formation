@@ -8,11 +8,33 @@
 
 namespace OCFram;
 
+/**
+ * Class BackController
+ *
+ * Modélise un contrôleur de l'application.
+ *
+ * @package OCFram
+ */
 abstract class BackController extends ApplicationComponent {
+	/**
+	 * @var $action string Nom de l'action associée au contrôleur
+	 */
 	protected $action;
+	/**
+	 * @var $module string Nom du module associé au contrôleur
+	 */
 	protected $module;
+	/**
+	 * @var $page Page page associée au contrôleur
+	 */
 	protected $page;
+	/**
+	 * @var $view string Adresse relative de la vue à utiliser pour ce contrôleur
+	 */
 	protected $view;
+	/**
+	 * @var $managers Managers Liste des mabagers existants pour ce module
+	 */
 	protected $managers;
 	
 	/**
@@ -20,17 +42,22 @@ abstract class BackController extends ApplicationComponent {
 	 * Le backController est associé à une action et un module, et construit une vue.
 	 *
 	 * @param Application $app
-	 * @param             $module
-	 * @param             $action
+	 * @param string      $module
+	 * @param string      $action
+	 * @param string      $dbName   Nom de la base de données
+	 * @param string      $daoClass Nom de la classe permettant de construire le DAO
 	 */
-	public function __construct( Application $app, $module, $action ) {
+	public function __construct( Application $app, $module, $action, $dbName, $daoClass = 'PDO') {
 		parent::__construct( $app );
 		$this->setAction( $action );
 		$this->setModule( $module );
 		$this->page = new Page( $app );
 		$this->setView( $action );
-		
-		$this->managers = new Managers( 'PDO', PDOFactory::getMysqlConnexion() );
+		// Calcul du nom de la classe construisant le DAO
+		$daoFactoryClass = $daoClass.'Factory';
+		// Calcul du nom de la méthode retournant le DAO
+		$daoMethod = 'get'.ucfirst($daoClass);
+		$this->managers = new Managers( $daoClass, $daoFactoryClass::$daoMethod($dbName) );
 	}
 	
 	/**

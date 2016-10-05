@@ -16,8 +16,7 @@ class HTTPRequest extends ApplicationComponent {
 	 *
 	 * @return string|null
 	 */
-	public function cookieData( $key ) //
-	{
+	public function cookieData( $key ) {
 		if ( $this->cookieExists( $key ) ) {
 			return (string)$_COOKIE[ $key ];
 		}

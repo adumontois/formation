@@ -17,7 +17,13 @@ namespace OCFram;
  */
 abstract class Entity implements \ArrayAccess {
 	use Hydrator;
+	/**
+	 * @var $erreurs string[] Tableau contenant toutes les erreurs concernant une entité.
+	 */
 	protected $erreurs;
+	/**
+	 * @var $id int ID de l'entité en DB. Vaut NULL si l'entité n'est pas encore insérée.
+	 */
 	protected $id;
 	
 	/**
@@ -38,9 +44,10 @@ abstract class Entity implements \ArrayAccess {
 	 * @return bool
 	 */
 	abstract public function isValid();
-		
+	
 	/**
 	 * Indique si l'objet est déjà inséré en base. Renvoie vrai si l'objet n'est pas inséré, faux sinon.
+	 *
 	 * @return bool
 	 */
 	public function object_new() {
@@ -50,7 +57,8 @@ abstract class Entity implements \ArrayAccess {
 	/**
 	 * Implémentation de l'interface ArrayAccess.
 	 * Vérifie si l'attribut indiqué par une accession en tableau existe.
-	 * @param mixed $offset
+	 *
+	 * @param string $offset
 	 *
 	 * @return bool
 	 */
@@ -64,9 +72,10 @@ abstract class Entity implements \ArrayAccess {
 	/**
 	 * Implémentation de l'interface ArrayAccess.
 	 * Renvoie la valeur de l'attribut $offset en accession en tableau. Si l'attribut n'existe pas, renvoie NULL.
-	 * @param mixed $offset
 	 *
-	 * @return null
+	 * @param string $offset
+	 *
+	 * @return mixed|null
 	 */
 	public function offsetGet( $offset ) {
 		if ( $this->offsetExists( $offset ) ) {
@@ -79,8 +88,8 @@ abstract class Entity implements \ArrayAccess {
 	/**
 	 * Set la valeur de l'attribut $offset à $value en accession en tableau.
 	 *
-	 * @param mixed $offset attribut
-	 * @param mixed $value valeur
+	 * @param string $offset attribut
+	 * @param mixed  $value  valeur
 	 */
 	public function offsetSet( $offset, $value ) {
 		$method = 'set' . ucfirst( $offset );
@@ -97,7 +106,8 @@ abstract class Entity implements \ArrayAccess {
 	
 	/**
 	 * Désactive la possibilité de détruire la valeur d'un attribut en accession en tableau.
-	 * @param mixed $offset
+	 *
+	 * @param string $offset
 	 *
 	 * @throws \Exception
 	 */
@@ -106,14 +116,14 @@ abstract class Entity implements \ArrayAccess {
 	}
 	
 	/**
-	 * @return integer DB id de l'objet.
+	 * @return int ID ID de l'entité en DB. Vaut NULL si l'entité n'est pas encore insérée.
 	 */
 	public function id() {
 		return $this->id;
 	}
 	
 	/**
-	 * @return array Tableau associatif indiquant à chaque attribut l'erreur qui est survenue
+	 * @return string[] Tableau contenant toutes les erreurs concernant une entité.
 	 */
 	public function erreurs() {
 		return $this->erreurs;
@@ -121,6 +131,7 @@ abstract class Entity implements \ArrayAccess {
 	
 	/**
 	 * Setter pour l'id
+	 *
 	 * @param $id int strictement positif
 	 */
 	public function setId( $id ) {

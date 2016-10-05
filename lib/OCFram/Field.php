@@ -18,19 +18,35 @@ namespace OCFram;
  */
 abstract class Field {
 	use Hydrator;
+	/**
+	 * @var $errorMessage string Message d'erreur à afficher lors du renvoi du formulaire
+	 */
 	protected $errorMessage;
+	/**
+	 * @var $label string Label à afficher pour le champ
+	 */
 	protected $label;
+	/**
+	 * @var $name string Nom du champ
+	 */
 	protected $name;
+	/**
+	 * @var $value string Valeur du champ
+	 */
 	protected $value;
+	/**
+	 * @var $validators Validator[] Liste des validateurs permettant de valider le champ
+	 */
 	protected $validators;
 	
 	/**
 	 * Construit un champ à partir des arguments en array associatif.
+	 * Le nom du champ est optionnel, il est fixé par défaut au label en minuscules.
 	 *
 	 * @param array $options
 	 */
 	public function __construct( array $options = array() ) {
-		$this -> setValidators(array());
+		$this->setValidators( array() );
 		$this->hydrate( $options );
 		// Par défaut, setter le nom du field au label en minuscules
 		if ( !isset( $this->name ) ) {
@@ -52,9 +68,6 @@ abstract class Field {
 	 */
 	public function isValid() {
 		foreach ( $this->validators as $validator ) {
-			/**
-			 * @var $validator \OCFram\Validator
-			 */
 			if ( !$validator->isValid( $this->value ) ) {
 				$this->errorMessage = $validator->errorMessage();
 				
@@ -98,6 +111,8 @@ abstract class Field {
 	}
 	
 	/**
+	 * Setter pour le paramètre label
+	 *
 	 * @param $label string
 	 */
 	public function setLabel( $label ) {
@@ -107,6 +122,8 @@ abstract class Field {
 	}
 	
 	/**
+	 * Setter pour le paramètre name
+	 *
 	 * @param $name string
 	 */
 	public function setName( $name ) {
@@ -116,6 +133,8 @@ abstract class Field {
 	}
 	
 	/**
+	 * Setter pour le paramètre value
+	 *
 	 * @param $value string
 	 */
 	public function setValue( $value ) {
@@ -136,5 +155,13 @@ abstract class Field {
 				$this->validators[] = $validators;
 			}
 		}
+	}
+	
+	/**
+	 * Efface le contenu du tableau de validateurs
+	 */
+	public function eraseValidators()
+	{
+		$this -> validators = array();
 	}
 }

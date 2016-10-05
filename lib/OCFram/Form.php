@@ -16,7 +16,13 @@ namespace OCFram;
  * @package OCFram
  */
 class Form {
+	/**
+	 * @var $entity Entity
+	 */
 	protected $entity;
+	/**
+	 * @var $fields Field[]
+	 */
 	protected $fields;
 	
 	/**
