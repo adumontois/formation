@@ -25,6 +25,19 @@ class StringField extends Field {
 	 *
 	 * @return string Code HTML associé au champ de texte.
 	 */
+	
+	/**
+	 * StringField constructor.
+	 * Ajoute automatiquement un validateur MaxLengthValidator.
+	 * @param array $options
+	 */
+	public function __construct( array $options ) {
+		parent::__construct( $options );
+		if (isset($this -> maxLength)) {
+			$this->setValidators( array( new MaxLengthValidator( 'Specified ' . strtolower($this->label) . ' is too long (max = ' .$this->maxLength . ' characters' ) ) );
+		}
+	}
+	
 	public function buildWidget() {
 		$code = '';
 		if ( !empty( $this->errorMessage ) ) {

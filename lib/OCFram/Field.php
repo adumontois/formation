@@ -30,7 +30,7 @@ abstract class Field {
 	 * @param array $options
 	 */
 	public function __construct( array $options = array() ) {
-		$this->setValidators( array() );
+		$this -> setValidators(array());
 		$this->hydrate( $options );
 		// Par défaut, setter le nom du field au label en minuscules
 		if ( !isset( $this->name ) ) {

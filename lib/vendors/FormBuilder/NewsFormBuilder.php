@@ -35,7 +35,6 @@ class NewsFormBuilder extends FormBuilder {
 			'label'      => 'Auteur',
 			'maxLength'  => self::AUTHOR_MAX_LENGTH,
 			'validators' => array(
-				new MaxLengthValidator( 'Specified author is too long (max = ' . self::AUTHOR_MAX_LENGTH . ' characters)', self::AUTHOR_MAX_LENGTH ),
 				new NotNullValidator( 'Author can\'t be unknown' ),
 			),
 		) ) );
@@ -53,7 +52,6 @@ class NewsFormBuilder extends FormBuilder {
 			'label'      => 'Titre',
 			'maxLength'  => self::TITLE_MAX_LENGTH,
 			'validators' => array(
-				new MaxLengthValidator( 'Specified title is too long (max = ' . self::TITLE_MAX_LENGTH . ' characters)', self::TITLE_MAX_LENGTH ),
 				new NotNullValidator( 'Title can\'t be undefined' ),
 			),
 		) ) );
