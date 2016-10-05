@@ -126,9 +126,9 @@ class NewsController extends BackController {
 		$news         = $news_manager->getUnique( $request->getData( 'id' ) );
 		// Suppression des commentaires associés à la news
 		$comments_manager = $this->managers->getManagerOf( 'Comments' );
-		$comments_manager->deleteFromNews( $request->getExists( 'id' ) );
+		$comments_manager->deleteFromNews( $request->getData( 'id' ) );
 		// Suppression de la news
-		$news_manager->delete( $news );
+		$news_manager->delete( $request->getData( 'id' ) );
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée' );
 		$this->app->httpResponse()->redirect( '.' );
@@ -176,12 +176,32 @@ class NewsController extends BackController {
 		 */
 		$manager = $this->managers->getManagerOf( 'Comment' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
-		if ( $request->getExists( 'id' ) ) {
+		if ( !$request->getExists( 'id' ) ) {
 			throw new \RuntimeException( 'Undefined comment to delete' );
 		}
-		$comment = $manager->get( $request->getExists( 'id' ) );
-		$manager->delete( $comment );
-		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimée' );
+		$manager->delete( $request->getData( 'id' ) );
+		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé' );
 		$this->app->httpResponse()->redirect( '.' );
+	}
+	
+	/**
+	 * Modifie un commentaire.
+	 *
+	 * @param HTTPRequest $request
+	 */
+	public function executeModifyComment( HTTPRequest $request ) {
+		/**
+		 * @var $manager CommentsManager
+		 */
+		$manager = $this->managers->getManagerOf( 'Comment' );
+		$this->page->addVar( 'title', 'Modification d\'un commentaire' );
+		if ( !$request->getExists( 'id' ) ) {
+			throw new \RuntimeException( 'Undefined comment to edit' );
+		}
+		$comment = $manager->get( $request->getData( 'id' ) );
+		$manager->save( $comment );
+		$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
+		// Redirection vers la news
+		$this->app->httpResponse()->redirect( 'news-' . $comment->news() . '.html' );
 	}
 }
