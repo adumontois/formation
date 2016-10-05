@@ -8,48 +8,77 @@
 
 namespace OCFram;
 
-class HTTPResponse extends ApplicationComponent
-{
-    protected $page;
-
-    public function addHeader($header)
-    // Ajoute le header spécifié en paramètre
-    {
-        header($header);
-    }
-
-    public function redirect($location)
-    // Crée une redirection vers la page $location
-    {
-        header('Location: '.$location);
-        // Toujours faire un exit après un header de redirect
-        exit;
-    }
-
-    public function redirect404()
-    // Crée une redirection vers une erreur 404
-    {
-        $this -> page = new Page($this -> app());
-        $this -> page -> setContentFile(__DIR__.'/../../Errors/404.html');
-        $this -> addHeader('HTTP/1.0 404 Not Found');
-        $this -> send();
-    }
-
-    public function send()
-    // Envoie la page au client
-    {
-        exit($this -> page -> getGeneratedPage());
-    }
-
-    public function setCookie($name, $value = '', $expire = 0, $path = NULL, $domain = NULL, $secure = false, $httpOnly = true)
-    // Crée ou update un cookie
-    {
-        setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
-    }
-
-    public function setPage($page)
-    // Affecte une page à l'attribut page
-    {
-        $this -> page = $page;
-    }
+/**
+ * Class HTTPResponse
+ * Classe permettant d'envoyer la réponse du serveur au client (headers, redirections...).
+ *
+ * @package OCFram
+ */
+class HTTPResponse extends ApplicationComponent {
+	/**
+	 * @var $page Page
+	 */
+	protected $page;
+	
+	/**
+	 * Ajoute le header spécifié en paramètre
+	 *
+	 * @param $header string
+	 */
+	public function addHeader( $header ) {
+		header( $header );
+	}
+	
+	/**
+	 * Crée une redirection vers la page $location
+	 *
+	 * @param $location string
+	 */
+	public function redirect( $location ) {
+		$this->addHeader( 'Location: ' . $location );
+		// Toujours faire un exit après un header de redirect
+		// sinon le code suivant est exécuté.
+		exit;
+	}
+	
+	/**
+	 * Crée une redirection vers une erreur 404
+	 */
+	public function redirect404() {
+		$this->page = new Page( $this->app() );
+		$this->page->setContentFile( __DIR__ . '/../../Errors/404.html' );
+		$this->addHeader( 'HTTP/1.0 404 Not Found' );
+		$this->send();
+	}
+	
+	/**
+	 * Envoie la page calculée au client
+	 */
+	public function send() {
+		exit( $this->page->getGeneratedPage() );
+	}
+	
+	/**
+	 * Crée un cookie avec setcookie. Attention les valeurs par défaut sont modifiées.
+	 *
+	 * @param string      $name     nom du cookie
+	 * @param string      $value    valeur du cookie
+	 * @param int         $expire   [time() + délai d'expiration] | [mktime date d'expiration]
+	 * @param string|null $path     chemin serveur sur lequel le cookie est disponible (NULL = tout)
+	 * @param string|null $domain   domaine serveur sur lequel le cookie est disponible (NULL = tout)
+	 * @param bool        $secure   indique si le cookie doit être transmis en HTTPS
+	 * @param bool        $httpOnly indique que le cookie n'est accessible que par HTTP
+	 */
+	public function setCookie( $name, $value = '', $expire = 0, $path = null, $domain = null, $secure = false, $httpOnly = true ) {
+		setcookie( $name, $value, $expire, $path, $domain, $secure, $httpOnly );
+	}
+	
+	/**
+	 * Setter pour l'attribut page.
+	 *
+	 * @param $page
+	 */
+	public function setPage( Page $page ) {
+		$this->page = $page;
+	}
 }

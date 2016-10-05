@@ -10,14 +10,26 @@ namespace App\Backend\Modules\News;
 
 use Entity\Comment;
 use Entity\News;
+use Model\CommentsManager;
+use Model\NewsManager;
 use OCFram\BackController;
 use OCFram\HTTPRequest;
 
+/**
+ * Class NewsController
+ *
+ * Contrôleur du module News.
+ *
+ * @package App\Backend\Modules\News
+ */
 class NewsController extends BackController {
 	/**
-	 * Récupère toutes les news disponibles en DB
+	 * Récupère toutes les news disponibles en DB.
 	 */
 	public function executeIndex() {
+		/**
+		 * @var $manager NewsManager
+		 */
 		$manager = $this->managers->getManagerOf( 'News' );
 		$this->page->addVar( 'title', 'Liste des news' );
 		$this->page->addVar( 'listeNews', $manager->getList() );
@@ -25,8 +37,9 @@ class NewsController extends BackController {
 	}
 	
 	/**
+	 * Gère l'insert ou l'update d'une news depuis un formulaire.
+	 *
 	 * @param HTTPRequest $request
-	 * Gère l'insert ou l'update d'une news
 	 */
 	public function processForm( HTTPRequest $request ) {
 		if ( $request->method() ) {
@@ -54,6 +67,9 @@ class NewsController extends BackController {
 			}
 		}
 		else {
+			/**
+			 * @var $manager NewsManager
+			 */
 			$manager = $this->managers->getManagerOf( 'News' );
 			$manager->save( $news );
 		}
@@ -61,8 +77,9 @@ class NewsController extends BackController {
 	}
 	
 	/**
+	 * Insère une news.
+	 *
 	 * @param HTTPRequest $request
-	 * insère une news dans la DB
 	 */
 	public function executeInsert( HTTPRequest $request ) {
 		if ( $request->postExists( 'auteur' ) ) {
@@ -72,10 +89,14 @@ class NewsController extends BackController {
 	}
 	
 	/**
+	 * Met à jour une news.
+	 *
 	 * @param HTTPRequest $request
-	 * met à jour une news
 	 */
 	public function executeUpdate( HTTPRequest $request ) {
+		/**
+		 * @var $manager NewsManager
+		 */
 		if ( $request->postExists( 'auteur' ) ) {
 			$this->processForm( $request );
 		}
@@ -89,29 +110,39 @@ class NewsController extends BackController {
 	}
 	
 	/**
+	 * Supprime une news.
+	 *
 	 * @param HTTPRequest $request
-	 * Supprime une news
 	 */
 	public function executeDelete( HTTPRequest $request ) {
+		/**
+		 * @var $news_manager     NewsManager
+		 * @var $comments_manager CommentsManager
+		 */
 		if ( $request->getExists( 'id' ) ) {
 			throw new \RuntimeException( 'Undefined news to delete' );
 		}
-		$manager = $this->managers->getManagerOf( 'News' );
-		$news    = $manager->getUnique( $request->getData( 'id' ) );
+		$news_manager = $this->managers->getManagerOf( 'News' );
+		$news         = $news_manager->getUnique( $request->getData( 'id' ) );
 		// Suppression des commentaires associés à la news
-		$manager->deleteFromNews( $request->getExists( 'id' ) );
+		$comments_manager = $this->managers->getManagerOf( 'Comments' );
+		$comments_manager->deleteFromNews( $request->getExists( 'id' ) );
 		// Suppression de la news
-		$manager->delete( $news );
+		$news_manager->delete( $news );
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée' );
 		$this->app->httpResponse()->redirect( '.' );
 	}
 	
 	/**
+	 * Met à jour un commentaire.
+	 *
 	 * @param HTTPRequest $request
-	 * Met à jour un commentaire
 	 */
 	public function executeUpdateComment( HTTPRequest $request ) {
+		/**
+		 * @var $manager CommentsManager
+		 */
 		$manager = $this->managers->getManagerOf( 'Comments' );
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		if ( $request->postExists( 'auteur' ) ) {
@@ -135,10 +166,14 @@ class NewsController extends BackController {
 	}
 	
 	/**
+	 * Supprime un commentaire.
+	 *
 	 * @param HTTPRequest $request
-	 * Supprime un commentaire
 	 */
 	public function executeDeleteComment( HTTPRequest $request ) {
+		/**
+		 * @var $manager CommentsManager
+		 */
 		$manager = $this->managers->getManagerOf( 'Comment' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
 		if ( $request->getExists( 'id' ) ) {

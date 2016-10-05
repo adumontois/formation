@@ -20,7 +20,11 @@
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<?php if ( $user->isAuthenticated() ) { ?>
+					<?php
+					/**
+					 * @var $user \OCFram\User
+					 */
+					if ( $user->isAuthenticated() ) { ?>
 						<!-- Aucun problème avec ces liens qui sont redirigés -->
 						<li><a href="/admin/">Admin</a></li>
 						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
@@ -33,9 +37,9 @@
 					<?php if ( $user->hasFlash() ) {
 						echo '<p style="text-align: center;">', $user->getFlash(), '</p>';
 					} ?>
-					
-					<!-- A vérifier -->
-					<?= $content ?>
+
+
+					<?= /** @var $content string Contenu de la page à afficher */ $content ?>
 				</section>
 			</div>
 			

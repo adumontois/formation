@@ -34,11 +34,12 @@
 				<?= htmlspecialchars( $news[ 'titre' ] ) ?>
 			</td>
 			<td>
-				le <?= $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
+				le <?= /** @var $news['dateAjout'] \DateTime (OK) */ $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
 			</td>
 			<td>
 				<?php
 				if ( $news[ 'dateAjout' ] != $news[ 'dateModif' ] ) {
+					/** @var $news['dateAjout'] \DateTime (OK) */
 					echo 'le ' . $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' );
 				}
 				?>

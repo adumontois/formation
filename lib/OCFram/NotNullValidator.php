@@ -8,11 +8,21 @@
 
 namespace OCFram;
 
-
-class NotNullValidator extends Validator
-{
-    public function isValid($value)
-    {
-        return $value != '';
-    }
+/**
+ * Class NotNullValidator
+ * Validateur qui vérifie la contrainte de non nullité d'un champ
+ *
+ * @package OCFram
+ */
+class NotNullValidator extends Validator {
+	/**
+	 * Vérifie si $value n'est pas une chaîne vide.
+	 *
+	 * @param $value string
+	 *
+	 * @return bool
+	 */
+	public function isValid( $value ) {
+		return $value != '';
+	}
 }

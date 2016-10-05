@@ -11,16 +11,16 @@ namespace App\Frontend\Modules\News;
 use Entity\Comment;
 use Entity\News;
 use FormBuilder\CommentFormBuilder;
+use Model\CommentsManager;
 use Model\NewsManager;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
 
 class NewsController extends BackController {
 	/**
-	 * @param HTTPRequest $request
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml
 	 */
-	public function executeIndex( HTTPRequest $request ) {
+	public function executeIndex() {
 		// Récupérer la config
 		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
 		$longueur_news = $this->app()->config()->get( 'longueur_news' );
@@ -52,9 +52,14 @@ class NewsController extends BackController {
 	 * Affiche une news et les commentaires associés
 	 */
 	public function executeShow( HTTPRequest $request ) {
-		$id      = $request->getData( 'id' );
-		$manager = $this->managers->getManagerOf( 'News' );
-		$news    = $manager->getUnique( $id );
+		/**
+		 * @var $news_manager    NewsManager
+		 * @var $news            News
+		 * @var $comment_manager CommentsManager
+		 */
+		$id           = $request->getData( 'id' );
+		$news_manager = $this->managers->getManagerOf( 'News' );
+		$news         = $news_manager->getUnique( $id );
 		
 		if ( empty( $news ) ) // Si la news n'existe pas on redirige
 		{
@@ -63,9 +68,10 @@ class NewsController extends BackController {
 		}
 		
 		// Afficher les commentaires
-		$listeComments = $this->managers->getManagerOf( 'Comments' )->getListOf( $news->id() );
+		$comment_manager = $this->managers->getManagerOf( 'Comments' );
+		$listeComments   = $comment_manager->getListOf( $news->id() );
 		
-		$this->page->addVar( 'titre', $news->titre );
+		$this->page->addVar( 'titre', $news->titre() );
 		$this->page->addVar( 'news', $news );
 		$this->page->addVar( 'listeCommentaires', $listeComments );
 		$this->page->addVar( 'user', $this->app->user() );
@@ -95,7 +101,11 @@ class NewsController extends BackController {
 		
 		if ( $request->method() == 'POST' AND $formulaire->form()->isValid() ) // Si le formulaire est valide, enregistrer le commentaire en DB
 		{
-			$this->managers->getManagerOf( 'Comments' )->save( $commentaire );
+			/**
+			 * @var $comment_manager CommentsManager
+			 */
+			$comment_manager = $this->managers->getManagerOf( 'Comments' );
+			$comment_manager->save( $commentaire );
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
 			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'news' ) . '.html' );
 		}

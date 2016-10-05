@@ -54,7 +54,12 @@ abstract class Application {
 				$vars = explode( ',', $route->getAttribute( 'vars' ) );
 			}
 			// Ajouter la route au routeur les arguments passés
-			$router->addRoute( new Route( $route->getAttribute( 'action' ), $route->getAttribute( 'module' ), $route->getAttribute( 'url' ), $vars ) );
+			$router->addRoute( new Route( array(
+				'action'    => $route->getAttribute( 'action' ),
+				'module'    => $route->getAttribute( 'module' ),
+				'url'       => $route->getAttribute( 'url' ),
+				'varsNames' => $vars,
+			) ) );
 		}
 		
 		// 2) Une fois toutes les routes créées, essayer de router l'URL reçue

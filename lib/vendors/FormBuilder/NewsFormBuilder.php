@@ -13,31 +13,45 @@ use OCFram\NotNullValidator;
 use OCFram\StringField;
 use OCFram\TextField;
 
-
+/**
+ * Class NewsFormBuilder
+ *
+ * Implémente un constructeur de formulaire pour les news.
+ *
+ * @package FormBuilder
+ */
 class NewsFormBuilder extends FormBuilder
 {
+	const AUTHOR_MAX_LENGTH = 50;
+	const TEXTAREA_COLS = 50;
+	const TEXTAREA_ROWS = 7;
+	const TITLE_MAX_LENGTH = 255;
+	
+	/**
+	 * Construit le formulaire de news.
+	 */
     public function build()
     {
         $this -> form -> add(new StringField(array('label' => 'Auteur',
                                                     'name' => 'auteur',
-                                                    'maxLength' => 50,
+                                                    'maxLength' => self::AUTHOR_MAX_LENGTH,
                                                     'validators' => array(
-                                                                        new MaxLengthValidator('Specified author is too long (max = 50 characters)', 50),
+                                                                        new MaxLengthValidator('Specified author is too long (max = '.self::AUTHOR_MAX_LENGTH.' characters)', self::AUTHOR_MAX_LENGTH),
                                                                         new NotNullValidator('Author can\'t be unknown'
                                                                         )))));
 
         $this -> form -> add(new TextField(array('label' => 'Contenu',
                                                     'name' => 'contenu',
-                                                    'rows' => 7,
-                                                    'cols' => 50,
+                                                    'rows' => self::TEXTAREA_ROWS,
+                                                    'cols' => self::TEXTAREA_COLS,
                                                     'validators' => array(new NotNullValidator('Content can\'t be empty'
                                                                             )))));
 
         $this -> form -> add(new StringField(array('label' => 'Titre',
                                                     'name' => 'titre',
-                                                    'maxLength' => 255,
+                                                    'maxLength' => self::TITLE_MAX_LENGTH,
                                                     'validators' => array(
-                                                                        new MaxLengthValidator('Specified title is too long (max = 255 characters)', 255),
+                                                                        new MaxLengthValidator('Specified title is too long (max = '.self::TITLE_MAX_LENGTH.' characters)', self::TITLE_MAX_LENGTH),
                                                                         new NotNullValidator('Title can\'t be undefined'
                                                                         )))));
     }

@@ -14,22 +14,35 @@ use OCFram\NotNullValidator;
 use OCFram\StringField;
 use OCFram\TextField;
 
-
+/**
+ * Class CommentFormBuilder
+ *
+ * Construit un formulaire pour les commentaires.
+ *
+ * @package FormBuilder
+ */
 class CommentFormBuilder extends FormBuilder
 {
+	const AUTHOR_MAX_LENGTH = 50;
+	const TEXTAREA_COLS = 50;
+	const TEXTAREA_ROWS = 7;
+	
+	/**
+	 * Construit le formulaire de commentaires.
+	 */
     public function build()
     {
         $this -> form -> add(new StringField(array('label' => 'Auteur',
                                                     'name' => 'auteur',
-                                                    'maxLength' => 50,
+                                                    'maxLength' => self::AUTHOR_MAX_LENGTH,
                                                     'validators' => array(
-                                                                        new MaxLengthValidator('Specified author is too long (max = 50 characters)', 50),
+                                                                        new MaxLengthValidator('Specified author is too long (max = '.self::AUTHOR_MAX_LENGTH.' characters)', self::AUTHOR_MAX_LENGTH),
                                                                         new NotNullValidator('Author can\'t be unknown'
                                                                         )))));
         $this -> form -> add(new TextField(array('label' => 'Contenu',
                                                     'name' => 'contenu',
-                                                    'rows' => 7,
-                                                    'cols' => 50,
+                                                    'rows' => self::TEXTAREA_ROWS,
+                                                    'cols' => self::TEXTAREA_COLS,
                                                     'validators' => array(new NotNullValidator('Content can\'t be empty'
                                                                         )))));
     }

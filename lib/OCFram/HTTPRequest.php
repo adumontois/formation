@@ -2,74 +2,118 @@
 
 namespace OCFram;
 
-class HTTPRequest extends ApplicationComponent
-{
-	public function cookieData($key)
-	// Retourne le contenu d'un cookie, ou NULL s'il n'est pas défini
+/**
+ * Class HTTPRequest
+ * Classe permettant de récupérer les éléments de la requête du client.
+ *
+ * @package OCFram
+ */
+class HTTPRequest extends ApplicationComponent {
+	/**
+	 * Retourne le contenu du cookie $key, ou NULL s'il n'est pas défini.
+	 *
+	 * @param $key string
+	 *
+	 * @return string|null
+	 */
+	public function cookieData( $key ) //
 	{
-		if ($this -> cookieExists($key))
-		{
-			return (string) $_COOKIE[$key];
+		if ( $this->cookieExists( $key ) ) {
+			return (string)$_COOKIE[ $key ];
 		}
-		return NULL;
-	}
-
-	public function cookieExists($key)
-	// Renvoie un booléen selon que le cookie soit défini ou non
-	{
-		return isset($_COOKIE[$key]);
-	}
-
-    public function getExists($key)
-        // Renvoie un booléen selon que la clé donnée soit assignée en méthode GET ou non
-    {
-        return isset($_GET[$key]);
-    }
-
-	public function getData($key)
-	// Retourne la variable passée en méthode GET demandée, ou NULL si elle n'est pas définie
-	{
-		if ($this -> getExists($key))
-		{
-			return (string) $_GET[$key];
-		}
-		return NULL;
+		
+		return null;
 	}
 	
-	public function method()
-	// Renvoie la méthode d'accès pour envoyer la requête
-	{
-	    if (isset($_SERVER['REQUEST_METHOD']))
-        {
-            return $_SERVER['REQUEST_METHOD'];
-        }
-        return NULL;
+	/**
+	 * Vérifie si le cookie $key est défini ou non.
+	 *
+	 * @param $key string
+	 *
+	 * @return bool
+	 */
+	public function cookieExists( $key ) {
+		return isset( $_COOKIE[ $key ] );
 	}
-
-    public function postExists($key)
-    // Renvoie un booléen selon que la clé donnée soit assignée en méthode POST ou non
-    {
-        return isset($_POST[$key]);
-    }
-
-    public function postData($key)
-        // Retourne la variable passée en méthode POST demandée, ou NULL si elle n'est pas définie
-    {
-        if ($this -> postExists($key))
-        {
-            return (string) $_POST[$key];
-        }
-        return NULL;
-    }
-
-    public function requestURI()
-    // Renvoie l'URI associée à la requête
-    {
-        if (isset($_SERVER['REQUEST_URI']))
-        {
-            return $_SERVER['REQUEST_URI'];
-        }
-        return NULL;
-    }
+	
+	/**
+	 * Vérifie si $_GET[$key] existe.
+	 *
+	 * @param $key string
+	 *
+	 * @return bool
+	 */
+	public function getExists( $key ) {
+		return isset( $_GET[ $key ] );
+	}
+	
+	/**
+	 * Retourne la variable passée en méthode GET demandée, ou NULL si elle n'est pas définie.
+	 *
+	 * @param $key string
+	 *
+	 * @return string|null
+	 */
+	public function getData( $key ) {
+		if ( $this->getExists( $key ) ) {
+			return (string)$_GET[ $key ];
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Renvoie la méthode d'accès pour envoyer la requête (POST, GET...) ou NULL si elle n'est pas définie.
+	 *
+	 * @return string|null
+	 */
+	public function method() //
+	{
+		if ( isset( $_SERVER[ 'REQUEST_METHOD' ] ) ) {
+			return $_SERVER[ 'REQUEST_METHOD' ];
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Vérifie si $_POST[$key] existe.
+	 *
+	 * @param $key string
+	 *
+	 * @return bool
+	 */
+	public function postExists( $key ) //
+	{
+		return isset( $_POST[ $key ] );
+	}
+	
+	/**
+	 * Retourne la variable passée en méthode POST demandée, ou NULL si elle n'est pas définie.
+	 *
+	 * @param $key string
+	 *
+	 * @return string|null
+	 */
+	public function postData( $key ) {
+		if ( $this->postExists( $key ) ) {
+			return (string)$_POST[ $key ];
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Renvoie l'URI associée à la requête ou NULL si elle n'est pas définie.
+	 *
+	 * @return string|null
+	 */
+	public function requestURI() {
+		if ( isset( $_SERVER[ 'REQUEST_URI' ] ) ) {
+			return $_SERVER[ 'REQUEST_URI' ];
+		}
+		
+		return null;
+	}
 }
 
