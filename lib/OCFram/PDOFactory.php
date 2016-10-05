@@ -10,7 +10,7 @@ namespace OCFram;
 
 /**
  * Class PDOFactory
- * Construit un DAO PDO
+ * Construit un DAO PDO.
  *
  * @package OCFram
  */
@@ -22,7 +22,7 @@ class PDOFactory {
 	 *
 	 * @return \PDO
 	 */
-	static public function getPDO( $dbname = 'news' ) {
+	static public function getPDO( $dbname ) {
 		$db = new \PDO( 'mysql:host=localhost;dbname=' . $dbname, 'root', 'root' );
 		$db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
 		

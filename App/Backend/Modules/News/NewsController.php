@@ -30,7 +30,7 @@ class NewsController extends BackController {
 		/**
 		 * @var $manager NewsManager
 		 */
-		$manager = $this->managers->getManagerOf( 'News' );
+		$manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		$this->page->addVar( 'listeNews', $manager->getList() );
 		$this->page->addVar( 'nbNews', $manager->count() );
@@ -70,7 +70,7 @@ class NewsController extends BackController {
 			/**
 			 * @var $manager NewsManager
 			 */
-			$manager = $this->managers->getManagerOf( 'News' );
+			$manager = $this->managers->getManagerOf();
 			$manager->save( $news );
 		}
 		$this->page->addVar( 'news', $news );
@@ -102,7 +102,7 @@ class NewsController extends BackController {
 		}
 		else {
 			// Aller récupérer la news en DB
-			$manager = $this->managers->getManagerOf( 'News' );
+			$manager = $this->managers->getManagerOf();
 			$news    = $manager->getUnique( $request->getData( 'id' ) );
 			$this->page->addVar( 'news', $news );
 		}
@@ -122,7 +122,7 @@ class NewsController extends BackController {
 		if ( $request->getExists( 'id' ) ) {
 			throw new \RuntimeException( 'Undefined news to delete' );
 		}
-		$news_manager = $this->managers->getManagerOf( 'News' );
+		$news_manager = $this->managers->getManagerOf();
 		$news         = $news_manager->getUnique( $request->getData( 'id' ) );
 		// Suppression des commentaires associés à la news
 		$comments_manager = $this->managers->getManagerOf( 'Comments' );

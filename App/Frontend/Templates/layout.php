@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var $user \OCFram\User
+ * @var $content string Contenu de la page à afficher
+ */
+?>
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -21,9 +28,7 @@
 				<ul>
 					<li><a href="/">Accueil</a></li>
 					<?php
-					/**
-					 * @var $user \OCFram\User
-					 */
+
 					if ( $user->isAuthenticated() ) { ?>
 						<!-- Aucun problème avec ces liens qui sont redirigés -->
 						<li><a href="/admin/">Admin</a></li>
@@ -39,7 +44,7 @@
 					} ?>
 
 
-					<?= /** @var $content string Contenu de la page à afficher */ $content ?>
+					<?= $content ?>
 				</section>
 			</div>
 			

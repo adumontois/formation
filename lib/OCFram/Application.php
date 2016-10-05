@@ -8,11 +8,33 @@
 
 namespace OCFram;
 
+/**
+ * Class Application
+ *
+ * Classe modélisant une des applications du site.
+ *
+ * @package OCFram
+ */
 abstract class Application {
+	/**
+	 * @var $httprequest HTTPRequest Requête envoyée par le client
+	 */
 	protected $httpRequest;
+	/**
+	 * @var $httpResponse HTTPResponse Page renvoyée au client par le serveur
+	 */
 	protected $httpResponse;
+	/**
+	 * @var $name string Nom de l'application
+	 */
 	protected $name;
+	/**
+	 * @var $user User Objet donnant les attributs de la session client
+	 */
 	protected $user;
+	/**
+	 * @var $config Config Objet donnant les variables de configuration serveur
+	 */
 	protected $config;
 	
 	/**

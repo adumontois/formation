@@ -8,8 +8,17 @@
 
 namespace OCFram;
 
-
+/**
+ * Class ApplicationComponent
+ *
+ * Modélise un composant de l'application.
+ *
+ * @package OCFram
+ */
 abstract class ApplicationComponent {
+	/**
+	 * @var $app Application
+	 */
 	protected $app;
 	
 	/**

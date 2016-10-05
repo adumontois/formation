@@ -10,7 +10,18 @@ namespace App\Frontend;
 
 use OCFram\Application;
 
+/**
+ * Class FrontendApplication
+ *
+ * Représente l'application de Frontent
+ *
+ * @package App\Frontend
+ */
 class FrontendApplication extends Application {
+	/**
+	 * FrontendApplication constructor.
+	 * Ajoute au constructeur parent le nom de l'application.
+	 */
 	function __construct() {
 		parent::__construct();
 		$this->name = 'Frontend';

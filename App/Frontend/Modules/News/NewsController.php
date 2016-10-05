@@ -20,6 +20,7 @@ class NewsController extends BackController {
 	/**
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml
 	 */
+	
 	public function executeIndex() {
 		// Récupérer la config
 		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
@@ -30,7 +31,7 @@ class NewsController extends BackController {
 		
 		// Récupérer le manager des news
 		/** @var NewsManager $manager */
-		$manager = $this->managers->getManagerOf( 'News' );
+		$manager = $this->managers->getManagerOf();
 		
 		// Récupérer la liste des news à afficher
 		$listeNews = $manager->getList( 0, $nombre_news );
@@ -38,7 +39,9 @@ class NewsController extends BackController {
 		//
 		foreach ( $listeNews as $news ) {
 			// Prendre le nombre de caractères nécessaires
-			/** @var News $news */
+			/**
+			 * @var News $news
+			 */
 			$news->setContenu( substr( $news->contenu(), 0, $longueur_news ) );
 			if ( strlen( $news ) == $longueur_news ) {
 				$news->setContenu( substr( $news->contenu(), 0, strrpos( ' ', $news->contenu() ) ) . '...' );
@@ -68,7 +71,7 @@ class NewsController extends BackController {
 		}
 		
 		// Afficher les commentaires
-		$comment_manager = $this->managers->getManagerOf( 'Comments' );
+		$comment_manager = $this->managers->getManagerOf();
 		$listeComments   = $comment_manager->getListOf( $news->id() );
 		
 		$this->page->addVar( 'titre', $news->titre() );

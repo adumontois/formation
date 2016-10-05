@@ -40,6 +40,8 @@ abstract class BackController extends ApplicationComponent {
 	/**
 	 * Construit un backController comme une composant de l'application.
 	 * Le backController est associé à une action et un module, et construit une vue.
+	 * La classe construisant l'objet DAO asociée à la daoClass doit s'appeler [daoClass]Factory.
+	 * La méthode de cette classe fournissant l'objet DAO doit s'appeler get[DAO}
 	 *
 	 * @param Application $app
 	 * @param string      $module
