@@ -6,4 +6,4 @@
  * Time: 18:19
  */
 
-    require __DIR__.'/../../Frontend/Templates/layout.php';
+require __DIR__ . '/../../Frontend/Templates/layout.php';

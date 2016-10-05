@@ -5,11 +5,14 @@
  * Date: 04/10/2016
  * Time: 10:09
  */
+
+/**
+ * @var $nbNews integer
+ */
 ?>
 
 <p style="text-align: center">
-	Il y a actuellement <?= /** @var $nbNews integer */
-	$nbNews ?> news. En voici la liste :
+	Il y a actuellement <?= $nbNews ?> news. En voici la liste :
 </p>
 
 <table>
@@ -24,7 +27,7 @@
 	/**
 	 * @var $listeNews \Entity\News[]
 	 */
-	foreach ( $listeNews as $news ) {
+	foreach ( $listeNews as $news ):
 		?>
 		<tr>
 			<td>
@@ -34,14 +37,13 @@
 				<?= htmlspecialchars( $news[ 'titre' ] ) ?>
 			</td>
 			<td>
-				le <?= /** @var $news['dateAjout'] \DateTime (OK) */ $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
+				le <?= 	$news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
 			</td>
 			<td>
 				<?php
-				if ( $news[ 'dateAjout' ] != $news[ 'dateModif' ] ) {
-					/** @var $news['dateAjout'] \DateTime (OK) */
+				if ( $news[ 'dateAjout' ] != $news[ 'dateModif' ] ):
 					echo 'le ' . $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' );
-				}
+				endif;
 				?>
 			</td>
 			<td>
@@ -50,6 +52,6 @@
 			</td>
 		</tr>
 		<?php
-	}
+	endforeach;
 	?>
 </table>

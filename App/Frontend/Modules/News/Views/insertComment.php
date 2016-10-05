@@ -6,9 +6,9 @@
  * Time: 16:49
  */
 
-/** @var $form string
- * Formulaire d'ajout de commentaire
- * */
+/**
+ * @var $form string Formulaire d'ajout de commentaire
+ */
 ?>
 
 <h2>
