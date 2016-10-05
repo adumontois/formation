@@ -9,6 +9,7 @@
 namespace Model;
 
 use Entity\Comment;
+use OCFram\Entity;
 
 /**
  * Class CommentsManagerPDO
@@ -21,11 +22,12 @@ class CommentsManagerPDO extends CommentsManager {
 	/**
 	 * Ajoute un nouveau commentaire en DB.
 	 *
-	 * @param Comment $comment
+	 * @param Entity $comment Commentaire à insérer
 	 */
-	protected function add( Comment $comment ) {
+	protected function add( Entity $comment ) {
 		/**
 		 * @var $query \PDOStatement
+		 * @var $comment Comment
 		 */
 		$sql = 'INSERT INTO comments
                     (news, auteur, contenu, date)
@@ -42,11 +44,12 @@ class CommentsManagerPDO extends CommentsManager {
 	/**
 	 * Met à jour un commentaire existant en DB.
 	 *
-	 * @param Comment $comment
+	 * @param Entity $comment
 	 */
-	protected function modify( Comment $comment ) {
+	protected function modify( Entity $comment ) {
 		/**
 		 * @var $query \PDOStatement
+		 * @var $comment Comment
 		 */
 		$sql = 'UPDATE FROM comments
                 SET news = :news, auteur = :auteur, contenu = :contenu

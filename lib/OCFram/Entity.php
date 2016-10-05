@@ -33,6 +33,13 @@ abstract class Entity implements \ArrayAccess {
 	}
 	
 	/**
+	 * Vérifie si l'entité est valide.
+	 *
+	 * @return bool
+	 */
+	abstract public function isValid();
+		
+	/**
 	 * Indique si l'objet est déjà inséré en base. Renvoie vrai si l'objet n'est pas inséré, faux sinon.
 	 * @return bool
 	 */

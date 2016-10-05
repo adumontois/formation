@@ -20,39 +20,6 @@ use OCFram\Manager;
  */
 abstract class CommentsManager extends Manager {
 	/**
-	 * Insère ou met à jour en DB un commentaire, selon s'il existe déjà ou non.
-	 *
-	 * @param Comment $comment
-	 */
-	public function save( Comment $comment ) {
-		if ( $comment->isValid() ) {
-			if ( $comment->object_new() ) {
-				$this->add( $comment );
-			}
-			else {
-				$this->modify( $comment );
-			}
-		}
-		else {
-			throw new \RuntimeException( 'Invalid comment, it couldn\'t be registered' );
-		}
-	}
-	
-	/**
-	 * Ajoute un nouveau commentaire en DB.
-	 *
-	 * @param Comment $comment
-	 */
-	abstract protected function add( Comment $comment );
-	
-	/**
-	 * Met à jour un commentaire existant en DB.
-	 *
-	 * @param Comment $comment
-	 */
-	abstract protected function modify( Comment $comment );
-	
-	/**
 	 * Récupère tous les commentaires associés à la news d'id passé en paramètre
 	 *
 	 * @param $id int ID de la news

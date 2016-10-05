@@ -49,39 +49,6 @@ abstract class NewsManager extends Manager {
 	abstract public function count();
 	
 	/**
-	 * Insère ou met à jour la news en DB selon qu'elle existe déjà ou non en base.
-	 *
-	 * @param News $news
-	 */
-	public function save( News $news ) {
-		if ( !$news->isValid() ) {
-			throw new \RuntimeException( 'Couldn\'t save the news : invalid news given' );
-		}
-		else {
-			if ( $news->object_new() ) {
-				$this->add( $news );
-			}
-			else {
-				$this->modify( $news );
-			}
-		}
-	}
-	
-	/**
-	 * Insère la news passée en paramètre en DB.
-	 *
-	 * @param News $news
-	 */
-	abstract public function add( News $news );
-	
-	/**
-	 * Met à jour la news passée en paramètre en DB.
-	 *
-	 * @param News $news
-	 */
-	abstract public function modify( News $news );
-	
-	/**
 	 * Supprime la news d'id donné de la DB.
 	 *
 	 * @param $id int

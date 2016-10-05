@@ -10,6 +10,7 @@
 namespace Model;
 
 use Entity\News;
+use OCFram\Entity;
 
 /**
  * Class NewsManagerPDO
@@ -102,11 +103,12 @@ class NewsManagerPDO extends NewsManager {
 	/**
 	 * Insère la news passée en paramètre en DB.
 	 *
-	 * @param News $news
+	 * @param Entity $news News à insérer
 	 */
-	public function add( News $news ) {
+	protected function add( Entity $news ) {
 		/**
 		 * @var $query \PDOStatement
+		 * @var $news News
 		 */
 		$sql   = 'INSERT INTO news (auteur, titre, contenu, dateAjout, dateModif)
                     VALUES (:auteur, :titre, :contenu, NOW(), NOW())';
@@ -120,11 +122,12 @@ class NewsManagerPDO extends NewsManager {
 	/**
 	 * Met à jour la news passée en paramètre en DB.
 	 *
-	 * @param News $news
+	 * @param Entity $news News à modifier
 	 */
-	public function modify( News $news ) {
+	protected function modify( Entity $news ) {
 		/**
 		 * @var $query \PDOStatement
+		 * @var $news News
 		 */
 		$sql   = 'UPDATE news
                 SET auteur = :auteur, titre = :titre, contenu = :contenu, dateModif = NOW()
