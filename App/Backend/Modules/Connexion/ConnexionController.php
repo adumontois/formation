@@ -31,7 +31,7 @@ class ConnexionController extends BackController {
 	 *
 	 * @param HTTPRequest $request
 	 */
-	public function executeIndex( HTTPRequest $request ) {
+	public function executeBuildIndex( HTTPRequest $request ) {
 		if ( $request->postExists( 'login' ) ) {
 			if ( $request->postData( 'login' ) === $this->app->config()->get( 'login' ) AND $request->postData( 'password' ) === $this->app->config()->get( 'password' ) ) {
 				$this->app->user()->setAuthenticated();
@@ -41,5 +41,15 @@ class ConnexionController extends BackController {
 				$this->app->user()->setFlash( 'Login-password combination is incorrect.' );
 			}
 		}
+	}
+	
+	/**
+	 * Déconnecte un utilisateur adminstrateur et redirige vers l'accueil du site
+	 */
+	public function	executeClearConnection() {
+		$this->app->user()->setAuthenticated(false);
+		$this->app->user()->setFlash(' You were disconnected from admin interface of monsupersite.');
+		// On redirige vers la racine
+		$this->app->httpResponse()->redirect('../');
 	}
 }

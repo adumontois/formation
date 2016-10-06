@@ -27,7 +27,7 @@ class BackendApplication extends Application {
 		}
 		else // Sinon on récupère le contrôleur d'authentification
 		{
-			$controller = new Modules\Connexion\ConnexionController( $this, 'Connexion', 'index' );
+			$controller = new Modules\Connexion\ConnexionController( $this, 'Connexion', 'buildIndex' );
 		}
 		$controller->execute();
 		$this->httpResponse()->setPage( $controller->page() );
