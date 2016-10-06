@@ -14,6 +14,7 @@ use FormBuilder\CommentFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
 use \OCFram\BackController;
+use OCFram\FormHandler;
 use \OCFram\HTTPRequest;
 
 class NewsController extends BackController {
@@ -101,22 +102,16 @@ class NewsController extends BackController {
 		$formulaire = new CommentFormBuilder( $commentaire );
 		// 2) Construction et vérification des données
 		$formulaire->build();
+		$form = $formulaire->form();
 		
-		if ( $request->method() == 'POST' AND $formulaire->form()->isValid() ) // Si le formulaire est valide, enregistrer le commentaire en DB
+		// Sauvegarde avec le handler
+		$formHandler = new FormHandler($form, $this->managers->getManagerOf('Comments'), $request);
+		if ( $formHandler->process() )
 		{
-			/**
-			 * @var $comment_manager CommentsManager
-			 */
-			$comment_manager = $this->managers->getManagerOf( 'Comments' );
-			$comment_manager->save( $commentaire );
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
 			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'news' ) . '.html' );
 		}
-		else {
-			$this->page->addVar( 'erreurs', $commentaire->erreurs() );
-		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
-		$this->page->addVar( 'comment', $commentaire );
 		// Passer le formulaire à la vue
 		$this->page->addVar( 'form', $formulaire->form()->createView() );
 	}

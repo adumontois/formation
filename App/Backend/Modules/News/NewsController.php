@@ -15,6 +15,7 @@ use FormBuilder\NewsFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
 use OCFram\BackController;
+use OCFram\FormHandler;
 use OCFram\HTTPRequest;
 
 /**
@@ -60,10 +61,9 @@ class NewsController extends BackController {
 			}
 		}
 		else {
-			if ($request -> getExists('id'))
-			{
+			if ( $request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
-				$news = $manager->getUnique('id');
+				$news = $manager->getUnique( 'id' );
 			}
 			else {
 				$news = new News();
@@ -71,21 +71,22 @@ class NewsController extends BackController {
 		}
 		
 		// Construction du formulaire
-		$FormBuilder = new NewsFormBuilder($news);
+		$FormBuilder = new NewsFormBuilder( $news );
 		$FormBuilder->build();
 		$form = $FormBuilder->form();
 		
-		if ( $request->method() == 'POST' AND $form->isValid() ) {
+		// Sauvegarder avec le FormHandler
+		$FormHandler = new FormHandler( $form, $manager, $request );
+		if ( $FormHandler->process() ) {
 			if ( $news->object_new() ) {
 				$this->app->user()->setFlash( 'La news a été correctement ajoutée' );
 			}
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée' );
 			};
-			$manager->save( $news );
-			$this->app->httpResponse()->redirect('/admin');
+			$this->app->httpResponse()->redirect( '/admin' );
 		}
-		$this->page->addVar('form', $form -> createView());
+		$this->page->addVar( 'form', $form->createView() );
 	}
 	
 	/**
@@ -143,7 +144,7 @@ class NewsController extends BackController {
 		 */
 		$manager = $this->managers->getManagerOf( 'Comments' );
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
-		if ($request->method() == 'POST') {
+		if ( $request->method() == 'POST' ) {
 			$comment = new Comment( array(
 				'id'      => $request->getData( 'id' ),
 				'auteur'  => $request->postData( 'auteur' ),
@@ -156,17 +157,19 @@ class NewsController extends BackController {
 		}
 		
 		// Construire le formulaire
-		$formBuilder = new CommentFormBuilder($comment);
-		$formBuilder ->build();
+		$formBuilder = new CommentFormBuilder( $comment );
+		$formBuilder->build();
 		$form = $formBuilder->form();
-		if ( $request->method() == 'POST' AND $form->isValid() ) {
-			$manager->save( $comment );
-			$this->app->user()->setFlash('Le commentaire a été correctement modifié');
+		
+		// Sauvegarder avec le FormHandler
+		$formHandler = new FormHandler( $form, $manager, $request );
+		if ( $formHandler->process() ) {
+			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
 			// Redirection vers l'accueil d'administration
 			$this->app->httpResponse()->redirect( '/admin' );
 		}
-		$this->page->addVar( 'form', $form ->createView() );
-}
+		$this->page->addVar( 'form', $form->createView() );
+	}
 	
 	/**
 	 * Supprime un commentaire.
