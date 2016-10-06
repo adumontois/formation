@@ -18,27 +18,32 @@ class ConnexionController extends BackController {
 	 * ConnexionController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
 	 *
-	 * @param Application $app
+	 * @param Application $App
 	 * @param string      $module
 	 * @param string      $action
 	 */
-	public function __construct( Application $app, $module, $action ) {
-		parent::__construct( $app, $module, $action, 'news' );
+	
+	const DATABASE                 = 'news';
+	const DISCONNECTION_SUCCESSFUL = 'You were disconnected from admin interface of Mon super site.';
+	const REFUSED_CONNECTION = 'Login-password combination is incorrect.';
+	
+	public function __construct( Application $App, $module, $action ) {
+		parent::__construct( $App, $module, $action, self::DATABASE );
 	}
 	
 	/**
 	 * Vérifie si les identifiants de connexion sont corrects, et redirige vers l'accueil d'administration si c'est le cas.
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeBuildIndex( HTTPRequest $request ) {
-		if ( $request->postExists( 'login' ) ) {
-			if ( $request->postData( 'login' ) === $this->app->config()->get( 'login' ) AND $request->postData( 'password' ) === $this->app->config()->get( 'password' ) ) {
+	public function executeBuildIndex( HTTPRequest $Request ) {
+		if ( $Request->postExists( 'login' ) ) {
+			if ( $Request->postData( 'login' ) === $this->app->config()->get( 'login' ) AND $Request->postData( 'password' ) === $this->app->config()->get( 'password' ) ) {
 				$this->app->user()->setAuthenticated();
 				$this->app->httpResponse()->redirect( '.' );
 			}
 			else {
-				$this->app->user()->setFlash( 'Login-password combination is incorrect.' );
+				$this->app->user()->setFlash( self::REFUSED_CONNECTION );
 			}
 		}
 	}
@@ -46,10 +51,10 @@ class ConnexionController extends BackController {
 	/**
 	 * Déconnecte un utilisateur adminstrateur et redirige vers l'accueil du site
 	 */
-	public function	executeClearConnection() {
-		$this->app->user()->setAuthenticated(false);
-		$this->app->user()->setFlash(' You were disconnected from admin interface of monsupersite.');
+	public function executeClearConnection() {
+		$this->app->user()->setAuthenticated( false );
+		$this->app->user()->setFlash( self::DISCONNECTION_SUCCESSFUL );
 		// On redirige vers la racine
-		$this->app->httpResponse()->redirect('../');
+		$this->app->httpResponse()->redirect( '../' );
 	}
 }

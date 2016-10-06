@@ -7,13 +7,15 @@
  */
 
 /**
+ * @var $T_NEWS_PUTINSERTNEWS_HEAD string en-tête (ajout ou modif) du formulaire
+ * @var $T_NEWS_PUTINSERTNEWS_FORM string contenu du formulaire à afficher
  * @var $form string Code HTML du formulaire de création de news
  */
 ?>
-<h2>Ajouter une news</h2>
+<h2><?= $T_NEWS_PUTINSERTNEWS_HEAD ?></h2>
 <form action="" method="post">
 	<p>
-		<?= $form ?>
+		<?= $T_NEWS_PUTINSERTNEWS_FORM ?>
 		<input type="submit" value="Ajouter" />
 	</p>
 </form>

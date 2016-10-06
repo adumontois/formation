@@ -37,7 +37,6 @@ class NewsController extends BackController {
 	 * @param string      $action
 	 */
 	const DATABASE = 'news';
-	
 	const BUILDINDEX_LOCATION = '/admin/';
 	
 	public function __construct( Application $App, $module, $action) {
@@ -109,18 +108,32 @@ class NewsController extends BackController {
 			};
 			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
 		}
-		$this->page->addVar('form', $Form->createView() );
-		$this->page->addVar('news', $News);
+
+		
+		if (!$Request->getExists( 'id' ))
+		{
+			$this->page->addVar( 'title', 'Insertion d\'une news' );
+			$this->page->addVar( 'T_NEWS_PUTINSERTNEWS_HEAD', 'Ajouter une news' );
+			$this->page->addVar('T_NEWS_PUTINSERTNEWS_FORM', $Form->createView() );
+			$this->page->addVar('T_NEWS_PUTINSERTNEWS_NEWS', $News);
+		}
+		else
+		{
+			$this->page->addVar( 'title', 'Modification d\'une news' );
+			$this->page->addVar( 'T_NEWS_PUTUPDATENEWS_HEAD', 'Modifier une news' );
+			$this->page->addVar('T_NEWS_PUTUPDATENEWS_FORM', $Form->createView() );
+			$this->page->addVar('T_NEWS_PUTUPDATENEWS_NEWS', $News);
+		}
 	}
+	
 	
 	/**
 	 * Insère une news.
 	 *
 	 * @param HTTPRequest $request
 	 */
-	public function executeInsert( HTTPRequest $request ) {
+	public function executePutInsertNews( HTTPRequest $request ) {
 		$this->processForm( $request );
-		$this->page->addVar( 'title', 'Insertion d\'une news' );
 	}
 	
 	/**
@@ -128,9 +141,8 @@ class NewsController extends BackController {
 	 *
 	 * @param HTTPRequest $request
 	 */
-	public function executeUpdate( HTTPRequest $request ) {
+	public function executePutUpdateNews( HTTPRequest $request ) {
 		$this->processForm( $request );
-		$this->page->addVar( 'title', 'Modification d\'une news' );
 	}
 	
 	/**
