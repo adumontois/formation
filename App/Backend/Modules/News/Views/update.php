@@ -8,12 +8,16 @@
 
 /**
  * @var $form string Code HTML du formulaire de création de news
+ * @var $news \Entity\News News à modifier
  */
 ?>
-<h2>Ajouter une news</h2>
+	
+<h2>Modifier une news</h2>
+
 <form action="" method="post">
 	<p>
 		<?= $form ?>
-		<input type="submit" value="Ajouter" />
+		<input type="hidden" name="id" value="<?= $news[ 'id' ] ?>" />
+		<input type="submit" value="Modifier" name="modifier" />
 	</p>
 </form>
