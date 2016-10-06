@@ -63,7 +63,9 @@ class Router {
 					}
 				}
 				$route->setVars( $listVars );
-				
+			}
+			// Si c'est la bonne route, la renvoyer
+			if ( $varsValues !== false ) {
 				return $route;
 			}
 		}

@@ -89,6 +89,7 @@ abstract class Application {
 			/**
 			 * @var $route \OCFram\Route
 			 */
+			var_dump($this->httpRequest->requestURI());
 			$route = $router->getRoute( $this->httpRequest()->requestURI() );
 			
 			// 3) Ajouter les variables lues dans l'url au tableau _GET
