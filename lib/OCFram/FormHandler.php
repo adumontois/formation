@@ -49,6 +49,7 @@ class FormHandler {
 	 * @return bool
 	 */
 	public function process() {
+		
 		if ( $this->request->method() == 'POST' AND $this->form->isValid() ) {
 			$this->manager->save( $this->form->entity() );
 			

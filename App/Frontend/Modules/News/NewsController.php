@@ -124,7 +124,7 @@ class NewsController extends BackController {
 		$formHandler = new FormHandler( $form, $this->managers->getManagerOf( 'Comments' ), $request );
 		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'id' ) . '.html' );
+			//$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'id' ) . '.html' );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

@@ -50,6 +50,7 @@ abstract class Manager {
 	 *
 	 */
 	final public function save( Entity $object ) {
+		
 		if ( $object->isValid() ) {
 			if ( $object->object_new() ) {
 				

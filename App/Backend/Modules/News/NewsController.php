@@ -199,7 +199,7 @@ class NewsController extends BackController {
 		/**
 		 * @var $manager CommentsManager
 		 */
-		$manager = $this->managers->getManagerOf( 'Comment' );
+		$manager = $this->managers->getManagerOf( 'Comments' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
 		if ( !$request->getExists( 'id' ) ) {
 			throw new \RuntimeException( 'Undefined comment to delete' );
