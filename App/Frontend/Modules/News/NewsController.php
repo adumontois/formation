@@ -47,12 +47,7 @@ class NewsController extends BackController {
 		$manager = $this->managers->getManagerOf();
 		
 		// Récupérer la liste des news à afficher
-		//try {
-			$listeNews = $manager->getList( 0, $nombre_news );
-		/*}
-		catch ( \PDOException $e ) {
-			$this->app->httpResponse()->redirectError( 503, $e );
-		}*/
+		$listeNews = $manager->getList( 0, $nombre_news );
 		
 		//
 		foreach ( $listeNews as $news ) {
@@ -124,7 +119,7 @@ class NewsController extends BackController {
 		$formHandler = new FormHandler( $form, $this->managers->getManagerOf( 'Comments' ), $request );
 		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			//$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'id' ) . '.html' );
+			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'id' ) . '.html' );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

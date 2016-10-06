@@ -166,6 +166,7 @@ class NewsController extends BackController {
 		if ( $request->method() == 'POST' ) {
 			$comment = new Comment( array(
 				'id'      => $request->getData( 'id' ),
+				'news'	  => $request->postData( 'news'),
 				'auteur'  => $request->postData( 'auteur' ),
 				'contenu' => $request->postData( 'contenu' ),
 			) );
@@ -185,9 +186,10 @@ class NewsController extends BackController {
 		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
 			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( '/admin/' );
+			//$this->app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->page->addVar( 'form', $form->createView() );
+		$this->page->addVar('comment', $comment);
 	}
 	
 	/**

@@ -51,10 +51,9 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $query \PDOStatement
 		 * @var $comment Comment
 		 */
-		$sql = 'UPDATE FROM comment
+		$sql = 'UPDATE comment
                 SET news = :news, auteur = :auteur, contenu = :contenu
                 WHERE id = :id';
-		
 		$query = $this->dao->prepare( $sql );
 		$query->bindValue( ':news', $comment->news(), \PDO::PARAM_INT );
 		$query->bindValue( ':auteur', $comment->auteur(), \PDO::PARAM_STR );
@@ -121,7 +120,6 @@ class CommentsManagerPDO extends CommentsManager {
 		$query->execute();
 		$comment = $query->fetch();
 		$query->closeCursor();
-		
 		return $comment;
 	}
 	
