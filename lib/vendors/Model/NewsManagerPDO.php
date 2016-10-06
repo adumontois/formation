@@ -68,8 +68,8 @@ class NewsManagerPDO extends NewsManager {
 		/**
 		 * @var $query \PDOStatement
 		 */
-		if ( $id < 0 ) {
-			return null;
+		if ( $id <= 0 ) {
+			throw new \InvalidArgumentException('getUnique method expects a positive integer');
 		}
 		$sql   = 'SELECT id, auteur, titre, contenu, dateAjout, dateModif
                 FROM news
@@ -139,7 +139,7 @@ class NewsManagerPDO extends NewsManager {
 		$query->bindValue( ':auteur', $news->auteur(), \PDO::PARAM_STR );
 		$query->bindValue( ':titre', $news->titre(), \PDO::PARAM_STR );
 		$query->bindValue( ':contenu', $news->contenu(), \PDO::PARAM_STR );
-		$query->execute( $sql );
+		$query->execute();
 	}
 	
 	/**

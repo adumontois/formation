@@ -82,7 +82,7 @@ class NewsController extends BackController {
 		else {
 			if ( $request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
-				$news = $manager->getUnique( 'id' );
+				$news = $manager->getUnique( $request->getData('id') );
 			}
 			else {
 				$news = new News();
@@ -92,8 +92,7 @@ class NewsController extends BackController {
 		// Construction du formulaire
 		$FormBuilder = new NewsFormBuilder( $news );
 		$FormBuilder->build();
-		$form = $FormBuilder->form();
-		
+		$form = $FormBuilder->form();;
 		// Sauvegarder avec le FormHandler
 		$FormHandler = new FormHandler( $form, $manager, $request );
 		if ( $FormHandler->process() ) {
@@ -106,6 +105,7 @@ class NewsController extends BackController {
 			$this->app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->page->addVar( 'form', $form->createView() );
+		$this->page->addVar('news', $news);
 	}
 	
 	/**
@@ -138,7 +138,7 @@ class NewsController extends BackController {
 		 * @var $news_manager     NewsManager
 		 * @var $comments_manager CommentsManager
 		 */
-		if ( $request->getExists( 'id' ) ) {
+		if ( !$request->getExists( 'id' ) ) {
 			throw new \RuntimeException( 'Undefined news to delete' );
 		}
 		$news_manager = $this->managers->getManagerOf();
@@ -185,7 +185,7 @@ class NewsController extends BackController {
 		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
 			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( '/admin' );
+			$this->app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->page->addVar( 'form', $form->createView() );
 	}

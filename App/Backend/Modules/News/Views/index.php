@@ -47,11 +47,13 @@
 				?>
 			</td>
 			<td>
-				<a href= <?= 'news-update-' . $news[ 'id' ] . '.html' ?>><img src="/Web/images/update.png" alt="Modifier" /></a>
-				<a href= <?= 'news-delete-' . $news[ 'id' ] . '.html' ?>><img src="/Web/images/delete.png" alt="Supprimer" /></a>
+				<a href= <?= 'news-update-' . $news[ 'id' ] . '.html' ?>><img src="../images/update.png" alt="Modifier" /></a>
+				<a href= <?= 'news-delete-' . $news[ 'id' ] . '.html' ?>><img src="../images/delete.png" alt="Supprimer" /></a>
 			</td>
 		</tr>
 		<?php
 	endforeach;
 	?>
 </table>
+
+<?php
