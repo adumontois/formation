@@ -21,7 +21,6 @@ class NewsController extends BackController {
 	/**
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml
 	 */
-	
 	public function executeIndex() {
 		// Récupérer la config
 		$nombre_news   = $this->app()->config()->get( 'nombre_news' );

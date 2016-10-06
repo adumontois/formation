@@ -1,2 +1,3 @@
 <?php
-header( 'Location: bootstrap.php' );
+//header( 'Location: bootstrap.php' );
+echo 'Hello world JJJ !';
