@@ -67,7 +67,6 @@ abstract class Field {
 	 * @return bool
 	 */
 	public function isValid() {
-		//var_dump($this->validators());
 		foreach ( $this->validators as $validator ) {
 			if ( !$validator->isValid( $this->value ) ) {
 				$this->errorMessage = $validator->errorMessage();

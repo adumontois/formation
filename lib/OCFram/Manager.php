@@ -51,9 +51,6 @@ abstract class Manager {
 	 */
 	final public function save( Entity $object ) {
 		if ( !$object->isValid() ) {
-			throw new \RuntimeException( 'Couldn\'t save the '.get_class($object).' : invalid '.get_class($object).' given' );
-		}
-		else {
 			if ( $object->object_new() ) {
 				$this->add( $object );
 			}

@@ -29,7 +29,7 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $query \PDOStatement
 		 * @var $comment Comment
 		 */
-		$sql = 'INSERT INTO comments
+		$sql = 'INSERT INTO comment
                     (news, auteur, contenu, date)
                 VALUES (:news, :auteur, :contenu, NOW())';
 		
@@ -51,7 +51,7 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $query \PDOStatement
 		 * @var $comment Comment
 		 */
-		$sql = 'UPDATE FROM comments
+		$sql = 'UPDATE FROM comment
                 SET news = :news, auteur = :auteur, contenu = :contenu
                 WHERE id = :id';
 		
@@ -80,12 +80,12 @@ class CommentsManagerPDO extends CommentsManager {
 		}
 		
 		$sql = 'SELECT id, news, auteur, contenu, date
-                FROM comments
+                FROM comment
                 WHERE news = :news
                 ORDER BY id DESC';
 		
 		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', $id, \PDO::PARAM_INT );
+		$query->bindValue( ':news', $id, \PDO::PARAM_INT );
 		$query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
 		$query->execute();
 		$listeComments = $query->fetchAll();
@@ -113,7 +113,7 @@ class CommentsManagerPDO extends CommentsManager {
 		}
 		
 		$sql   = 'SELECT id, news, auteur, contenu, date
-                FROM comments
+                FROM comment
                 WHERE id = :id';
 		$query = $this->dao->prepare( $sql );
 		$query->bindValue( ':id', $id, \PDO::PARAM_INT );
@@ -134,7 +134,7 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $query \PDOStatement
 		 */
-		$sql   = 'DELETE FROM comments
+		$sql   = 'DELETE FROM comment
                 WHERE id = :id';
 		$query = $this->dao->prepare( $sql );
 		$query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
@@ -150,7 +150,7 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $query \PDOStatement
 		 */
-		$sql   = 'DELETE FROM comments
+		$sql   = 'DELETE FROM comment
                 WHERE news = :id';
 		$query = $this->dao->prepare( $sql );
 		$query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );

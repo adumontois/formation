@@ -61,7 +61,7 @@ class NewsController extends BackController {
 			 * @var News $news
 			 */
 			$news->setContenu( substr( $news->contenu(), 0, $longueur_news ) );
-			if ( strlen( $news ) == $longueur_news ) {
+			if ( strlen( $news->contenu() ) == $longueur_news ) {
 				$news->setContenu( substr( $news->contenu(), 0, strrpos( ' ', $news->contenu() ) ) . '...' );
 			}
 		}
@@ -79,7 +79,7 @@ class NewsController extends BackController {
 		 * @var $comment_manager CommentsManager
 		 */
 		$id           = $request->getData( 'id' );
-		$news_manager = $this->managers->getManagerOf( 'News' );
+		$news_manager = $this->managers->getManagerOf();
 		$news         = $news_manager->getUnique( $id );
 		
 		if ( empty( $news ) ) // Si la news n'existe pas on redirige
@@ -89,7 +89,7 @@ class NewsController extends BackController {
 		}
 		
 		// Afficher les commentaires
-		$comment_manager = $this->managers->getManagerOf();
+		$comment_manager = $this->managers->getManagerOf('Comments');
 		$listeComments   = $comment_manager->getListOf( $news->id() );
 		
 		$this->page->addVar( 'titre', $news->titre() );
@@ -105,7 +105,7 @@ class NewsController extends BackController {
 	public function executeInsertComment( HTTPRequest $request ) {
 		if ( $request->method() == 'POST' ) {
 			$commentaire = new Comment( array(
-				'news'    => $request->getData( 'news' ),
+				'news'    => $request->getData( 'id' ),
 				'auteur'  => $request->postData( 'auteur' ),
 				'contenu' => $request->postData( 'contenu' ),
 			) );
@@ -113,7 +113,6 @@ class NewsController extends BackController {
 		else {
 			$commentaire = new Comment();
 		}
-		
 		// Construction du formulaire
 		// 1) Données values
 		$formulaire = new CommentFormBuilder( $commentaire );
@@ -125,7 +124,7 @@ class NewsController extends BackController {
 		$formHandler = new FormHandler( $form, $this->managers->getManagerOf( 'Comments' ), $request );
 		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'news' ) . '.html' );
+			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'id' ) . '.html' );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

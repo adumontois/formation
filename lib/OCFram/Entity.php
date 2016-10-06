@@ -135,8 +135,8 @@ abstract class Entity implements \ArrayAccess {
 	 * @param $id int strictement positif
 	 */
 	public function setId( $id ) {
-		if ( is_int( $id ) AND $id > 0 ) {
-			$this->id = $id;
+		if ( (int) $id > 0 ) {
+			$this->id = (int) $id;
 		}
 	}
 }

@@ -27,7 +27,6 @@ class Managers {
 	 * @var $managers Manager[]
 	 */
 	protected $managers;
-	
 	// For use of debug_backtrace to get class caller name
 	const CALLER_LEVEL = 1;
 	
@@ -51,24 +50,26 @@ class Managers {
 	 *
 	 * @return Manager
 	 */
-	public function getManagerOf( $module = NULL) {
+	public function getManagerOf( $module = null ) {
 		// Récupérer l'entité associée à la classe appelante si on ne l'a pas déclaré précisément.
-		if (NULL === $module)
-		{
-			$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['class'];
-			$module = substr($caller, 0, strrpos($caller, 'Controller')); // Récupérer le nom de l'entité
-			$module = 'Model\\'.substr($module, strrpos($module, '\\')+1); // Construire le chemin relatif depuis le dossier vendors
+		if ( null === $module ) {
+			$caller = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 )[ 1 ][ 'class' ];
+			// Récupérer le nom de l'entité
+			$module = substr( $caller, 0, strrpos( $caller, 'Controller' ) );
+			$module = substr( $module, strrpos( $module, '\\' ) + 1 );
 		}
-		
 		if ( !is_string( $module ) OR empty( $module ) ) {
 			throw new \InvalidArgumentException( 'Module must be a valid string' );
 		}
 		
+		// Construire le chemin relatif depuis le dossier vendors
+		$module = 'Model\\' . $module;
+		
 		if ( !isset( $this->managers[ $module ] ) ) {
-
 			$manager                   = $module . 'Manager' . $this->api;
 			$this->managers[ $module ] = new $manager( $this->dao );
 		}
+		
 		return $this->managers[ $module ];
 	}
 }

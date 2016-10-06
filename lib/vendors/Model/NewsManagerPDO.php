@@ -104,6 +104,7 @@ class NewsManagerPDO extends NewsManager {
 	/**
 	 * Insère la news passée en paramètre en DB.
 	 *
+	 *
 	 * @param Entity $news News à insérer
 	 */
 	protected function add( Entity $news ) {

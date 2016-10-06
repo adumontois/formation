@@ -82,7 +82,7 @@ class Comment extends Entity {
 	 * @param $news int
 	 */
 	public function setNews( $news ) {
-		if ( !is_int( $news ) ) {
+		if ( (int)$news <= 0 ) {
 			$this->erreurs[] = self::INVALID_NEWS;
 		}
 		else {
