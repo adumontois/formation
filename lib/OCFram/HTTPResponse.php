@@ -20,6 +20,9 @@ class HTTPResponse extends ApplicationComponent {
 	 */
 	protected $page;
 	
+	const NOT_FOUND = 404;
+	const SERVICE_TEMPORARY_UNAVAILABLE = 503;
+	
 	/**
 	 * Ajoute le header spécifié en paramètre
 	 *

@@ -18,6 +18,7 @@ use OCFram\Application;
 use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
+use OCFram\HTTPResponse;
 
 /**
  * Class NewsController
@@ -31,81 +32,85 @@ class NewsController extends BackController {
 	 * NewsController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
 	 *
-	 * @param Application $app
+	 * @param Application $App
 	 * @param string      $module
 	 * @param string      $action
 	 */
-	public function __construct( Application $app, $module, $action) {
-		parent::__construct( $app, $module, $action, 'news');
+	const DATABASE = 'news';
+	
+	const BUILDINDEX_LOCATION = '/admin/';
+	
+	public function __construct( Application $App, $module, $action) {
+		parent::__construct( $App, $module, $action, self::DATABASE);
 	}
 	
 	/**
 	 * Récupère toutes les news disponibles en DB.
 	 */
-	public function executeIndex() {
+	public function executeBuildIndex() {
 		/**
-		 * @var $manager NewsManager
+		 * @var $News_manager NewsManager
 		 */
-		$manager = $this->managers->getManagerOf();
+		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
-			$this->page->addVar( 'listeNews', $manager->getList() );
-			$this->page->addVar( 'nbNews', $manager->count() );
+			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST', $News_manager->getList() );
+			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_COUNT', $News_manager->count() );
 		}
-		catch (\PDOException $e)
+		catch (\PDOException $Db_error)
 		{
-			$this->app->httpResponse()->redirectError(503, $e);
+			$this->app->httpResponse()->redirectError(HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error);
 		}
 	}
 	
 	/**
 	 * Gère l'insert ou l'update d'une news depuis un formulaire.
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function processForm( HTTPRequest $request ) {
+	public function processForm( HTTPRequest $Request ) {
 		/**
-		 * @var $manager NewsManager
+		 * @var $Manager NewsManager
 		 */
-		$manager = $this->managers->getManagerOf();
-		if ( $request->method() == 'POST' ) {
-			$news = new News( array(
-				'auteur'  => $request->postData( 'auteur' ),
-				'titre'   => $request->postData( 'titre' ),
-				'contenu' => $request->postData( 'contenu' ),
+		$Manager = $this->managers->getManagerOf();
+		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			$News = new News( array(
+				'auteur'  => $Request->postData( 'auteur' ),
+				'titre'   => $Request->postData( 'titre' ),
+				'contenu' => $Request->postData( 'contenu' ),
 			) );
 			// S'il s'agit d'un update, il faut connaître l'id de la news qui est donné dans l'url
-			if ( $request->getExists( 'id' ) ) {
-				$news->setId( $request->getData( 'id' ) );
+			if ( $Request->getExists( 'id' ) ) {
+				$News->setId( $Request->getData( 'id' ) );
 			}
 		}
 		else {
-			if ( $request->getExists( 'id' ) ) {
+			if ( $Request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
-				$news = $manager->getUnique( $request->getData('id') );
+				$News = $Manager->getUnique( $Request->getData('id') );
 			}
 			else {
-				$news = new News();
+				$News = new News();
 			}
 		}
 		
 		// Construction du formulaire
-		$FormBuilder = new NewsFormBuilder( $news );
-		$FormBuilder->build();
-		$form = $FormBuilder->form();;
+		$Form_builder = new NewsFormBuilder( $News );
+		$Form_builder->build();
+		$Form = $Form_builder->form();;
 		// Sauvegarder avec le FormHandler
-		$FormHandler = new FormHandler( $form, $manager, $request );
+		$FormHandler = new FormHandler( $Form, $Manager, $Request );
 		if ( $FormHandler->process() ) {
-			if ( $news->object_new() ) {
+			if ( $News->object_new() ) {
 				$this->app->user()->setFlash( 'La news a été correctement ajoutée' );
 			}
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée' );
 			};
-			$this->app->httpResponse()->redirect( '/admin/' );
+			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
 		}
-		$this->page->addVar( 'form', $form->createView() );
-		$this->page->addVar('news', $news);
+		$this->page->addVar('form', $Form->createView() );
+		$this->page->addVar('news', $News);
 	}
 	
 	/**
@@ -177,18 +182,18 @@ class NewsController extends BackController {
 		}
 		
 		// Construire le formulaire
-		$formBuilder = new CommentFormBuilder( $comment );
-		$formBuilder->build();
-		$form = $formBuilder->form();
+		$FormBuilder = new CommentFormBuilder( $comment );
+		$FormBuilder->build();
+		$Form = $FormBuilder->form();
 		
 		// Sauvegarder avec le FormHandler
-		$formHandler = new FormHandler( $form, $manager, $request );
-		if ( $formHandler->process() ) {
+		$FormHandler = new FormHandler( $Form, $manager, $request );
+		if ( $FormHandler->process() ) {
 			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
 			// Redirection vers l'accueil d'administration
 			$this->app->httpResponse()->redirect( '/admin/' );
 		}
-		$this->page->addVar( 'form', $form->createView() );
+		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar('comment', $comment);
 	}
 	

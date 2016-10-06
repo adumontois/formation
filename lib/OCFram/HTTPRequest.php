@@ -9,6 +9,9 @@ namespace OCFram;
  * @package OCFram
  */
 class HTTPRequest extends ApplicationComponent {
+	
+	const POST_METHOD = 'POST';
+	
 	/**
 	 * Retourne le contenu du cookie $key, ou NULL s'il n'est pas défini.
 	 *
