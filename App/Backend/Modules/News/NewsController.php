@@ -103,7 +103,7 @@ class NewsController extends BackController {
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée' );
 			};
-			$this->app->httpResponse()->redirect( '/admin' );
+			$this->app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->page->addVar( 'form', $form->createView() );
 	}

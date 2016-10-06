@@ -117,7 +117,7 @@ class NewsManagerPDO extends NewsManager {
 		$query->bindValue( ':auteur', $news->auteur(), \PDO::PARAM_STR );
 		$query->bindValue( ':titre', $news->titre(), \PDO::PARAM_STR );
 		$query->bindValue( ':contenu', $news->contenu(), \PDO::PARAM_STR );
-		$query->execute( $sql );
+		$query->execute();
 	}
 	
 	/**
