@@ -56,17 +56,18 @@ class Managers {
 		if (NULL === $module)
 		{
 			$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['class'];
-			$module = substr($caller, 0, strrpos($caller, 'Controller'));
+			$module = substr($caller, 0, strrpos($caller, 'Controller')); // Récupérer le nom de l'entité
+			$module = 'Model\\'.substr($module, strrpos($module, '\\')+1); // Construire le chemin relatif depuis le dossier vendors
 		}
+		
 		if ( !is_string( $module ) OR empty( $module ) ) {
 			throw new \InvalidArgumentException( 'Module must be a valid string' );
 		}
 		
 		if ( !isset( $this->managers[ $module ] ) ) {
-			$manager                   = '\\Model\\' . $module . 'Manager' . $this->api;
+			$manager                   = $module . 'Manager' . $this->api;
 			$this->managers[ $module ] = new $manager( $this->dao );
 		}
-		
 		return $this->managers[ $module ];
 	}
 }

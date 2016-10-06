@@ -40,7 +40,7 @@ abstract class BackController extends ApplicationComponent {
 	/**
 	 * Construit un backController comme une composant de l'application.
 	 * Le backController est associé à une action et un module, et construit une vue.
-	 * La classe construisant l'objet DAO asociée à la daoClass doit s'appeler [daoClass]Factory.
+	 * La classe construisant l'objet DAO asociée à la daoClass doit s'appeler [daoClass]Factory et se situer dans le répertoire OCFram.
 	 * La méthode de cette classe fournissant l'objet DAO doit s'appeler get[DAO}
 	 *
 	 * @param Application $app
@@ -55,11 +55,15 @@ abstract class BackController extends ApplicationComponent {
 		$this->setModule( $module );
 		$this->page = new Page( $app );
 		$this->setView( $action );
+
+		
 		// Calcul du nom de la classe construisant le DAO
-		$daoFactoryClass = $daoClass.'Factory';
+		$daoFactoryClass = 'OCFram\\'.$daoClass.'Factory';
 		// Calcul du nom de la méthode retournant le DAO
 		$daoMethod = 'get'.ucfirst($daoClass);
+	
 		$this->managers = new Managers( $daoClass, $daoFactoryClass::$daoMethod($dbName) );
+
 	}
 	
 	/**

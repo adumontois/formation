@@ -14,6 +14,7 @@ use FormBuilder\CommentFormBuilder;
 use FormBuilder\NewsFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
+use OCFram\Application;
 use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
@@ -26,6 +27,18 @@ use OCFram\HTTPRequest;
  * @package App\Backend\Modules\News
  */
 class NewsController extends BackController {
+	/**
+	 * NewsController constructor.
+	 * Construit un backcontroller en spécifiant la DB news
+	 *
+	 * @param Application $app
+	 * @param string      $module
+	 * @param string      $action
+	 */
+	public function __construct( Application $app, $module, $action) {
+		parent::__construct( $app, $module, $action, 'news');
+	}
+	
 	/**
 	 * Récupère toutes les news disponibles en DB.
 	 */

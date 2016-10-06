@@ -13,11 +13,24 @@ use Entity\News;
 use FormBuilder\CommentFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
+use OCFram\Application;
 use \OCFram\BackController;
 use OCFram\FormHandler;
 use \OCFram\HTTPRequest;
 
 class NewsController extends BackController {
+	/**
+	 * NewsController constructor.
+	 * Construit un backcontroller en spécifiant la DB news
+	 *
+	 * @param Application $app
+	 * @param string      $module
+	 * @param string      $action
+	 */
+	public function __construct( Application $app, $module, $action ) {
+		parent::__construct( $app, $module, $action, 'news' );
+	}
+	
 	/**
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml
 	 */
@@ -104,9 +117,8 @@ class NewsController extends BackController {
 		$form = $formulaire->form();
 		
 		// Sauvegarde avec le handler
-		$formHandler = new FormHandler($form, $this->managers->getManagerOf('Comments'), $request);
-		if ( $formHandler->process() )
-		{
+		$formHandler = new FormHandler( $form, $this->managers->getManagerOf( 'Comments' ), $request );
+		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
 			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'news' ) . '.html' );
 		}
