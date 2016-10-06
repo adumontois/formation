@@ -47,12 +47,12 @@ class NewsController extends BackController {
 		$manager = $this->managers->getManagerOf();
 		
 		// Récupérer la liste des news à afficher
-		try {
+		//try {
 			$listeNews = $manager->getList( 0, $nombre_news );
-		}
+		/*}
 		catch ( \PDOException $e ) {
 			$this->app->httpResponse()->redirectError( 503, $e );
-		}
+		}*/
 		
 		//
 		foreach ( $listeNews as $news ) {
