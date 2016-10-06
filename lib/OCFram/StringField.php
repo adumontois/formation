@@ -34,7 +34,7 @@ class StringField extends Field {
 	public function __construct( array $options ) {
 		parent::__construct( $options );
 		if (isset($this -> maxLength)) {
-			$this->setValidators( array( new MaxLengthValidator( 'Specified ' . strtolower($this->label) . ' is too long (max = ' .$this->maxLength . ' characters' ) ) );
+			$this->setValidators( array( new MaxLengthValidator( 'Specified ' . strtolower($this->label) . ' is too long (max = ' .$this->maxLength . ' characters', $this->maxLength ) ));
 		}
 	}
 	

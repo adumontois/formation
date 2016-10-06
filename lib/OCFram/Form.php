@@ -58,19 +58,14 @@ class Form {
 	 * @return string
 	 */
 	public function createView() {
-		if ( $this->isValid() ) {
-			$view = '';
-			// Construire tous les fields
-			foreach ( $this->fields as $field ) {
-				$view .= $field->buildWidget();
-				$view .= '<br />';
-			}
-			
-			return $view;
+		$view = '';
+		// Construire tous les fields
+		foreach ( $this->fields as $field ) {
+			$view .= $field->buildWidget();
+			$view .= '<br />';
 		}
-		else {
-			throw new \RuntimeException( 'Can\'t generate invalid form' );
-		}
+		
+		return $view;
 	}
 	
 	/**

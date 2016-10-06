@@ -67,6 +67,7 @@ abstract class Field {
 	 * @return bool
 	 */
 	public function isValid() {
+		//var_dump($this->validators());
 		foreach ( $this->validators as $validator ) {
 			if ( !$validator->isValid( $this->value ) ) {
 				$this->errorMessage = $validator->errorMessage();
@@ -151,8 +152,8 @@ abstract class Field {
 	public function setValidators( array $validators ) {
 		// Ajouter les validateurs suivants
 		foreach ( $validators as $validator ) {
-			if ( $validator instanceof Validator AND !in_array( $validator, $this->validators ) ) {
-				$this->validators[] = $validators;
+			if ( $validator instanceof Validator AND (NULL === $this->validators OR !in_array( $validator, $this->validators ) )) {
+				$this->validators[] = $validator;
 			}
 		}
 	}
