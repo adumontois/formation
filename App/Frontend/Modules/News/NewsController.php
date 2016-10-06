@@ -62,7 +62,7 @@ class NewsController extends BackController {
 			 */
 			$news->setContenu( substr( $news->contenu(), 0, $longueur_news ) );
 			if ( strlen( $news->contenu() ) == $longueur_news ) {
-				$news->setContenu( substr( $news->contenu(), 0, strrpos( ' ', $news->contenu() ) ) . '...' );
+				$news->setContenu( substr( $news->contenu(), 0, strrpos( $news->contenu(), ' ' ) ) . '...' );
 			}
 		}
 		$this->page->addVar( 'listeNews', $listeNews );
