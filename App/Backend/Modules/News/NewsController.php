@@ -186,7 +186,7 @@ class NewsController extends BackController {
 		if ( $formHandler->process() ) {
 			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
 			// Redirection vers l'accueil d'administration
-			//$this->app->httpResponse()->redirect( '/admin/' );
+			$this->app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->page->addVar( 'form', $form->createView() );
 		$this->page->addVar('comment', $comment);
