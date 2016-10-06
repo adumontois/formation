@@ -1,1 +1,7 @@
 <h1>404 Error</h1>
+<p>
+	Descriptif de l'erreur rencontrée : <?= $erreur ?>
+</p>
+<?= // Afficher une info si le code d'erreur n'était pas 404
+isset($inexistant) ? $inexistant : '' ?>
+		

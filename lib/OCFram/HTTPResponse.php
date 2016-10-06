@@ -42,12 +42,26 @@ class HTTPResponse extends ApplicationComponent {
 	}
 	
 	/**
-	 * Crée une redirection vers une erreur 404
+	 * Crée une redirection vers une erreur
+	 *
+	 * @param $error_number int
 	 */
-	public function redirect404() {
+	public function redirectError($error_number, \Exception $error) {
 		$this->page = new Page( $this->app() );
-		$this->page->setContentFile( __DIR__ . '/../../Errors/404.html' );
-		$this->addHeader( 'HTTP/1.0 404 Not Found' );
+		$this->page->setContentFile( __DIR__ . '\..\..\Errors\\'.$error_number.'.html' );
+		$this->page->addVar('erreur', $error->getMessage());
+		switch ($error_number){
+			case 404:
+
+			case 503:
+				$this->addHeader( 'HTTP/1.0 503 Service Temporarily Unavailable');
+				break;
+			default:
+				$this->addHeader( 'HTTP/1.0 404 not found' );
+				$this->page->addVar('inexistant', 'Page associated to error '.$error_number.' doesn\'t exists');
+				break;
+		}
+		// Envoyer le contenu de l'erreur à la page d'erreur
 		$this->send();
 	}
 	

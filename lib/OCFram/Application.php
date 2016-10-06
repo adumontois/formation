@@ -102,7 +102,7 @@ abstract class Application {
 		catch ( \RuntimeException $e ) {
 			if ( $e->getCode() == Router::ROUTE_NOT_FOUND ) // Si on n'a pas trouvé la route, erreur 404
 			{
-				$this->httpResponse()->redirect404();
+				$this->httpResponse()->redirectError(404, $e);
 			}
 		}
 		

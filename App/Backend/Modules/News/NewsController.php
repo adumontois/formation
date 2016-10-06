@@ -48,8 +48,14 @@ class NewsController extends BackController {
 		 */
 		$manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
-		$this->page->addVar( 'listeNews', $manager->getList() );
-		$this->page->addVar( 'nbNews', $manager->count() );
+		try {
+			$this->page->addVar( 'listeNews', $manager->getList() );
+			$this->page->addVar( 'nbNews', $manager->count() );
+		}
+		catch (\PDOException $e)
+		{
+			$this->app->httpResponse()->redirectError(503, $e);
+		}
 	}
 	
 	/**
