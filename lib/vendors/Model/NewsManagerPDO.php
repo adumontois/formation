@@ -36,15 +36,16 @@ class NewsManagerPDO extends NewsManager {
 		if ( $start < 0 OR $count <= 0 ) {
 			throw new \InvalidArgumentException( 'Offset and limit values must be positive integers' );
 		}
-		
+
 		$sql = 'SELECT id, auteur, titre, contenu, dateAjout, dateModif
             FROM news ORDER BY id DESC LIMIT ' . $count . ' OFFSET ' . $start;
 		
 		// Utiliser le dao pour exécuter la requête
 		$query = $this->dao->query( $sql );
-		$query->setFetchMode( PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
+
+		$query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
 		$listeNews = $query->fetchAll();
-		
+
 		// Ajouter les propriétés date "à la main"
 		foreach ( $listeNews as $news ) {
 			$news->setDateAjout( new \DateTime( $news->dateAjout() ) );

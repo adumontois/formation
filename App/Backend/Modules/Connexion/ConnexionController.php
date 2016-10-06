@@ -33,7 +33,7 @@ class ConnexionController extends BackController {
 	 */
 	public function executeIndex( HTTPRequest $request ) {
 		if ( $request->postExists( 'login' ) ) {
-			if ( $request->postData( 'login' ) === $this->app->config()->get( 'login' ) AND $request->postData( 'login' ) === $this->app->config()->get( 'password' ) ) {
+			if ( $request->postData( 'login' ) === $this->app->config()->get( 'login' ) AND $request->postData( 'password' ) === $this->app->config()->get( 'password' ) ) {
 				$this->app->user()->setAuthenticated();
 				$this->app->httpResponse()->redirect( '.' );
 			}

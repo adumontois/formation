@@ -143,7 +143,6 @@ class SplClassLoader {
 				$fileName  = str_replace( $this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace ) . DIRECTORY_SEPARATOR;
 			}
 			$fileName .= str_replace( '_', DIRECTORY_SEPARATOR, $className ) . $this->_fileExtension;
-			
 			if ($this->_includePath !== null) {
 				require ($this->_includePath . DIRECTORY_SEPARATOR . $fileName);
 			}
