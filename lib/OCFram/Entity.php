@@ -18,10 +18,6 @@ namespace OCFram;
 abstract class Entity implements \ArrayAccess {
 	use Hydrator;
 	/**
-	 * @var $erreurs string[] Tableau contenant toutes les erreurs concernant une entité.
-	 */
-	protected $erreurs;
-	/**
 	 * @var $id int ID de l'entité en DB. Vaut NULL si l'entité n'est pas encore insérée.
 	 */
 	protected $id;
@@ -35,7 +31,6 @@ abstract class Entity implements \ArrayAccess {
 		if ( !empty( $values ) ) {
 			$this->hydrate( $values );
 		}
-		$this->erreurs = array();
 	}
 	
 	/**
@@ -120,13 +115,6 @@ abstract class Entity implements \ArrayAccess {
 	 */
 	public function id() {
 		return $this->id;
-	}
-	
-	/**
-	 * @return string[] Tableau contenant toutes les erreurs concernant une entité.
-	 */
-	public function erreurs() {
-		return $this->erreurs;
 	}
 	
 	/**

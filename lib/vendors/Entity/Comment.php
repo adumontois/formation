@@ -35,9 +35,6 @@ class Comment extends Entity {
 	 * @var $Date \DateTime
 	 */
 	protected $Date;
-	const INVALID_AUTHOR  = 1;
-	const INVALID_CONTENT = 2;
-	const INVALID_NEWS    = 3;
 	
 	/**
 	 * Vérifie si le commentaire est valide.
@@ -82,10 +79,7 @@ class Comment extends Entity {
 	 * @param $news int
 	 */
 	public function setNews( $news ) {
-		if ( (int)$news <= 0 ) {
-			$this->erreurs[] = self::INVALID_NEWS;
-		}
-		else {
+		if ( (int)$news > 0 ) {
 			$this->news = $news;
 		}
 	}
@@ -96,10 +90,7 @@ class Comment extends Entity {
 	 * @param $auteur string
 	 */
 	public function setAuteur( $auteur ) {
-		if ( !is_string( $auteur ) OR empty( $auteur ) ) {
-			$this->erreurs[] = self::INVALID_AUTHOR;
-		}
-		else {
+		if ( is_string( $auteur ) AND !empty( $auteur ) ) {
 			$this->auteur = $auteur;
 		}
 	}
@@ -110,10 +101,7 @@ class Comment extends Entity {
 	 * @param $contenu string
 	 */
 	public function setContenu( $contenu ) {
-		if ( !is_string( $contenu ) OR empty( $contenu ) ) {
-			$this->erreurs[] = self::INVALID_CONTENT;
-		}
-		else {
+		if ( is_string( $contenu ) AND !empty( $contenu ) ) {
 			$this->contenu = $contenu;
 		}
 	}

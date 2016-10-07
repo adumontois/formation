@@ -39,9 +39,6 @@ class News extends Entity {
 	 * @var $DateModif \DateTime
 	 */
 	protected $DateModif;
-	const INVALID_AUTHOR  = 1;
-	const INVALID_TITLE   = 2;
-	const INVALID_CONTENT = 3;
 	
 	/**
 	 * Vérifie si la news est valide.
@@ -61,9 +58,6 @@ class News extends Entity {
 		if ( !empty( $auteur ) AND is_string( $auteur ) ) {
 			$this->auteur = $auteur;
 		}
-		else {
-			$this->erreurs[] = self::INVALID_AUTHOR;
-		}
 	}
 	
 	/**
@@ -75,9 +69,6 @@ class News extends Entity {
 		if ( !empty( $titre ) AND is_string( $titre ) ) {
 			$this->titre = $titre;
 		}
-		else {
-			$this->erreurs[] = self::INVALID_TITLE;
-		}
 	}
 	
 	/**
@@ -88,9 +79,6 @@ class News extends Entity {
 	public function setContenu( $contenu ) {
 		if ( !empty( $contenu ) AND is_string( $contenu ) ) {
 			$this->contenu = $contenu;
-		}
-		else {
-			$this->erreurs[] = self::INVALID_CONTENT;
 		}
 	}
 	
