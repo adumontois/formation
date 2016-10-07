@@ -9,6 +9,9 @@
 namespace Model;
 
 
+use Entity\User;
+use OCFram\Entity;
+
 class UserManagerPDO extends UserManager {
 	/**
 	 * Insère un utilisateur en base.
@@ -17,7 +20,15 @@ class UserManagerPDO extends UserManager {
 	 * @param Entity $User
 	 */
 	protected function insertUserc(Entity $User) {
-		
+		/**
+		 * @var $User User
+		 * @var $Query \PDOStatement
+		 */
+		$sql = 'INSERT INTO T_SIT_userc (SUC_login, SUC_password, SUC_mail, SUC_DateSubscription, SUC_fk_SUY, SUC_fk_SUE_banned, SUC_fk_SUE_valid)
+		VALUES (:login, :password, :mail, NOW(), '.User::USERY_STANDARD.', '.User::USERE_BANNED_NOT_BANNED.', '.User::USERE_VALID_VALIDATED_BY_FORM.' )';
+		$Query = $this->dao->prepare($sql);
+		$Query->bindValue(':login', $User->login());
+		$Query->bindValue(':password', $User->password());
 	}
 	/**
 	 * Met à jour un utilisateur en base.

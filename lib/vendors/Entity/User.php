@@ -9,14 +9,17 @@
 namespace Entity;
 
 
+use App\Traits\Password;
 use OCFram\Entity;
 
 class User extends Entity {
+	use Password;
 	/**
 	 * State constants
 	 */
 	const USERE_BANNED_NOT_BANNED       = 1;
 	const USERE_BANNED_BANNED_FOR_FLOOD = 2;
+	const USERE_VALID_VALIDATED_BY_FORM = 21;
 	/**
 	 * Type constants
 	 */
@@ -27,12 +30,6 @@ class User extends Entity {
 	 */
 	protected $login;
 	/**
-	 * Le password est géré en non-crypté ; il est stocké en base crypté.
-	 *
-	 * @var $password string
-	 */
-	protected $password;
-	/**
 	 * @var $email string
 	 */
 	protected $email;
@@ -40,22 +37,29 @@ class User extends Entity {
 	 * @var $DateSubscription \DateTime
 	 */
 	protected $DateSubscription;
+	/**
+	 * @var $type int Type de l'utilisateur (standard, admin, superadmin...)
+	 */
+	protected $type;
+	/**
+	 * @var $banned int Indique si l'utilisateur est banni
+	 */
+	protected $banned;
+	/**
+	 * @var $valid int Indique si l'utilisateur a été validé
+	 */
+	protected $valid;
 	
 	/**
-	 * Vérifie si l'utilisateur est valide.
+	 * Vérifie si les coordonnées de l'utilisateur est valide.
 	 * Les vérifications s'ajoutent aux vérifications effectuées dans le formulaire de création/mise à jour de Entity\User
+	 *
+	 * /!\ Ne concerne pas le champ valid !
 	 *
 	 * @return bool
 	 */
 	public function isValid() {
-		return !empty( $this->login ) AND !empty( $this->password ) AND !empty( $this->email );
-	}
-	
-	/**
-	 * Crypte le password courant. La méthode de cryptage utilisée est SHA_512.
-	 */
-	public function crypt() {
-		$this->setPassword( crypt( $this->password, '$6$rounds=457312984$p@__{#5h£y|+7G*-$' ) );
+		return !empty( $this->login ) AND $this->isCrypted() AND !empty( $this->email );
 	}
 	
 	/**
@@ -66,17 +70,6 @@ class User extends Entity {
 	public function setLogin( $login ) {
 		if ( !empty( $login ) AND is_string( $login ) ) {
 			$this->login = $login;
-		}
-	}
-	
-	/**
-	 * Setter pour l'attribut password.
-	 *
-	 * @param $password string
-	 */
-	public function setPassword( $password ) {
-		if ( !empty( $password ) AND is_string( $password ) ) {
-			$this->password = $password;
 		}
 	}
 	
@@ -101,17 +94,46 @@ class User extends Entity {
 	}
 	
 	/**
-	 * @return string
+	 * Setter pour l'attribut type.
+	 *
+	 * @param $SUY_id int Tinyint associé à un type de user existant.
 	 */
-	public function login() {
-		return $this->login;
+	public function setType($SUY_id) {
+		if (!is_int($SUY_id) OR $SUY_id < 0 OR $SUY_id > 255) {
+			throw new \BadMethodCallException('Le type d\'un User doit être une entier entre 0 et 255');
+		}
+		$this->type = $SUY_id;
+	}
+	
+	/**
+	 * Setter pour l'attribut banned.
+	 *
+	 * @param $SUE_id int Tinyint associé à un état de bannissement existant.
+	 */
+	public function setBanned($SUE_id) {
+		if (!is_int($SUE_id) OR $SUE_id < 1 OR $SUE_id > 19) {
+			throw new \BadMethodCallException('L\'état de bannissement d\'un User doit être une entier entre 1 et 19');
+		}
+		$this->type = $SUE_id;
+	}
+	
+	/**
+	 * Setter pour l'attribut valid.
+	 *
+	 * @param $SUE_id int Tinyint associé à un état de validation existant.
+	 */
+	public function setValid($SUE_id) {
+		if (!is_int($SUE_id) OR $SUE_id < 21 OR $SUE_id > 39) {
+			throw new \BadMethodCallException('L\'état de validation d\'un User doit être une entier entre 21 et 39');
+		}
+		$this->type = $SUE_id;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function password() {
-		return $this->password;
+	public function login() {
+		return $this->login;
 	}
 	
 	/**
@@ -126,5 +148,30 @@ class User extends Entity {
 	 */
 	public function DateSubscription() {
 		return $this->DateSubscription;
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function type() {
+		return $this->type;
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function	banned() {
+		return $this->banned;
+	}
+	
+	/**
+	 * Accesseur pour l'attribut valid.
+	 *
+	 * /!\ N'effectue pas la vérification de validité d'un champ lors de l'acces
+	 *
+	 * @return int
+	 */
+	public function valid() {
+		return $this->valid;
 	}
 }
