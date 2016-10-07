@@ -36,8 +36,8 @@ class NewsManagerPDO extends NewsManager {
 			throw new \InvalidArgumentException( 'Offset and limit values must be positive integers' );
 		}
 		
-		$sql = 'SELECT id, auteur, titre, contenu, dateAjout as DateAjout, dateModif as DateModif
-            FROM news ORDER BY id DESC LIMIT ' . $count . ' OFFSET ' . $start;
+		$sql = 'SELECT SNC_id id, SNC_author auteur, SNC_title titre, SNC_content contenu, SNC_dateadd DateAjout, SNC_dateupdate DateModif
+            FROM T_SIT_newsc ORDER BY SNC_id DESC LIMIT ' . $count . ' OFFSET ' . $start;
 		
 		// Utiliser le dao pour exécuter la requête
 		$Query = $this->dao->query( $sql );
@@ -67,9 +67,9 @@ class NewsManagerPDO extends NewsManager {
 		/**
 		 * @var $Query \PDOStatement
 		 */
-		$sql   = 'SELECT id, auteur, titre, contenu, dateAjout as DateAjout, dateModif as DateModif
-                FROM news
-                WHERE id = :id';
+		$sql   = 'SELECT SNC_id id, SNC_author auteur, SNC_title titre, SNC_content contenu, SNC_dateadd DateAjout, SNC_dateupdate DateModif
+                FROM T_SIT_newsc
+                WHERE SNC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', $newsc_id, \PDO::PARAM_INT );
 		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
@@ -92,7 +92,7 @@ class NewsManagerPDO extends NewsManager {
 	 */
 	public function countNewscUsingNewscId() {
 		$sql = 'SELECT COUNT(*)
-                FROM news';
+                FROM T_SIT_newsc';
 		
 		return $this->dao->query( $sql )->fetchColumn();
 	}
@@ -108,7 +108,7 @@ class NewsManagerPDO extends NewsManager {
 		 * @var $Query \PDOStatement
 		 * @var $News  News
 		 */
-		$sql   = 'INSERT INTO news (auteur, titre, contenu, dateAjout, dateModif)
+		$sql   = 'INSERT INTO T_SIT_newsc (SNC_author, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate)
                     VALUES (:auteur, :titre, :contenu, NOW(), NOW())';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':auteur', $News->auteur(), \PDO::PARAM_STR );
@@ -128,9 +128,9 @@ class NewsManagerPDO extends NewsManager {
 		 * @var $Query \PDOStatement
 		 * @var $News  News
 		 */
-		$sql   = 'UPDATE news
-                SET auteur = :auteur, titre = :titre, contenu = :contenu, dateModif = NOW()
-                WHERE id = :id';
+		$sql   = 'UPDATE T_SIT_newsc
+                SET SNC_author = :auteur, SNC_title = :titre, SNC_content = :contenu, SNC_dateupdate = NOW()
+                WHERE SNC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', $News->id(), \PDO::PARAM_INT );
 		$Query->bindValue( ':auteur', $News->auteur(), \PDO::PARAM_STR );
@@ -151,8 +151,8 @@ class NewsManagerPDO extends NewsManager {
 		/**
 		 * @var $Query \PDOStatement
 		 */
-		$sql   = 'DELETE FROM news
-                WHERE id = :id';
+		$sql   = 'DELETE FROM T_SIT_newsc
+                WHERE SNC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
 		$Query->execute();

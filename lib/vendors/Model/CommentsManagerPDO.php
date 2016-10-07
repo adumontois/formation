@@ -29,8 +29,8 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Query   \PDOStatement
 		 * @var $Comment Comment
 		 */
-		$sql = 'INSERT INTO comment
-                    (news, auteur, contenu, date)
+		$sql = 'INSERT INTO T_SIT_commentc
+                    (SCC_fk_SNC, SCC_author, SCC_content, SCC_date)
                 VALUES (:news, :auteur, :contenu, NOW())';
 		
 		$Query = $this->dao->prepare( $sql );
@@ -52,9 +52,9 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Query   \PDOStatement
 		 * @var $Comment Comment
 		 */
-		$sql   = 'UPDATE comment
-                SET news = :news, auteur = :auteur, contenu = :contenu
-                WHERE id = :id';
+		$sql   = 'UPDATE T_SIT_commentc
+                SET SCC_fk_SNC = :news, SCC_author = :auteur, SCC_content = :contenu
+                WHERE SCC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':news', $Comment->news(), \PDO::PARAM_INT );
 		$Query->bindValue( ':auteur', $Comment->auteur(), \PDO::PARAM_STR );
@@ -75,10 +75,10 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Query            \PDOStatement
 		 * @var $Liste_comments_a Comment[]
 		 */
-		$sql = 'SELECT id, news, auteur, contenu, date as Date
-                FROM comment
-                WHERE news = :news
-                ORDER BY id DESC';
+		$sql = 'SELECT SCC_id id, SCC_fk_SNC news, SCC_author auteur, SCC_content contenu, SCC_date Date
+                FROM T_SIT_commentc
+                WHERE SCC_fk_SNC = :news
+                ORDER BY SCC_id DESC';
 		
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':news', (int)$newsc_id, \PDO::PARAM_INT );
@@ -104,9 +104,9 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $Query \PDOStatement
 		 */
-		$sql   = 'SELECT id, news, auteur, contenu, date as Date
-                FROM comment
-                WHERE id = :id';
+		$sql   = 'SELECT SCC_id id, SCC_fk_SNC news, SCC_author auteur, SCC_content contenu, SCC_date Date
+                FROM T_SIT_commentc
+                WHERE SCC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
 		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
@@ -129,8 +129,8 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $Query \PDOStatement
 		 */
-		$sql   = 'DELETE FROM comment
-                WHERE id = :id';
+		$sql   = 'DELETE FROM T_SIT_commentc
+                WHERE SCC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
 		$Query->execute();
@@ -147,8 +147,8 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $Query \PDOStatement
 		 */
-		$sql   = 'DELETE FROM comment
-                WHERE news = :id';
+		$sql   = 'DELETE FROM T_SIT_commentc
+                WHERE SCC_fk_SNC = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', (int)$newsc_id, \PDO::PARAM_INT );
 		$Query->execute();
