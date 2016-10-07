@@ -7,14 +7,14 @@
  */
 
 /**
- * @var $T_NEWS_PUTINSERTNEWS_HEAD string en-tête (ajout ou modif) du formulaire
- * @var $T_NEWS_PUTINSERTNEWS_FORM string contenu du formulaire à afficher
+ * @var $header string en-tête (ajout ou modif) du formulaire
+ * @var $form string contenu du formulaire à afficher
  */
 ?>
-<h2><?= $T_NEWS_PUTINSERTNEWS_HEAD ?></h2>
+<h2><?= $header ?></h2>
 <form action="" method="post">
 	<p>
-		<?= $T_NEWS_PUTINSERTNEWS_FORM ?>
+		<?= $form ?>
 		<input type="submit" value="Ajouter" />
 	</p>
 </form>

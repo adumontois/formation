@@ -13,6 +13,16 @@ use OCFram\Entity;
 
 class User extends Entity {
 	/**
+	 * State constants
+	 */
+	const USERE_BANNED_NOT_BANNED       = 1;
+	const USERE_BANNED_BANNED_FOR_FLOOD = 2;
+	/**
+	 * Type constants
+	 */
+	const USERY_STANDARD   = 1;
+	const USERY_SUPERADMIN = 2;
+	/**
 	 * @var $login string
 	 */
 	protected $login;
@@ -44,11 +54,9 @@ class User extends Entity {
 	/**
 	 * Crypte le password courant. La méthode de cryptage utilisée est SHA_512.
 	 */
-	public function crypt()
-	{
-		$this->setPassword(crypt($this->password, '$6$rounds=457312984$p@__{#5h£y|+7G*-$'));
+	public function crypt() {
+		$this->setPassword( crypt( $this->password, '$6$rounds=457312984$p@__{#5h£y|+7G*-$' ) );
 	}
-	
 	
 	/**
 	 * Setter pour l'attribut login.
@@ -78,7 +86,7 @@ class User extends Entity {
 	 * @param $email string
 	 */
 	public function setEmail( $email ) {
-		if (filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+		if ( filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
 			$this->email = $email;
 		}
 	}

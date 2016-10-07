@@ -7,7 +7,7 @@
  */
 
 /**
- * @var $T_NEWS_PUTINSERTCOMMENT_FORM string Formulaire d'ajout de commentaire
+ * @var $form string Formulaire d'ajout de commentaire
  */
 ?>
 
@@ -17,7 +17,7 @@
 <form action="" method="post">
 	<!-- Action vide = déclencher la page courante -->
 	<p>
-		<?= $T_NEWS_PUTINSERTCOMMENT_FORM ?>
+		<?= $form ?>
 		<input type="submit" value="Commenter" />
 	</p>
 </form>

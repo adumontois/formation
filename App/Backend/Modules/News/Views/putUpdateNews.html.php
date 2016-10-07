@@ -7,18 +7,18 @@
  */
 
 /**
- * @var $T_NEWS_PUTUPDATENEWS_HEAD string En-tête du formulaire
- * @var $T_NEWS_PUTUPDATENEWS_FORM string Code HTML du formulaire de création de news
- * @var $T_NEWS_PUTUPDATENEWS_NEWS \Entity\News News à modifier
+ * @var $header string En-tête du formulaire
+ * @var $form string Code HTML du formulaire de création de news
+ * @var $News \Entity\News News à modifier
  */
 ?>
 
-<h2><?= $T_NEWS_PUTUPDATENEWS_HEAD ?></h2>
+<h2><?= $header ?></h2>
 
 <form action="" method="post">
 	<p>
-		<?= $T_NEWS_PUTUPDATENEWS_FORM ?>
-		<input type="hidden" name="id" value="<?= $T_NEWS_PUTUPDATENEWS_NEWS[ 'id' ] ?>" />
+		<?= $form ?>
+		<input type="hidden" name="id" value="<?= $News[ 'id' ] ?>" />
 		<input type="submit" value="Modifier" name="modifier" />
 	</p>
 </form>

@@ -58,18 +58,18 @@ class Page extends ApplicationComponent {
 			throw new \RuntimeException( 'Specified view "' . $this->contentFile . '" doesn\'t exists' );
 		}
 		/*
-		 * @var $T_USER User utilisée dans les vues
+		 * @var $User User utilisée dans les vues
 		 */
-		$T_USER = $this->app->user();
+		$User = $this->app->user();
 		extract( $this->vars );
 		
 		// Créer la page en bufferisation
 		ob_start();
 		require $this->contentFile; // Existence du fichier vérifiée
 		/**
-		 * @var $T_CONTENT string utilisée dans les vues
+		 * @var $content string utilisée dans les vues
 		 */
-		$T_CONTENT = ob_get_clean(); // Vider le buffer dans la sortie
+		$content = ob_get_clean(); // Vider le buffer dans la sortie
 		
 		ob_start();
 		

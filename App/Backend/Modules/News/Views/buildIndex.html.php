@@ -7,12 +7,12 @@
  */
 
 /**
- * @var $T_NEWS_BUILDINDEX_NEWS_COUNT integer
+ * @var $news_count integer
  */
 ?>
 	
 	<p style="text-align: center">
-		Il y a actuellement <?= $T_NEWS_BUILDINDEX_NEWS_COUNT ?> news. En voici la liste :
+		Il y a actuellement <?= $news_count ?> news. En voici la liste :
 	</p>
 	
 	<table>
@@ -25,9 +25,9 @@
 		</tr>
 		<?php
 		/**
-		 * @var $T_NEWS_BUILDINDEX_NEWS_LIST_A \Entity\News[]
+		 * @var $News_list_a \Entity\News[]
 		 */
-		foreach ( $T_NEWS_BUILDINDEX_NEWS_LIST_A as $News ):
+		foreach ( $News_list_a as $News ):
 			?>
 			<tr>
 				<td>

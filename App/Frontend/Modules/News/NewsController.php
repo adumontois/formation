@@ -59,8 +59,8 @@ class NewsController extends BackController {
 				$News->setContenu( substr( $News->contenu(), 0, strrpos( $News->contenu(), ' ' ) ) . '...' );
 			}
 		}
-		$this->page->addVar( 'T_TITLE', 'Liste des ' . $nombre_news . ' dernières news' );
-		$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST_A', $Liste_news_a );
+		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
+		$this->page->addVar( 'News_list_a', $Liste_news_a );
 	}
 	
 	/**
@@ -85,10 +85,10 @@ class NewsController extends BackController {
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
 		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
 		
-		$this->page->addVar( 'T_TITLE', $News->titre() );
-		$this->page->addVar( 'T_NEWS_BUILDNEWS_NEWS', $News );
-		$this->page->addVar( 'T_NEWS_BUILDNEWS_COMMENT_LIST_A', $Liste_comments_a );
-		$this->page->addVar( 'T_NEWS_BUILDNEWS_USER', $this->app->user() );
+		$this->page->addVar( 'title', $News->titre() );
+		$this->page->addVar( 'News', $News );
+		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
+		$this->page->addVar( 'User', $this->app->user() );
 	}
 	
 	/**
@@ -119,8 +119,8 @@ class NewsController extends BackController {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
 			$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
 		}
-		$this->page->addVar( 'T_TITLE', 'Ajout d\'un commentaire' );
+		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
-		$this->page->addVar( 'T_NEWS_PUTINSERTCOMMENT_FORM', $Form_builder->form()->createView() );
+		$this->page->addVar( 'form', $Form_builder->form()->createView() );
 	}
 }

@@ -6,17 +6,17 @@
  * Time: 12:05
  */
 
-/** @var $T_NEWS_PUTUPDATECOMMENT_FORM string
+/** @var $form string
  * Formulaire d'ajout de commentaire
- *
- * @var $T_NEWS_PUTUPDATECOMMENT_COMMENT ['news'] integer
+ * @var $Comment \Entity\Comment
+ * @var $Comment ['news'] integer
  * foreign key to news table
  */
 ?>
 <form action="" method="post">
 	<p>
-		<?= $T_NEWS_PUTUPDATECOMMENT_FORM ?>
-		<input type="hidden" name="news" value="<?= $T_NEWS_PUTUPDATECOMMENT_COMMENT[ 'news' ] ?>" />
+		<?= $form ?>
+		<input type="hidden" name="news" value="<?= $Comment[ 'news' ] ?>" />
 		<input type="submit" value="Modifier" />
 	</p>
 </form>

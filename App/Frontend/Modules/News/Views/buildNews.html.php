@@ -7,38 +7,38 @@
  */
 
 /**
- * @var $T_NEWS_BUILDNEWS_NEWS              \Entity\News
- * @var $T_NEWS_BUILDNEWS_COMMENT_LIST_A    \Entity\Comment[]
- * @var $T_NEWS_BUILDNEWS_USER              OCFram\User
+ * @var $News              \Entity\News
+ * @var $Comment_list_a    \Entity\Comment[]
+ * @var $User              OCFram\User
  *
- * @var $T_NEWS_BUILDNEWS_NEWS              ['DateAjout'] DateTime (OK)
- * @var $T_NEWS_BUILDNEWS_NEWS              ['DateModif'] DateTime (OK)
- * @var $comment                            ['Date'] DateTime (OK)
+ * @var $News              ['DateAjout'] DateTime (OK)
+ * @var $News              ['DateModif'] DateTime (OK)
+ * @var $Comment                            ['Date'] DateTime (OK)
  */
 
 ?>
 
 <p>
-	Par <em><?= htmlspecialchars( $T_NEWS_BUILDNEWS_NEWS[ 'auteur' ] ) ?></em>, le <?= $T_NEWS_BUILDNEWS_NEWS[ 'DateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
+	Par <em><?= htmlspecialchars( $News[ 'auteur' ] ) ?></em>, le <?= $News[ 'DateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
 </p>
-<h2><?= htmlspecialchars( $T_NEWS_BUILDNEWS_NEWS[ 'titre' ] ) ?></h2>
-<p><?= nl2br( htmlspecialchars( $T_NEWS_BUILDNEWS_NEWS[ 'contenu' ] ) ) ?></p>
+<h2><?= htmlspecialchars( $News[ 'titre' ] ) ?></h2>
+<p><?= nl2br( htmlspecialchars( $News[ 'contenu' ] ) ) ?></p>
 
 <?php
-if ( $T_NEWS_BUILDNEWS_NEWS[ 'DateAjout' ] != $T_NEWS_BUILDNEWS_NEWS[ 'DateModif' ] ): ?>
+if ( $News[ 'DateAjout' ] != $News[ 'DateModif' ] ): ?>
 	<p style="text-align: right;">
-		<small><em>Modifiée le <?= $T_NEWS_BUILDNEWS_NEWS[ 'DateModif' ]->format( 'd/m/Y à H\hi' ) ?></em></small>
+		<small><em>Modifiée le <?= $News[ 'DateModif' ]->format( 'd/m/Y à H\hi' ) ?></em></small>
 	</p>
 	<?php
 endif;
 ?>
 
 <p>
-	<a href="commenter-<?= $T_NEWS_BUILDNEWS_NEWS[ 'id' ] ?>.html">Ajouter un commentaire</a>
+	<a href="commenter-<?= $News[ 'id' ] ?>.html">Ajouter un commentaire</a>
 </p>
 
 <?php
-if ( empty( $T_NEWS_BUILDNEWS_COMMENT_LIST_A ) ):
+if ( empty( $Comment_list_a ) ):
 	?>
 	<p>
 		Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !
@@ -46,21 +46,21 @@ if ( empty( $T_NEWS_BUILDNEWS_COMMENT_LIST_A ) ):
 	<?php
 endif;
 
-foreach ( $T_NEWS_BUILDNEWS_COMMENT_LIST_A as $comment ):
+foreach ( $Comment_list_a as $Comment ):
 	?>
 	<fieldset>
 		<legend>
-			Posté par <strong><?= htmlspecialchars( $comment[ 'auteur' ] ) ?></strong> le <?= $comment[ 'Date' ]->format( 'd/m/Y à H\hi' ) ?>
-			<?php if ( $T_NEWS_BUILDNEWS_USER->isAuthenticated() ):
+			Posté par <strong><?= htmlspecialchars( $Comment[ 'auteur' ] ) ?></strong> le <?= $Comment[ 'Date' ]->format( 'd/m/Y à H\hi' ) ?>
+			<?php if ( $User->isAuthenticated() ):
 				?>
-				- <a href="admin/comment-update-<?= $comment[ 'id' ] ?>.html">Modifier</a> |
-				<a href="admin/comment-delete-<?= $comment[ 'id' ] ?>.html">Supprimer</a>
+				- <a href="admin/comment-update-<?= $Comment[ 'id' ] ?>.html">Modifier</a> |
+				<a href="admin/comment-delete-<?= $Comment[ 'id' ] ?>.html">Supprimer</a>
 				<?php
 			endif;
 			?>
 		</legend>
 		<p>
-			<?= nl2br( htmlspecialchars( $comment[ 'contenu' ] ) ) ?>
+			<?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?>
 		</p>
 	</fieldset>
 	<?php
@@ -68,5 +68,5 @@ endforeach;
 ?>
 
 <p>
-	<a href="commenter-<?= $T_NEWS_BUILDNEWS_NEWS[ 'id' ] ?>.html">Ajouter un commentaire</a>
+	<a href="commenter-<?= $News[ 'id' ] ?>.html">Ajouter un commentaire</a>
 </p>

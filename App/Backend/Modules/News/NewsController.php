@@ -51,10 +51,10 @@ class NewsController extends BackController {
 		 * @var $News_manager NewsManager
 		 */
 		$News_manager = $this->managers->getManagerOf();
-		$this->page->addVar( 'T_TITLE', 'Liste des news' );
+		$this->page->addVar( 'title', 'Liste des news' );
 		try {
-			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST_A', $News_manager->getNewscSortByIdDesc() );
-			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_COUNT', $News_manager->countNewscUsingNewscId() );
+			$this->page->addVar( 'News_list_a', $News_manager->getNewscSortByIdDesc() );
+			$this->page->addVar( 'news_count', $News_manager->countNewscUsingNewscId() );
 		}
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
@@ -116,17 +116,15 @@ class NewsController extends BackController {
 		
 		
 		if ( !$Request->getExists( 'id' ) ) {
-			$page_prefix = 'T_NEWS_PUTINSERTNEWS_';
-			$this->page->addVar( 'T_TITLE', 'Insertion d\'une news' );
-			$this->page->addVar( $page_prefix . 'HEAD', 'Ajouter une news' );
+			$this->page->addVar( 'title', 'Insertion d\'une news' );
+			$this->page->addVar( 'header', 'Ajouter une news' );
 		}
 		else {
-			$page_prefix = 'T_NEWS_PUTUPDATENEWS_';
-			$this->page->addVar( 'T_TITLE', 'Modification d\'une news' );
-			$this->page->addVar( $page_prefix . 'HEAD', 'Modifier une news' );
+			$this->page->addVar( 'title', 'Modification d\'une news' );
+			$this->page->addVar( 'header', 'Modifier une news' );
 		}
-		$this->page->addVar( $page_prefix . 'FORM', $Form->createView() );
-		$this->page->addVar( $page_prefix . 'NEWS', $News );
+		$this->page->addVar( 'form', $Form->createView() );
+		$this->page->addVar( 'News', $News );
 	}
 	
 	/**
@@ -169,7 +167,7 @@ class NewsController extends BackController {
 		if ( !$News_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
 		}
-		$this->page->addVar( 'T_TITLE', 'Suppression d\'une news' );
+		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
 		$this->app->httpResponse()->redirect( '.' );
 	}
@@ -216,9 +214,9 @@ class NewsController extends BackController {
 			// Redirection vers l'accueil d'administration
 			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
 		}
-		$this->page->addVar( 'T_TITLE', 'Edition d\'un commentaire' );
-		$this->page->addVar( 'T_NEWS_PUTUPDATECOMMENT_FORM', $Form->createView() );
-		$this->page->addVar( 'T_NEWS_PUTUPDATECOMMENT_COMMENT', $Comment );
+		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
+		$this->page->addVar( 'form', $Form->createView() );
+		$this->page->addVar( 'Comment', $Comment );
 	}
 	
 	/**
@@ -237,7 +235,7 @@ class NewsController extends BackController {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
 		}
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
-		$this->page->addVar( 'T_TITLE', 'Suppression d\'un commentaire' );
+		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
 		$this->app->httpResponse()->redirect( '.' );
 	}
 }

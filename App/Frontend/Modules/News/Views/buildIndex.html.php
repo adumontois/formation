@@ -6,9 +6,9 @@
  * Time: 15:34
  */
 /**
- * @var $T_NEWS_BUILDINDEX_NEWS_LIST_A \Entity\News[]
+ * @var $News_list_a \Entity\News[]
  */
-foreach ( $T_NEWS_BUILDINDEX_NEWS_LIST_A as $News ):
+foreach ( $News_list_a as $News ):
 	?>
 	<h2><a href="news-<?= $News[ 'id' ] ?>.html"><?= htmlspecialchars( $News[ 'titre' ] ) ?></a></h2>
 	<?php // Besoin de nl2br pour afficher les contenus

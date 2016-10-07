@@ -5,8 +5,8 @@
  */
 
 /**
- * @var $T_USER    \OCFram\User Session utilisateur
- * @var $T_CONTENT string Contenu de la page générée
+ * @var $User    \OCFram\User Session utilisateur
+ * @var $content string Contenu de la page générée
  */
 
 ?>
@@ -33,9 +33,9 @@
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<li><a href="/admin/">Admin<?= $T_USER->isAuthenticated() ? ' (connecté)' : ' (non connecté)' ?></a></li>
+					<li><a href="/admin/">Admin<?= $User->isAuthenticated() ? ' (connecté)' : ' (non connecté)' ?></a></li>
 					<?php
-					if ( $T_USER->isAuthenticated() ): ?>
+					if ( $User->isAuthenticated() ): ?>
 						<li><a href="/admin/logout.html">Déconnexion</a></li>
 						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
 						<?php
@@ -46,10 +46,10 @@
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?php if ( $T_USER->hasFlash() ):
-						echo '<p style="text-align: center;">', $T_USER->getFlash(), '</p>';
+					<?php if ( $User->hasFlash() ):
+						echo '<p style="text-align: center;">', $User->getFlash(), '</p>';
 					endif; ?>
-					<?= $T_CONTENT ?>
+					<?= $content ?>
 				</section>
 			</div>
 			
