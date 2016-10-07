@@ -28,4 +28,9 @@ abstract class Manager {
 	public function __construct( $dao ) {
 		$this->dao = $dao;
 	}
+	
+	/**
+	 * Sauvegarde (insert ou update) l'entité passée en paramètre
+	 */
+	abstract public function save(Entity $object);
 }

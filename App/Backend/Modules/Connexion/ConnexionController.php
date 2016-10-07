@@ -24,8 +24,8 @@ class ConnexionController extends BackController {
 	 */
 	
 	const DATABASE                 = 'news';
-	const DISCONNECTION_SUCCESSFUL = 'You were disconnected from admin interface of Mon super site.';
-	const REFUSED_CONNECTION       = 'Login-password combination is incorrect.';
+	const DISCONNECTION_SUCCESSFUL = 'Vous avez été déconnecté de l\'interface administrateur de Mon super site.';
+	const REFUSED_CONNECTION       = 'La combinaison login-password entrée est incorrecte.';
 	
 	public function __construct( Application $App, $module, $action ) {
 		parent::__construct( $App, $module, $action, self::DATABASE );

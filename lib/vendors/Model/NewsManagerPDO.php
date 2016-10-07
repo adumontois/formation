@@ -108,6 +108,7 @@ class NewsManagerPDO extends NewsManager {
 		 * @var $Query \PDOStatement
 		 * @var $News  News
 		 */
+		var_dump($News);
 		$sql   = 'INSERT INTO T_SIT_newsc (SNC_author, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate)
                     VALUES (:auteur, :titre, :contenu, NOW(), NOW())';
 		$Query = $this->dao->prepare( $sql );
@@ -158,23 +159,5 @@ class NewsManagerPDO extends NewsManager {
 		$Query->execute();
 		
 		return (bool)$Query->rowCount();
-	}
-	
-	/**
-	 * Insère ou met à jour la news en DB selon qu'il existe déjà ou non en base.
-	 *
-	 * @param News $News
-	 *
-	 */
-	public function save( News $News ) {
-		if ( $News->isValid() ) {
-			if ( $News->objectNew() ) {
-				$this->insertNewsc( $News );
-			}
-			
-			else {
-				$this->updateNewsc( $News );
-			}
-		}
 	}
 }

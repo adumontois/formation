@@ -9,6 +9,7 @@
 namespace Model;
 
 use Entity\Comment;
+use OCFram\Entity;
 use OCFram\Manager;
 
 /**
@@ -35,7 +36,7 @@ abstract class CommentsManager extends Manager {
 	 *
 	 * @return Comment|null
 	 */
-	abstract public function getNewscUsingCommentcId( $commentc_id );
+	abstract public function getCommentcUsingCommentcId( $commentc_id );
 	
 	/**
 	 * Supprime le commentaire d'id fourni en paramètre.
@@ -57,10 +58,13 @@ abstract class CommentsManager extends Manager {
 	/**
 	 * Insère ou met à jour le commentaire en DB selon qu'il existe déjà ou non en base.
 	 *
-	 * @param Comment $Comment
+	 * @param Entity $Comment
 	 *
 	 */
-	final public function saveCommentc( Comment $Comment ) {
+	final public function save( Entity $Comment ) {
+		if (!$Comment instanceof Comment) {
+			throw new \BadMethodCallException('Save method expects Comment argument.');
+		}
 		if ( $Comment->isValid() ) {
 			if ( $Comment->objectNew() ) {
 				$this->insertCommentc( $Comment );
@@ -74,7 +78,7 @@ abstract class CommentsManager extends Manager {
 	
 	/**
 	 * Insère le commentaire en DB.
-	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
 	 *
 	 * @param Comment $Comment
 	 */
@@ -82,7 +86,7 @@ abstract class CommentsManager extends Manager {
 	
 	/**
 	 * Modifie le commentaire en DB.
-	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
 	 *
 	 * @param Comment $Comment
 	 */

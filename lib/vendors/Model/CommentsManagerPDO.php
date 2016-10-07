@@ -20,7 +20,7 @@ use Entity\Comment;
 class CommentsManagerPDO extends CommentsManager {
 	/**
 	 * Insère le commentaire en DB.
-	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
 	 *
 	 * @param Comment $Comment
 	 */
@@ -43,7 +43,7 @@ class CommentsManagerPDO extends CommentsManager {
 	
 	/**
 	 * Modifie le commentaire en DB.
-	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
 	 *
 	 * @param Comment $Comment
 	 */
@@ -100,7 +100,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @return Comment|null
 	 */
-	public function getNewscUsingCommentcId( $commentc_id ) {
+	public function getCommentcUsingCommentcId( $commentc_id ) {
 		/**
 		 * @var $Query \PDOStatement
 		 */

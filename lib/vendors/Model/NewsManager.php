@@ -10,6 +10,7 @@
 namespace Model;
 
 use Entity\News;
+use OCFram\Entity;
 use OCFram\Manager;
 
 /**
@@ -61,10 +62,13 @@ abstract class NewsManager extends Manager {
 	/**
 	 * Insère ou met à jour la news en DB selon qu'elle existe déjà ou non en base.
 	 *
-	 * @param News $News
+	 * @param Entity $News
 	 *
 	 */
-	final public function saveNewsc( News $News ) {
+	final public function save( Entity $News ) {
+		if (!$News instanceof News) {
+			throw new \BadMethodCallException('Save method expects News argument.');
+		}
 		if ( $News->isValid() ) {
 			if ( $News->objectNew() ) {
 				$this->insertNewsc( $News );

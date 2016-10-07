@@ -164,7 +164,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		// Suppression des commentaires associés à la news
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		$Comments_manager->deleteFromNews( $Request->getData( 'id' ) );
+		$Comments_manager->deleteCommentcUsingNewscId( $Request->getData( 'id' ) );
 		// Suppression de la news : si elle n'existe pas on redirige vers 404
 		if ( !$News_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
@@ -196,7 +196,7 @@ class NewsController extends BackController {
 		}
 		else {
 			// Récupérer le commentaire en DB
-			$Comment = $Comments_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
+			$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
 		}
 		
 		// News qui n'existe pas : on redirige vers une erreur 404
@@ -233,7 +233,7 @@ class NewsController extends BackController {
 		 * @var $Comments_manager CommentsManager
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		if ( !$Comments_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+		if ( !$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
 		}
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
