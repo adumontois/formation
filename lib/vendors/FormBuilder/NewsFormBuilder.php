@@ -10,7 +10,6 @@ namespace FormBuilder;
 
 use OCFram\Entity;
 use OCFram\FormBuilder;
-use OCFram\MaxLengthValidator;
 use OCFram\NotNullValidator;
 use OCFram\StringField;
 use OCFram\TextField;

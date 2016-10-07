@@ -32,13 +32,13 @@ class News extends Entity {
 	 */
 	protected $contenu;
 	/**
-	 * @var $dateAjout \DateTime
+	 * @var $DateAjout \DateTime
 	 */
-	protected $dateAjout;
+	protected $DateAjout;
 	/**
-	 * @var $dateModif \DateTime
+	 * @var $DateModif \DateTime
 	 */
-	protected $dateModif;
+	protected $DateModif;
 	const INVALID_AUTHOR  = 1;
 	const INVALID_TITLE   = 2;
 	const INVALID_CONTENT = 3;
@@ -95,21 +95,21 @@ class News extends Entity {
 	}
 	
 	/**
-	 * Setter pour l'attribut dateAjout.
+	 * Setter pour l'attribut DateAjout.
 	 *
-	 * @param \DateTime $date
+	 * @param \DateTime $DateAjout
 	 */
-	public function setDateAjout( \DateTime $date ) {
-		$this->dateAjout = $date;
+	public function setDateAjout( \DateTime $DateAjout ) {
+		$this->DateAjout = $DateAjout;
 	}
 	
 	/**
-	 * Setter pour l'attribut dateModif.
+	 * Setter pour l'attribut DateModif.
 	 *
-	 * @param \DateTime $date
+	 * @param \DateTime $DateModif
 	 */
-	public function setDateModif( \DateTime $date ) {
-		$this->dateModif = $date;
+	public function setDateModif( \DateTime $DateModif ) {
+		$this->DateModif = $DateModif;
 	}
 	
 	/**
@@ -136,14 +136,14 @@ class News extends Entity {
 	/**
 	 * @return \DateTime
 	 */
-	public function dateAjout() {
-		return $this->dateAjout;
+	public function DateAjout() {
+		return $this->DateAjout;
 	}
 	
 	/**
 	 * @return \DateTime
 	 */
-	public function dateModif() {
-		return $this->dateModif;
+	public function DateModif() {
+		return $this->DateModif;
 	}
 }

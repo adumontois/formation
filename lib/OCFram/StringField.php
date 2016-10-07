@@ -19,7 +19,6 @@ class StringField extends Field {
 	 * @var $maxLength int Entier strictement positif, longueur maximale du champ
 	 */
 	protected $maxLength;
-	
 	/**
 	 * Construit le champ de texte.
 	 *
@@ -29,12 +28,13 @@ class StringField extends Field {
 	/**
 	 * StringField constructor.
 	 * Ajoute automatiquement un validateur MaxLengthValidator.
+	 *
 	 * @param array $options
 	 */
 	public function __construct( array $options ) {
 		parent::__construct( $options );
-		if (isset($this -> maxLength)) {
-			$this->setValidators( array( new MaxLengthValidator( 'Specified ' . strtolower($this->label) . ' is too long (max = ' .$this->maxLength . ' characters', $this->maxLength ) ));
+		if ( isset( $this->maxLength ) ) {
+			$this->setValidators( array( new MaxLengthValidator( 'Specified ' . strtolower( $this->label ) . ' is too long (max = ' . $this->maxLength . ' characters', $this->maxLength ) ) );
 		}
 	}
 	

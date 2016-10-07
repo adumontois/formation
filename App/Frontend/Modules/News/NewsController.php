@@ -17,112 +17,110 @@ use OCFram\Application;
 use \OCFram\BackController;
 use OCFram\FormHandler;
 use \OCFram\HTTPRequest;
+use OCFram\HTTPResponse;
 
 class NewsController extends BackController {
 	/**
 	 * NewsController constructor.
-	 * Construit un backcontroller en spécifiant la DB news
+	 * Construit un backcontroller en spécifiant la DB news.
 	 *
-	 * @param Application $app
+	 * @param Application $App
 	 * @param string      $module
 	 * @param string      $action
 	 */
-	public function __construct( Application $app, $module, $action ) {
-		parent::__construct( $app, $module, $action, 'news' );
+	public function __construct( Application $App, $module, $action ) {
+		parent::__construct( $App, $module, $action, 'news' );
 	}
 	
 	/**
-	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml
+	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml.
 	 */
-	public function executeIndex() {
+	public function executeBuildIndex() {
+		/**
+		 * @var $News_manager NewsManager
+		 * @var $Liste_news_a News[]
+		 */
 		// Récupérer la config
 		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
 		$longueur_news = $this->app()->config()->get( 'longueur_news' );
 		
-		// Ajouter un titre à la page
-		$this->page->addVar( 'title', 'List of ' . $nombre_news . ' last news' );
-		
 		// Récupérer le manager des news
-		/** @var NewsManager $manager */
-		$manager = $this->managers->getManagerOf();
+		
+		$News_manager = $this->managers->getManagerOf();
 		
 		// Récupérer la liste des news à afficher
-		$listeNews = $manager->getList( 0, $nombre_news );
+		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
 		
 		//
-		foreach ( $listeNews as $news ) {
+		foreach ( $Liste_news_a as $News ) {
 			// Prendre le nombre de caractères nécessaires
-			/**
-			 * @var News $news
-			 */
-			$news->setContenu( substr( $news->contenu(), 0, $longueur_news ) );
-			if ( strlen( $news->contenu() ) == $longueur_news ) {
-				$news->setContenu( substr( $news->contenu(), 0, strrpos( $news->contenu(), ' ' ) ) . '...' );
+			$News->setContenu( substr( $News->contenu(), 0, $longueur_news ) );
+			if ( strlen( $News->contenu() ) == $longueur_news ) {
+				$News->setContenu( substr( $News->contenu(), 0, strrpos( $News->contenu(), ' ' ) ) . '...' );
 			}
 		}
-		$this->page->addVar( 'listeNews', $listeNews );
+		$this->page->addVar( 'T_TITLE', 'Liste des ' . $nombre_news . ' dernières news' );
+		$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST_A', $Liste_news_a );
 	}
 	
 	/**
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 * Affiche une news et les commentaires associés
 	 */
-	public function executeShow( HTTPRequest $request ) {
+	public function executeBuildNews( HTTPRequest $Request ) {
 		/**
-		 * @var $news_manager    NewsManager
-		 * @var $news            News
-		 * @var $comment_manager CommentsManager
+		 * @var $News_manager    NewsManager
+		 * @var $News            News
+		 * @var $Comment_manager CommentsManager
 		 */
-		$id           = $request->getData( 'id' );
-		$news_manager = $this->managers->getManagerOf();
-		$news         = $news_manager->getUnique( $id );
+		$News_manager = $this->managers->getManagerOf();
+		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		
-		if ( empty( $news ) ) // Si la news n'existe pas on redirige
-		{
-			$this->app->httpResponse()->redirectError( 404, new \RuntimeException( 'News asked doesn\'t exist' ) );
-			exit;
+		// Si la news n'existe pas on redirige vers une erreur 404
+		if ( empty( $News ) ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
 		}
 		
 		// Afficher les commentaires
-		$comment_manager = $this->managers->getManagerOf('Comments');
-		$listeComments   = $comment_manager->getListOf( $news->id() );
+		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
+		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
 		
-		$this->page->addVar( 'titre', $news->titre() );
-		$this->page->addVar( 'news', $news );
-		$this->page->addVar( 'listeCommentaires', $listeComments );
-		$this->page->addVar( 'user', $this->app->user() );
+		$this->page->addVar( 'T_TITLE', $News->titre() );
+		$this->page->addVar( 'T_NEWS_BUILDNEWS_NEWS', $News );
+		$this->page->addVar( 'T_NEWS_BUILDNEWS_COMMENT_LIST_A', $Liste_comments_a );
+		$this->page->addVar( 'T_NEWS_BUILDNEWS_USER', $this->app->user() );
 	}
 	
 	/**
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 * Insère un commentaire
 	 */
-	public function executeInsertComment( HTTPRequest $request ) {
-		if ( $request->method() == 'POST' ) {
-			$commentaire = new Comment( array(
-				'news'    => $request->getData( 'id' ),
-				'auteur'  => $request->postData( 'auteur' ),
-				'contenu' => $request->postData( 'contenu' ),
+	public function executePutInsertComment( HTTPRequest $Request ) {
+		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			$Commentaire = new Comment( array(
+				'news'    => $Request->getData( 'id' ),
+				'auteur'  => $Request->postData( 'auteur' ),
+				'contenu' => $Request->postData( 'contenu' ),
 			) );
 		}
 		else {
-			$commentaire = new Comment();
+			$Commentaire = new Comment();
 		}
 		// Construction du formulaire
 		// 1) Données values
-		$formulaire = new CommentFormBuilder( $commentaire );
+		$Form_builder = new CommentFormBuilder( $Commentaire );
 		// 2) Construction et vérification des données
-		$formulaire->build();
-		$form = $formulaire->form();
+		$Form_builder->build();
+		$Form = $Form_builder->form();
 		
 		// Sauvegarde avec le handler
-		$formHandler = new FormHandler( $form, $this->managers->getManagerOf( 'Comments' ), $request );
-		if ( $formHandler->process() ) {
+		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
+		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( 'news-' . $request->getData( 'id' ) . '.html' );
+			$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
 		}
-		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
+		$this->page->addVar( 'T_TITLE', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
-		$this->page->addVar( 'form', $formulaire->form()->createView() );
+		$this->page->addVar( 'T_NEWS_PUTINSERTCOMMENT_FORM', $Form_builder->form()->createView() );
 	}
 }

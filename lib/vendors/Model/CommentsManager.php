@@ -22,32 +22,69 @@ abstract class CommentsManager extends Manager {
 	/**
 	 * Récupère tous les commentaires associés à la news d'id passé en paramètre
 	 *
-	 * @param $id int ID de la news
+	 * @param $newsc_id int ID de la news
 	 *
 	 * @return Comment[]
 	 */
-	abstract public function getListOf( $id );
+	abstract public function getCommentcUsingNewscIdSortByIdDesc( $newsc_id );
 	
 	/**
 	 * Récupère le commentaire d'id donné.
 	 *
-	 * @param $id int ID du commentaire
+	 * @param $commentc_id int ID du commentaire
 	 *
-	 * @return Comment
+	 * @return Comment|null
 	 */
-	abstract public function get( $id );
+	abstract public function getNewscUsingCommentcId( $commentc_id );
 	
 	/**
 	 * Supprime le commentaire d'id fourni en paramètre.
+	 * Renvoie true si le commentaire existait, false sinon.
 	 *
-	 * @param $id int ID du commentaire
+	 * @param $commentc_id int ID du commentaire
+	 *
+	 * @return bool
 	 */
-	abstract public function delete( $id );
+	abstract public function deleteCommentcUsingCommentcId( $commentc_id );
 	
 	/**
 	 * Supprime tous les commentaires liés à une news d'id donné.
 	 *
-	 * @param $id int ID de la news
+	 * @param $newsc_id int ID de la news
 	 */
-	abstract public function deleteFromNews( $id );
+	abstract public function deleteCommentcUsingNewscId( $newsc_id );
+	
+	/**
+	 * Insère ou met à jour le commentaire en DB selon qu'il existe déjà ou non en base.
+	 *
+	 * @param Comment $Comment
+	 *
+	 */
+	final public function saveCommentc( Comment $Comment ) {
+		if ( $Comment->isValid() ) {
+			if ( $Comment->objectNew() ) {
+				$this->insertCommentc( $Comment );
+			}
+			
+			else {
+				$this->updateCommentc( $Comment );
+			}
+		}
+	}
+	
+	/**
+	 * Insère le commentaire en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
+	 *
+	 * @param Comment $Comment
+	 */
+	abstract protected function insertCommentc( Comment $Comment );
+	
+	/**
+	 * Modifie le commentaire en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
+	 *
+	 * @param Comment $Comment
+	 */
+	abstract protected function updateCommentc( Comment $Comment );
 }

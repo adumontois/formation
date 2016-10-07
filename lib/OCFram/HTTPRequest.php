@@ -9,7 +9,6 @@ namespace OCFram;
  * @package OCFram
  */
 class HTTPRequest extends ApplicationComponent {
-	
 	const POST_METHOD = 'POST';
 	
 	/**

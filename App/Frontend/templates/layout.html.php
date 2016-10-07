@@ -1,15 +1,21 @@
 <?php
 /**
- * @var $user \OCFram\User
+ * @var $user    \OCFram\User
  * @var $content string Contenu de la page à afficher
  */
+
+/**
+ * @var $T_USER    \OCFram\User Session utilisateur
+ * @var $T_CONTENT string Contenu de la page générée
+ */
+
 ?>
 
 <!DOCTYPE html>
 <html>
 	<head>
 		<title>
-			<?= isset( $title ) ? $title : 'Mon super site' ?>
+			<?= isset( $T_TITLE ) ? $T_TITLE : 'Mon super site' ?>
 		</title>
 		
 		<meta charset="utf-8" />
@@ -27,23 +33,23 @@
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<li><a href="/admin/">Admin<?= $user->isAuthenticated() ? ' (connecté)' : ' (non connecté)'?></a></li>
+					<li><a href="/admin/">Admin<?= $T_USER->isAuthenticated() ? ' (connecté)' : ' (non connecté)' ?></a></li>
 					<?php
-					if ( $user->isAuthenticated() ): ?>
+					if ( $T_USER->isAuthenticated() ): ?>
 						<li><a href="/admin/logout.html">Déconnexion</a></li>
 						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
-					<?php
+						<?php
 					endif; ?>
-					
+				
 				</ul>
 			</nav>
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?php if ( $user->hasFlash() ):
-						echo '<p style="text-align: center;">', $user->getFlash(), '</p>';
+					<?php if ( $T_USER->hasFlash() ):
+						echo '<p style="text-align: center;">', $T_USER->getFlash(), '</p>';
 					endif; ?>
-					<?= $content ?>
+					<?= $T_CONTENT ?>
 				</section>
 			</div>
 			

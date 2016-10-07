@@ -23,35 +23,72 @@ abstract class NewsManager extends Manager {
 	const MAX_LIST_SIZE = 1000000;
 	
 	/**
-	 * Récupère une liste de $count news, commençant par la start-ème news.
+	 * Récupère une liste de $count news, commençant par la $start-ème news.
 	 *
 	 * @param $start int Offset dans la liste
 	 * @param $count int Nombre maximal de news à retourner
 	 *
-	 * @return News[] Renvoie un tableau de news
+	 * @return News[]
 	 */
-	abstract public function getList( $start = 0, $count = self::MAX_LIST_SIZE );
+	abstract public function getNewscSortByIdDesc( $start = 0, $count = self::MAX_LIST_SIZE );
 	
 	/**
 	 * Récupère la news d'id donné.
 	 *
-	 * @param $id int
+	 * @param $newsc_id int
 	 *
 	 * @return null|News
 	 */
-	abstract public function getUnique( $id );
+	abstract public function getNewscUsingNewscId( $newsc_id );
 	
 	/**
 	 * Compte le nombre de news en DB.
 	 *
 	 * @return int
 	 */
-	abstract public function count();
+	abstract public function countNewscUsingNewscId();
 	
 	/**
 	 * Supprime la news d'id donné de la DB.
+	 * Renvoie true si la news existait, false sinon.
 	 *
-	 * @param $id int
+	 * @param $newsc_id int
+	 *
+	 * @return bool
 	 */
-	abstract public function delete( $id );
+	abstract public function deleteNewscUsingNewscId( $newsc_id );
+	
+	/**
+	 * Insère ou met à jour la news en DB selon qu'elle existe déjà ou non en base.
+	 *
+	 * @param News $News
+	 *
+	 */
+	final public function saveNewsc( News $News ) {
+		if ( $News->isValid() ) {
+			if ( $News->objectNew() ) {
+				$this->insertNewsc( $News );
+			}
+			
+			else {
+				$this->updateNewsc( $News );
+			}
+		}
+	}
+	
+	/**
+	 * Insère la news en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
+	 *
+	 * @param News $News
+	 */
+	abstract protected function insertNewsc( News $News );
+	
+	/**
+	 * Modifie la news en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
+	 *
+	 * @param News $News
+	 */
+	abstract protected function updateNewsc( News $News );
 }

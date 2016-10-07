@@ -10,7 +10,6 @@
 namespace Model;
 
 use Entity\News;
-use OCFram\Entity;
 
 /**
  * Class NewsManagerPDO
@@ -28,62 +27,59 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @return News[] Renvoie un tableau de news
 	 */
-	public function getList( $start = 0, $count = parent::MAX_LIST_SIZE ) {
+	public function getNewscSortByIdDesc( $start = 0, $count = parent::MAX_LIST_SIZE ) {
 		/**
-		 * @var $query \PDOStatement
-		 * @var $news  News
+		 * @var $Query \PDOStatement
+		 * @var $News  News
 		 */
 		if ( $start < 0 OR $count <= 0 ) {
 			throw new \InvalidArgumentException( 'Offset and limit values must be positive integers' );
 		}
-
-		$sql = 'SELECT id, auteur, titre, contenu, dateAjout, dateModif
+		
+		$sql = 'SELECT id, auteur, titre, contenu, dateAjout as DateAjout, dateModif as DateModif
             FROM news ORDER BY id DESC LIMIT ' . $count . ' OFFSET ' . $start;
 		
 		// Utiliser le dao pour exécuter la requête
-		$query = $this->dao->query( $sql );
-
-		$query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
-		$listeNews = $query->fetchAll();
-
+		$Query = $this->dao->query( $sql );
+		
+		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
+		$Liste_news_a = $Query->fetchAll();
+		
 		// Ajouter les propriétés date "à la main"
-		foreach ( $listeNews as $news ) {
-			$news->setDateAjout( new \DateTime( $news->dateAjout() ) );
-			$news->setDateModif( new \DateTime( $news->dateModif() ) );
+		foreach ( $Liste_news_a as $News ) {
+			$News->setDateAjout( new \DateTime( $News->DateAjout() ) );
+			$News->setDateModif( new \DateTime( $News->DateModif() ) );
 		}
 		
-		$query->closeCursor();
+		$Query->closeCursor();
 		
-		return $listeNews;
+		return $Liste_news_a;
 	}
 	
 	/**
 	 * Récupère la news d'id donné.
 	 *
-	 * @param $id int
+	 * @param $newsc_id int
 	 *
 	 * @return null|News
 	 */
-	public function getUnique( $id ) {
+	public function getNewscUsingNewscId( $newsc_id ) {
 		/**
-		 * @var $query \PDOStatement
+		 * @var $Query \PDOStatement
 		 */
-		if ( $id <= 0 ) {
-			throw new \InvalidArgumentException('getUnique method expects a positive integer');
-		}
-		$sql   = 'SELECT id, auteur, titre, contenu, dateAjout, dateModif
+		$sql   = 'SELECT id, auteur, titre, contenu, dateAjout as DateAjout, dateModif as DateModif
                 FROM news
                 WHERE id = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', $id, \PDO::PARAM_INT );
-		$query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
-		$query->execute();
-		$news = $query->fetch();
-		if ( $news ) {
-			$news->setDateAjout( new \DateTime( $news->dateAjout() ) );
-			$news->setDateModif( new \DateTime( $news->dateModif() ) );
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', $newsc_id, \PDO::PARAM_INT );
+		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' ); // Contresens avec la doc PHP.net
+		$Query->execute();
+		$News = $Query->fetch();
+		if ( $News ) {
+			$News->setDateAjout( new \DateTime( $News->DateAjout() ) );
+			$News->setDateModif( new \DateTime( $News->DateModif() ) );
 			
-			return $news;
+			return $News;
 		}
 		
 		return null;
@@ -94,7 +90,7 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @return int
 	 */
-	public function count() {
+	public function countNewscUsingNewscId() {
 		$sql = 'SELECT COUNT(*)
                 FROM news';
 		
@@ -102,59 +98,83 @@ class NewsManagerPDO extends NewsManager {
 	}
 	
 	/**
-	 * Insère la news passée en paramètre en DB.
+	 * Insère la news en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
 	 *
-	 *
-	 * @param Entity $news News à insérer
+	 * @param News $News
 	 */
-	protected function add( Entity $news ) {
+	protected function insertNewsc( News $News ) {
 		/**
-		 * @var $query \PDOStatement
-		 * @var $news News
+		 * @var $Query \PDOStatement
+		 * @var $News  News
 		 */
 		$sql   = 'INSERT INTO news (auteur, titre, contenu, dateAjout, dateModif)
                     VALUES (:auteur, :titre, :contenu, NOW(), NOW())';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':auteur', $news->auteur(), \PDO::PARAM_STR );
-		$query->bindValue( ':titre', $news->titre(), \PDO::PARAM_STR );
-		$query->bindValue( ':contenu', $news->contenu(), \PDO::PARAM_STR );
-		$query->execute();
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':auteur', $News->auteur(), \PDO::PARAM_STR );
+		$Query->bindValue( ':titre', $News->titre(), \PDO::PARAM_STR );
+		$Query->bindValue( ':contenu', $News->contenu(), \PDO::PARAM_STR );
+		$Query->execute();
 	}
 	
 	/**
-	 * Met à jour la news passée en paramètre en DB.
+	 * Modifie la news en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique save.
 	 *
-	 * @param Entity $news News à modifier
+	 * @param News $News
 	 */
-	protected function modify( Entity $news ) {
+	protected function updateNewsc( News $News ) {
 		/**
-		 * @var $query \PDOStatement
-		 * @var $news News
+		 * @var $Query \PDOStatement
+		 * @var $News  News
 		 */
 		$sql   = 'UPDATE news
                 SET auteur = :auteur, titre = :titre, contenu = :contenu, dateModif = NOW()
                 WHERE id = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', $news->id(), \PDO::PARAM_INT );
-		$query->bindValue( ':auteur', $news->auteur(), \PDO::PARAM_STR );
-		$query->bindValue( ':titre', $news->titre(), \PDO::PARAM_STR );
-		$query->bindValue( ':contenu', $news->contenu(), \PDO::PARAM_STR );
-		$query->execute();
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', $News->id(), \PDO::PARAM_INT );
+		$Query->bindValue( ':auteur', $News->auteur(), \PDO::PARAM_STR );
+		$Query->bindValue( ':titre', $News->titre(), \PDO::PARAM_STR );
+		$Query->bindValue( ':contenu', $News->contenu(), \PDO::PARAM_STR );
+		$Query->execute();
 	}
 	
 	/**
 	 * Supprime la news d'id donné de la DB.
+	 * Renvoie true si la news existait, false sinon.
 	 *
 	 * @param $id int
+	 *
+	 * @return bool
 	 */
-	public function delete( $id ) {
+	public function deleteNewscUsingNewscId( $id ) {
 		/**
-		 * @var $query \PDOStatement
+		 * @var $Query \PDOStatement
 		 */
 		$sql   = 'DELETE FROM news
                 WHERE id = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
-		$query->execute();
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
+		$Query->execute();
+		
+		return (bool)$Query->rowCount();
+	}
+	
+	/**
+	 * Insère ou met à jour la news en DB selon qu'il existe déjà ou non en base.
+	 *
+	 * @param News $News
+	 *
+	 */
+	public function save( News $News ) {
+		if ( $News->isValid() ) {
+			if ( $News->objectNew() ) {
+				$this->insertNewsc( $News );
+			}
+			
+			else {
+				$this->updateNewsc( $News );
+			}
+		}
 	}
 }

@@ -50,7 +50,7 @@ class FormHandler {
 	 */
 	public function process() {
 		
-		if ( $this->request->method() == 'POST' AND $this->form->isValid() ) {
+		if ( $this->request->method() == HTTPRequest::POST_METHOD AND $this->form->isValid() ) {
 			$this->manager->save( $this->form->entity() );
 			
 			return true;

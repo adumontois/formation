@@ -9,7 +9,6 @@
 namespace Model;
 
 use Entity\Comment;
-use OCFram\Entity;
 
 /**
  * Class CommentsManagerPDO
@@ -20,138 +19,138 @@ use OCFram\Entity;
  */
 class CommentsManagerPDO extends CommentsManager {
 	/**
-	 * Ajoute un nouveau commentaire en DB.
+	 * Insère le commentaire en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
 	 *
-	 * @param Entity $comment Commentaire à insérer
+	 * @param Comment $Comment
 	 */
-	protected function add( Entity $comment ) {
+	protected function insertCommentc( Comment $Comment ) {
 		/**
-		 * @var $query \PDOStatement
-		 * @var $comment Comment
+		 * @var $Query   \PDOStatement
+		 * @var $Comment Comment
 		 */
 		$sql = 'INSERT INTO comment
                     (news, auteur, contenu, date)
                 VALUES (:news, :auteur, :contenu, NOW())';
 		
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':news', $comment->news(), \PDO::PARAM_INT );
-		$query->bindValue( ':auteur', $comment->auteur(), \PDO::PARAM_STR );
-		$query->bindValue( ':contenu', $comment->contenu(), \PDO::PARAM_STR );
-		$query->execute();
-		$comment->setId( $this->dao->lastInsertId() );
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':news', $Comment->news(), \PDO::PARAM_INT );
+		$Query->bindValue( ':auteur', $Comment->auteur(), \PDO::PARAM_STR );
+		$Query->bindValue( ':contenu', $Comment->contenu(), \PDO::PARAM_STR );
+		$Query->execute();
+		$Comment->setId( $this->dao->lastInsertId() );
 	}
 	
 	/**
-	 * Met à jour un commentaire existant en DB.
+	 * Modifie le commentaire en DB.
+	 * Cette méthode ne doit pas être appelée directement ; utiliser la méthode publique saveCommentc.
 	 *
-	 * @param Entity $comment
+	 * @param Comment $Comment
 	 */
-	protected function modify( Entity $comment ) {
+	protected function updateCommentc( Comment $Comment ) {
 		/**
-		 * @var $query \PDOStatement
-		 * @var $comment Comment
+		 * @var $Query   \PDOStatement
+		 * @var $Comment Comment
 		 */
-		$sql = 'UPDATE comment
+		$sql   = 'UPDATE comment
                 SET news = :news, auteur = :auteur, contenu = :contenu
                 WHERE id = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':news', $comment->news(), \PDO::PARAM_INT );
-		$query->bindValue( ':auteur', $comment->auteur(), \PDO::PARAM_STR );
-		$query->bindValue( ':contenu', $comment->contenu(), \PDO::PARAM_STR );
-		$query->bindValue( ':id', $comment->id(), \PDO::PARAM_INT );
-		$query->execute();
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':news', $Comment->news(), \PDO::PARAM_INT );
+		$Query->bindValue( ':auteur', $Comment->auteur(), \PDO::PARAM_STR );
+		$Query->bindValue( ':contenu', $Comment->contenu(), \PDO::PARAM_STR );
+		$Query->bindValue( ':id', $Comment->id(), \PDO::PARAM_INT );
+		$Query->execute();
 	}
 	
 	/**
 	 * Récupère tous les commentaires associés à la news d'id passé en paramètre
 	 *
-	 * @param $id int ID de la news
+	 * @param $newsc_id int ID de la news
 	 *
 	 * @return Comment[]
 	 */
-	public function getListOf( $id ) {
+	public function getCommentcUsingNewscIdSortByIdDesc( $newsc_id ) {
 		/**
-		 * @var $query         \PDOStatement
-		 * @var $listeComments Comment[]
+		 * @var $Query            \PDOStatement
+		 * @var $Liste_comments_a Comment[]
 		 */
-		if ( !ctype_digit( $id ) ) {
-			throw new \RuntimeException( 'News id must be an integer value' );
-		}
-		
-		$sql = 'SELECT id, news, auteur, contenu, date
+		$sql = 'SELECT id, news, auteur, contenu, date as Date
                 FROM comment
                 WHERE news = :news
                 ORDER BY id DESC';
 		
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':news', $id, \PDO::PARAM_INT );
-		$query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
-		$query->execute();
-		$listeComments = $query->fetchAll();
-		foreach ( $listeComments as $comment ) {
-			$comment->setDate( new \DateTime( $comment->date() ) );
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':news', (int)$newsc_id, \PDO::PARAM_INT );
+		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
+		$Query->execute();
+		$Liste_comments_a = $Query->fetchAll();
+		foreach ( $Liste_comments_a as $Comment ) {
+			$Comment->setDate( new \DateTime( $Comment->Date() ) );
 		}
-		$query->closeCursor();
+		$Query->closeCursor();
 		
-		return $listeComments;
+		return $Liste_comments_a;
 	}
 	
 	/**
 	 * Récupère le commentaire d'id donné.
 	 *
-	 * @param $id int ID du commentaire
+	 * @param $commentc_id int ID du commentaire
 	 *
-	 * @return Comment
+	 * @return Comment|null
 	 */
-	public function get( $id ) {
+	public function getNewscUsingCommentcId( $commentc_id ) {
 		/**
-		 * @var $query \PDOStatement
+		 * @var $Query \PDOStatement
 		 */
-		if ( !ctype_digit( $id ) ) {
-			throw new \RuntimeException( 'Comment id must be an integer value' );
-		}
-		
-		$sql   = 'SELECT id, news, auteur, contenu, date
+		$sql   = 'SELECT id, news, auteur, contenu, date as Date
                 FROM comment
                 WHERE id = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', $id, \PDO::PARAM_INT );
-		$query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
-		$query->execute();
-		$comment = $query->fetch();
-		$query->closeCursor();
-		return $comment;
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
+		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
+		$Query->execute();
+		$Comment = $Query->fetch();
+		$Query->closeCursor();
+		
+		return $Comment;
 	}
 	
 	/**
 	 * Supprime le commentaire d'id fourni en paramètre.
+	 * Renvoie true si le commentaire existait, false sinon.
 	 *
-	 * @param $id int ID du commentaire
+	 * @param $commentc_id int ID du commentaire
+	 *
+	 * @return bool
 	 */
-	public function delete( $id ) {
+	public function deleteCommentcUsingCommentcId( $commentc_id ) {
 		/**
-		 * @var $query \PDOStatement
+		 * @var $Query \PDOStatement
 		 */
 		$sql   = 'DELETE FROM comment
                 WHERE id = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
-		$query->execute();
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
+		$Query->execute();
+		
+		return (bool)$Query->rowCount();
 	}
 	
 	/**
 	 * Supprime tous les commentaires liés à une news d'id donné.
 	 *
-	 * @param $id int ID de la news
+	 * @param $newsc_id int ID de la news
 	 */
-	public function deleteFromNews( $id ) {
+	public function deleteCommentcUsingNewscId( $newsc_id ) {
 		/**
-		 * @var $query \PDOStatement
+		 * @var $Query \PDOStatement
 		 */
 		$sql   = 'DELETE FROM comment
                 WHERE news = :id';
-		$query = $this->dao->prepare( $sql );
-		$query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
-		$query->execute();
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', (int)$newsc_id, \PDO::PARAM_INT );
+		$Query->execute();
 	}
 }

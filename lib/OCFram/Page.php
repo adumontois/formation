@@ -58,22 +58,22 @@ class Page extends ApplicationComponent {
 			throw new \RuntimeException( 'Specified view "' . $this->contentFile . '" doesn\'t exists' );
 		}
 		/*
-		 * @var $user User utilisée dans les vues
+		 * @var $T_USER User utilisée dans les vues
 		 */
-		$user = $this->app->user();
+		$T_USER = $this->app->user();
 		extract( $this->vars );
 		
 		// Créer la page en bufferisation
 		ob_start();
 		require $this->contentFile; // Existence du fichier vérifiée
 		/**
-		 * @var $content string utilisée dans les vues
+		 * @var $T_CONTENT string utilisée dans les vues
 		 */
-		$content = ob_get_clean(); // Vider le buffer dans la sortie
+		$T_CONTENT = ob_get_clean(); // Vider le buffer dans la sortie
 		
 		ob_start();
 		
-		require __DIR__ . '/../../App/' . $this->app->name() . '/Templates/layout.php'; // Construction dynamique du chemin de layout OK
+		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.html.php'; // Construction dynamique du chemin de layout OK
 		
 		return ob_get_clean();
 	}

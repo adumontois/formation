@@ -12,7 +12,7 @@
  * @var $T_NEWS_PUTUPDATENEWS_NEWS \Entity\News News à modifier
  */
 ?>
-	
+
 <h2><?= $T_NEWS_PUTUPDATENEWS_HEAD ?></h2>
 
 <form action="" method="post">

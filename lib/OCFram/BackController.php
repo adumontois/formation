@@ -49,21 +49,20 @@ abstract class BackController extends ApplicationComponent {
 	 * @param string      $dbName   Nom de la base de données
 	 * @param string      $daoClass Nom de la classe permettant de construire le DAO
 	 */
-	public function __construct( Application $app, $module, $action, $dbName, $daoClass = 'PDO') {
+	public function __construct( Application $app, $module, $action, $dbName, $daoClass = 'PDO' ) {
 		parent::__construct( $app );
 		$this->setAction( $action );
 		$this->setModule( $module );
 		$this->page = new Page( $app );
 		$this->setView( $action );
-
+		
 		
 		// Calcul du nom de la classe construisant le DAO
-		$daoFactoryClass = 'OCFram\\'.$daoClass.'Factory';
+		$daoFactoryClass = 'OCFram\\' . $daoClass . 'Factory';
 		// Calcul du nom de la méthode retournant le DAO
-		$daoMethod = 'get'.ucfirst($daoClass);
-	
-		$this->managers = new Managers( $daoClass, $daoFactoryClass::$daoMethod($dbName) );
-
+		$daoMethod = 'get' . ucfirst( $daoClass );
+		
+		$this->managers = new Managers( $daoClass, $daoFactoryClass::$daoMethod( $dbName ) );
 	}
 	
 	/**
@@ -123,6 +122,6 @@ abstract class BackController extends ApplicationComponent {
 			throw new \InvalidArgumentException( 'View must be a valid string' );
 		}
 		$this->view = $view;
-		$this->page->setContentFile( __DIR__ . '/../../App/' . $this->app->name() . '/Modules/' . $this->module . '/Views/' . $this->view . '.php' );
+		$this->page->setContentFile( __DIR__ . '/../../App/' . $this->app->name() . '/Modules/' . $this->module . '/Views/' . $this->view . '.html.php' );
 	}
 }

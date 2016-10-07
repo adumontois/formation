@@ -23,14 +23,14 @@ class BackendApplication extends Application {
 	public function run() {
 		if ( $this->user->isAuthenticated() ) // Si l'utilisateur est authentifié, on récupère le contrôleur souhaité
 		{
-			$controller = $this->getController();
+			$Controller = $this->getController();
 		}
 		else // Sinon on récupère le contrôleur d'authentification
 		{
-			$controller = new Modules\Connexion\ConnexionController( $this, 'Connexion', 'buildIndex' );
+			$Controller = new Modules\Connexion\ConnexionController( $this, 'Connexion', 'buildIndex' );
 		}
-		$controller->execute();
-		$this->httpResponse()->setPage( $controller->page() );
+		$Controller->execute();
+		$this->httpResponse()->setPage( $Controller->page() );
 		$this->httpResponse()->send();
 	}
 }

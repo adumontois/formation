@@ -151,7 +151,7 @@ abstract class Field {
 	public function setValidators( array $validators ) {
 		// Ajouter les validateurs suivants
 		foreach ( $validators as $validator ) {
-			if ( $validator instanceof Validator AND (NULL === $this->validators OR !in_array( $validator, $this->validators ) )) {
+			if ( $validator instanceof Validator AND ( null === $this->validators OR !in_array( $validator, $this->validators ) ) ) {
 				$this->validators[] = $validator;
 			}
 		}
@@ -160,8 +160,7 @@ abstract class Field {
 	/**
 	 * Efface le contenu du tableau de validateurs
 	 */
-	public function eraseValidators()
-	{
-		$this -> validators = array();
+	public function eraseValidators() {
+		$this->validators = array();
 	}
 }

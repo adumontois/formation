@@ -28,36 +28,4 @@ abstract class Manager {
 	public function __construct( $dao ) {
 		$this->dao = $dao;
 	}
-	
-	/**
-	 * Insère l'objet paramètre en DB.
-	 *
-	 * @param Entity $object
-	 */
-	abstract protected function add(Entity $object);
-	
-	/**
-	 * Modifie l'objet paramètre en DB.
-	 *
-	 * @param Entity $object
-	 */
-	abstract protected function modify(Entity $object);
-	
-	/**
-	 * Insère ou met à jour la news en DB selon qu'il existe déjà ou non en base.
-	 *
-	 * @param Entity $object
-	 *
-	 */
-	final public function save( Entity $object ) {
-		if ( $object->isValid() ) {
-			if ( $object->object_new() ) {
-				
-				$this->add( $object );
-			}
-			else {
-				$this->modify( $object );
-			}
-		}
-	}
 }

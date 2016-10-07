@@ -32,9 +32,9 @@ class Comment extends Entity {
 	 */
 	protected $contenu;
 	/**
-	 * @var $date \DateTime
+	 * @var $Date \DateTime
 	 */
-	protected $date;
+	protected $Date;
 	const INVALID_AUTHOR  = 1;
 	const INVALID_CONTENT = 2;
 	const INVALID_NEWS    = 3;
@@ -72,8 +72,8 @@ class Comment extends Entity {
 	/**
 	 * @return \DateTime
 	 */
-	public function date() {
-		return $this->date;
+	public function Date() {
+		return $this->Date;
 	}
 	
 	/**
@@ -119,11 +119,11 @@ class Comment extends Entity {
 	}
 	
 	/**
-	 * Setter pour l'attribut date.
+	 * Setter pour l'attribut Date.
 	 *
-	 * @param \DateTime $date
+	 * @param \DateTime $Date
 	 */
-	public function setDate( \DateTime $date ) {
-		$this->date = $date;
+	public function setDate( \DateTime $Date ) {
+		$this->Date = $Date;
 	}
 }

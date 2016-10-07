@@ -50,7 +50,7 @@ abstract class Entity implements \ArrayAccess {
 	 *
 	 * @return bool
 	 */
-	public function object_new() {
+	public function objectNew() {
 		return empty( $this->id );
 	}
 	
@@ -135,8 +135,8 @@ abstract class Entity implements \ArrayAccess {
 	 * @param $id int strictement positif
 	 */
 	public function setId( $id ) {
-		if ( (int) $id > 0 ) {
-			$this->id = (int) $id;
+		if ( (int)$id > 0 ) {
+			$this->id = (int)$id;
 		}
 	}
 }

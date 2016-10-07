@@ -45,7 +45,7 @@ class SplClassLoader {
 	 * Creates a new <tt>SplClassLoader</tt> that loads classes of the
 	 * specified namespace.
 	 *
-	 * @param string $ns The namespace to use.
+	 * @param string $ns          The namespace to use.
 	 * @param string $includePath Path to include.
 	 */
 	public function __construct( $ns = null, $includePath = null ) {
@@ -136,19 +136,18 @@ class SplClassLoader {
 	 */
 	public function loadClass( $className ) {
 		if ( null === $this->_namespace || $this->_namespace . $this->_namespaceSeparator === substr( $className, 0, strlen( $this->_namespace . $this->_namespaceSeparator ) ) ) {
-			$fileName  = '';
+			$fileName = '';
 			if ( false !== ( $lastNsPos = strripos( $className, $this->_namespaceSeparator ) ) ) {
 				$namespace = substr( $className, 0, $lastNsPos );
 				$className = substr( $className, $lastNsPos + 1 );
 				$fileName  = str_replace( $this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace ) . DIRECTORY_SEPARATOR;
 			}
 			$fileName .= str_replace( '_', DIRECTORY_SEPARATOR, $className ) . $this->_fileExtension;
-			if ($this->_includePath !== null) {
-				require ($this->_includePath . DIRECTORY_SEPARATOR . $fileName);
+			if ( $this->_includePath !== null ) {
+				require( $this->_includePath . DIRECTORY_SEPARATOR . $fileName );
 			}
-			else
-			{
-				require ($this->_includePath . $fileName);
+			else {
+				require( $this->_includePath . $fileName );
 			}
 		}
 	}

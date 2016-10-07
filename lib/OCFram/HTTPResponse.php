@@ -19,8 +19,7 @@ class HTTPResponse extends ApplicationComponent {
 	 * @var $page Page
 	 */
 	protected $page;
-	
-	const NOT_FOUND = 404;
+	const NOT_FOUND                     = 404;
 	const SERVICE_TEMPORARY_UNAVAILABLE = 503;
 	
 	/**
@@ -49,19 +48,19 @@ class HTTPResponse extends ApplicationComponent {
 	 *
 	 * @param $error_number int
 	 */
-	public function redirectError($error_number, \Exception $error) {
+	public function redirectError( $error_number, \Exception $error ) {
 		$this->page = new Page( $this->app() );
-		$this->page->setContentFile( __DIR__ . '\..\..\Errors\\'.$error_number.'.html' );
-		$this->page->addVar('erreur', $error->getMessage());
-		switch ($error_number){
+		$this->page->setContentFile( __DIR__ . '\..\..\Errors\\' . $error_number . '.html' );
+		$this->page->addVar( 'erreur', $error->getMessage() );
+		switch ( $error_number ) {
 			case 404:
-
+			
 			case 503:
-				$this->addHeader( 'HTTP/1.0 503 Service Temporarily Unavailable');
+				$this->addHeader( 'HTTP/1.0 503 Service Temporarily Unavailable' );
 				break;
 			default:
 				$this->addHeader( 'HTTP/1.0 404 not found' );
-				$this->page->addVar('inexistant', 'Page associated to error '.$error_number.' doesn\'t exists');
+				$this->page->addVar( 'inexistant', 'Page associated to error ' . $error_number . ' doesn\'t exists' );
 				break;
 		}
 		// Envoyer le contenu de l'erreur à la page d'erreur

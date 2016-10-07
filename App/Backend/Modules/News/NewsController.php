@@ -51,10 +51,10 @@ class NewsController extends BackController {
 		 * @var $News_manager NewsManager
 		 */
 		$News_manager = $this->managers->getManagerOf();
-		$this->page->addVar( 'title', 'Liste des news' );
+		$this->page->addVar( 'T_TITLE', 'Liste des news' );
 		try {
-			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST', $News_manager->getList() );
-			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_COUNT', $News_manager->count() );
+			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST_A', $News_manager->getNewscSortByIdDesc() );
+			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_COUNT', $News_manager->countNewscUsingNewscId() );
 		}
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
@@ -64,13 +64,15 @@ class NewsController extends BackController {
 	/**
 	 * Gère l'insert ou l'update d'une news depuis un formulaire.
 	 *
+	 * Attention, cette action n'est pas destinée à être appelée directement par l'utilisateur.
+	 *
 	 * @param HTTPRequest $Request
 	 */
-	public function processForm( HTTPRequest $Request ) {
+	protected function executePutNews( HTTPRequest $Request ) {
 		/**
-		 * @var $Manager NewsManager
+		 * @var $News_manager NewsManager
 		 */
-		$Manager = $this->managers->getManagerOf();
+		$News_manager = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$News = new News( array(
 				'auteur'  => $Request->postData( 'auteur' ),
@@ -85,11 +87,15 @@ class NewsController extends BackController {
 		else {
 			if ( $Request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
-				$News = $Manager->getUnique( $Request->getData( 'id' ) );
+				$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 			}
 			else {
 				$News = new News();
 			}
+		}
+		// News qui n'existe pas : on redirige vers une erreur 404
+		if ( null === $News ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à éditer n\'existe pas !' ) );
 		}
 		
 		// Construction du formulaire
@@ -97,13 +103,13 @@ class NewsController extends BackController {
 		$Form_builder->build();
 		$Form = $Form_builder->form();;
 		// Sauvegarder avec le FormHandler
-		$FormHandler = new FormHandler( $Form, $Manager, $Request );
-		if ( $FormHandler->process() ) {
-			if ( $News->object_new() ) {
-				$this->app->user()->setFlash( 'La news a été correctement ajoutée' );
+		$Form_handler = new FormHandler( $Form, $News_manager, $Request );
+		if ( $Form_handler->process() ) {
+			if ( $News->objectNew() ) {
+				$this->app->user()->setFlash( 'La news a été correctement ajoutée.' );
 			}
 			else {
-				$this->app->user()->setFlash( 'La news a été correctement modifiée' );
+				$this->app->user()->setFlash( 'La news a été correctement modifiée.' );
 			};
 			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
 		}
@@ -111,16 +117,16 @@ class NewsController extends BackController {
 		
 		if ( !$Request->getExists( 'id' ) ) {
 			$page_prefix = 'T_NEWS_PUTINSERTNEWS_';
-			$this->page->addVar( 'title', 'Insertion d\'une news' );
-			$this->page->addVar( $page_prefix.'HEAD', 'Ajouter une news' );
+			$this->page->addVar( 'T_TITLE', 'Insertion d\'une news' );
+			$this->page->addVar( $page_prefix . 'HEAD', 'Ajouter une news' );
 		}
 		else {
 			$page_prefix = 'T_NEWS_PUTUPDATENEWS_';
-			$this->page->addVar( 'title', 'Modification d\'une news' );
-			$this->page->addVar( $page_prefix.'HEAD', 'Modifier une news' );
+			$this->page->addVar( 'T_TITLE', 'Modification d\'une news' );
+			$this->page->addVar( $page_prefix . 'HEAD', 'Modifier une news' );
 		}
-		$this->page->addVar( $page_prefix.'FORM', $Form->createView() );
-		$this->page->addVar( $page_prefix.'NEWS', $News );
+		$this->page->addVar( $page_prefix . 'FORM', $Form->createView() );
+		$this->page->addVar( $page_prefix . 'NEWS', $News );
 	}
 	
 	/**
@@ -129,98 +135,109 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executePutInsertNews( HTTPRequest $Request ) {
-		$this->processForm( $Request );
+		$this->executePutNews( $Request );
 	}
 	
 	/**
 	 * Met à jour une news.
 	 *
-	 * @param HTTPRequest $request
+	 * Si la news n'existe pas, redirige vers une erreur 404.
+	 *
+	 * @param HTTPRequest $Request
 	 */
-	public function executePutUpdateNews( HTTPRequest $request ) {
-		$this->processForm( $request );
+	public function executePutUpdateNews( HTTPRequest $Request ) {
+		$this->executePutNews( $Request );
 	}
 	
 	/**
-	 * Supprime une news.
+	 * Supprime une news et tous les commentaires qui lui sont associés.
 	 *
-	 * @param HTTPRequest $request
+	 * Si la news n'existe pas, redirige vers une erreur 404.
+	 *
+	 * @param HTTPRequest $Request
 	 */
-	public function executeDelete( HTTPRequest $request ) {
+	public function executeClearNews( HTTPRequest $Request ) {
 		/**
-		 * @var $news_manager     NewsManager
-		 * @var $comments_manager CommentsManager
+		 * @var $News_manager     NewsManager
+		 * @var $Comments_manager CommentsManager
 		 */
-		if ( !$request->getExists( 'id' ) ) {
-			throw new \RuntimeException( 'Undefined news to delete' );
-		}
-		$news_manager = $this->managers->getManagerOf();
+		$News_manager = $this->managers->getManagerOf();
 		// Suppression des commentaires associés à la news
-		$comments_manager = $this->managers->getManagerOf( 'Comments' );
-		$comments_manager->deleteFromNews( $request->getData( 'id' ) );
-		// Suppression de la news
-		$news_manager->delete( $request->getData( 'id' ) );
-		$this->page->addVar( 'title', 'Suppression d\'une news' );
-		$this->app->user()->setFlash( 'La news a été correctement supprimée' );
+		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+		$Comments_manager->deleteFromNews( $Request->getData( 'id' ) );
+		// Suppression de la news : si elle n'existe pas on redirige vers 404
+		if ( !$News_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
+		}
+		$this->page->addVar( 'T_TITLE', 'Suppression d\'une news' );
+		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
 		$this->app->httpResponse()->redirect( '.' );
 	}
 	
 	/**
 	 * Met à jour un commentaire.
 	 *
-	 * @param HTTPRequest $request
+	 * Si le commentaire n'existe pas, redirige vers une erreur 404.
+	 *
+	 * @param HTTPRequest $Request
 	 */
-	public function executeUpdateComment( HTTPRequest $request ) {
+	public function executePutUpdateComment( HTTPRequest $Request ) {
 		/**
-		 * @var $manager CommentsManager
+		 * @var $Comments_manager CommentsManager
 		 */
-		$manager = $this->managers->getManagerOf( 'Comments' );
-		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
-		if ( $request->method() == 'POST' ) {
-			$comment = new Comment( array(
-				'id'      => $request->getData( 'id' ),
-				'news'    => $request->postData( 'news' ),
-				'auteur'  => $request->postData( 'auteur' ),
-				'contenu' => $request->postData( 'contenu' ),
+		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			$Comment = new Comment( array(
+				'id'      => $Request->getData( 'id' ),
+				'news'    => $Request->postData( 'news' ),
+				'auteur'  => $Request->postData( 'auteur' ),
+				'contenu' => $Request->postData( 'contenu' ),
 			) );
 		}
 		else {
 			// Récupérer le commentaire en DB
-			$comment = $manager->get( $request->getData( 'id' ) );
+			$Comment = $Comments_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
+		}
+		
+		// News qui n'existe pas : on redirige vers une erreur 404
+		if ( null === $Comment ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à éditer n\'existe pas !' ) );
 		}
 		
 		// Construire le formulaire
-		$FormBuilder = new CommentFormBuilder( $comment );
-		$FormBuilder->build();
-		$Form = $FormBuilder->form();
+		$Form_builder = new CommentFormBuilder( $Comment );
+		$Form_builder->build();
+		$Form = $Form_builder->form();
 		
 		// Sauvegarder avec le FormHandler
-		$FormHandler = new FormHandler( $Form, $manager, $request );
-		if ( $FormHandler->process() ) {
-			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié' );
+		$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
+		if ( $Form_handler->process() ) {
+			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
 			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( '/admin/' );
+			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
 		}
-		$this->page->addVar( 'form', $Form->createView() );
-		$this->page->addVar( 'comment', $comment );
+		$this->page->addVar( 'T_TITLE', 'Edition d\'un commentaire' );
+		$this->page->addVar( 'T_NEWS_PUTUPDATECOMMENT_FORM', $Form->createView() );
+		$this->page->addVar( 'T_NEWS_PUTUPDATECOMMENT_COMMENT', $Comment );
 	}
 	
 	/**
 	 * Supprime un commentaire.
 	 *
-	 * @param HTTPRequest $request
+	 * Si le commentaire n'existe pas, redirige vers une erreur 404.
+	 *
+	 * @param HTTPRequest $Request
 	 */
-	public function executeDeleteComment( HTTPRequest $request ) {
+	public function executeClearComment( HTTPRequest $Request ) {
 		/**
-		 * @var $manager CommentsManager
+		 * @var $Comments_manager CommentsManager
 		 */
-		$manager = $this->managers->getManagerOf( 'Comments' );
-		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
-		if ( !$request->getExists( 'id' ) ) {
-			throw new \RuntimeException( 'Undefined comment to delete' );
+		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+		if ( !$Comments_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
 		}
-		$manager->delete( $request->getData( 'id' ) );
-		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé' );
+		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
+		$this->page->addVar( 'T_TITLE', 'Suppression d\'un commentaire' );
 		$this->app->httpResponse()->redirect( '.' );
 	}
 }

@@ -9,7 +9,6 @@
 namespace FormBuilder;
 
 use OCFram\FormBuilder;
-use OCFram\MaxLengthValidator;
 use OCFram\NotNullValidator;
 use OCFram\StringField;
 use OCFram\TextField;
@@ -34,7 +33,7 @@ class CommentFormBuilder extends FormBuilder {
 			'label'      => 'Auteur',
 			'maxLength'  => self::AUTHOR_MAX_LENGTH,
 			'validators' => array(
-				new NotNullValidator( 'Author can\'t be unknown' ),
+				new NotNullValidator( 'Le nom de l\'auteur doit être précisé.' ),
 			),
 		) ) );
 		$this->form->add( new TextField( array(
@@ -42,7 +41,7 @@ class CommentFormBuilder extends FormBuilder {
 			'rows'       => self::TEXTAREA_ROWS,
 			'cols'       => self::TEXTAREA_COLS,
 			'validators' => array(
-				new NotNullValidator( 'Content can\'t be empty' ),
+				new NotNullValidator( 'Vous ne pouvez pas envoyer un message vide !' ),
 			),
 		) ) );
 	}
