@@ -27,7 +27,7 @@
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<li><a href="/admin/">Admin</a></li>
+					<li><a href="/admin/">Admin<?= $user->isAuthenticated() ? ' (connecté)' : ' (non connecté)'?></a></li>
 					<?php
 					if ( $user->isAuthenticated() ): ?>
 						<li><a href="/admin/logout.html">Déconnexion</a></li>
@@ -43,8 +43,6 @@
 					<?php if ( $user->hasFlash() ):
 						echo '<p style="text-align: center;">', $user->getFlash(), '</p>';
 					endif; ?>
-
-
 					<?= $content ?>
 				</section>
 			</div>

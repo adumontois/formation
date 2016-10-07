@@ -36,11 +36,11 @@ class NewsController extends BackController {
 	 * @param string      $module
 	 * @param string      $action
 	 */
-	const DATABASE = 'news';
+	const DATABASE            = 'news';
 	const BUILDINDEX_LOCATION = '/admin/';
 	
-	public function __construct( Application $App, $module, $action) {
-		parent::__construct( $App, $module, $action, self::DATABASE);
+	public function __construct( Application $App, $module, $action ) {
+		parent::__construct( $App, $module, $action, self::DATABASE );
 	}
 	
 	/**
@@ -56,9 +56,8 @@ class NewsController extends BackController {
 			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_LIST', $News_manager->getList() );
 			$this->page->addVar( 'T_NEWS_BUILDINDEX_NEWS_COUNT', $News_manager->count() );
 		}
-		catch (\PDOException $Db_error)
-		{
-			$this->app->httpResponse()->redirectError(HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error);
+		catch ( \PDOException $Db_error ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
 		}
 	}
 	
@@ -86,7 +85,7 @@ class NewsController extends BackController {
 		else {
 			if ( $Request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
-				$News = $Manager->getUnique( $Request->getData('id') );
+				$News = $Manager->getUnique( $Request->getData( 'id' ) );
 			}
 			else {
 				$News = new News();
@@ -108,32 +107,29 @@ class NewsController extends BackController {
 			};
 			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
 		}
-
 		
-		if (!$Request->getExists( 'id' ))
-		{
+		
+		if ( !$Request->getExists( 'id' ) ) {
+			$page_prefix = 'T_NEWS_PUTINSERTNEWS_';
 			$this->page->addVar( 'title', 'Insertion d\'une news' );
-			$this->page->addVar( 'T_NEWS_PUTINSERTNEWS_HEAD', 'Ajouter une news' );
-			$this->page->addVar('T_NEWS_PUTINSERTNEWS_FORM', $Form->createView() );
-			$this->page->addVar('T_NEWS_PUTINSERTNEWS_NEWS', $News);
+			$this->page->addVar( $page_prefix.'HEAD', 'Ajouter une news' );
 		}
-		else
-		{
+		else {
+			$page_prefix = 'T_NEWS_PUTUPDATENEWS_';
 			$this->page->addVar( 'title', 'Modification d\'une news' );
-			$this->page->addVar( 'T_NEWS_PUTUPDATENEWS_HEAD', 'Modifier une news' );
-			$this->page->addVar('T_NEWS_PUTUPDATENEWS_FORM', $Form->createView() );
-			$this->page->addVar('T_NEWS_PUTUPDATENEWS_NEWS', $News);
+			$this->page->addVar( $page_prefix.'HEAD', 'Modifier une news' );
 		}
+		$this->page->addVar( $page_prefix.'FORM', $Form->createView() );
+		$this->page->addVar( $page_prefix.'NEWS', $News );
 	}
-	
 	
 	/**
 	 * Insère une news.
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executePutInsertNews( HTTPRequest $request ) {
-		$this->processForm( $request );
+	public function executePutInsertNews( HTTPRequest $Request ) {
+		$this->processForm( $Request );
 	}
 	
 	/**
@@ -183,7 +179,7 @@ class NewsController extends BackController {
 		if ( $request->method() == 'POST' ) {
 			$comment = new Comment( array(
 				'id'      => $request->getData( 'id' ),
-				'news'	  => $request->postData( 'news'),
+				'news'    => $request->postData( 'news' ),
 				'auteur'  => $request->postData( 'auteur' ),
 				'contenu' => $request->postData( 'contenu' ),
 			) );
@@ -206,7 +202,7 @@ class NewsController extends BackController {
 			$this->app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->page->addVar( 'form', $Form->createView() );
-		$this->page->addVar('comment', $comment);
+		$this->page->addVar( 'comment', $comment );
 	}
 	
 	/**
