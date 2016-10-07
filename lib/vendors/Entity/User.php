@@ -30,9 +30,6 @@ class User extends Entity {
 	 * @var $DateSubscription \DateTime
 	 */
 	protected $DateSubscription;
-	const INVALID_LOGIN  = 1;
-	const INVALID_PASSWORD   = 2;
-	const INVALID_EMAIL = 3;
 	
 	/**
 	 * Vérifie si l'utilisateur est valide.
@@ -45,6 +42,15 @@ class User extends Entity {
 	}
 	
 	/**
+	 * Crypte le password courant. La méthode de cryptage utilisée est SHA_512.
+	 */
+	public function crypt()
+	{
+		$this->setPassword(crypt($this->password, '$6$rounds=457312984$p@__{#5h£y|+7G*-$'));
+	}
+	
+	
+	/**
 	 * Setter pour l'attribut login.
 	 *
 	 * @param $login string
@@ -52,9 +58,6 @@ class User extends Entity {
 	public function setLogin( $login ) {
 		if ( !empty( $login ) AND is_string( $login ) ) {
 			$this->login = $login;
-		}
-		else {
-			$this->erreurs[] = self::INVALID_LOGIN;
 		}
 	}
 	
@@ -67,9 +70,6 @@ class User extends Entity {
 		if ( !empty( $password ) AND is_string( $password ) ) {
 			$this->password = $password;
 		}
-		else {
-			$this->erreurs[] = self::INVALID_PASSWORD;
-		}
 	}
 	
 	/**
@@ -81,61 +81,42 @@ class User extends Entity {
 		if (filter_var($email, FILTER_VALIDATE_EMAIL) ) {
 			$this->email = $email;
 		}
-		else {
-			$this->erreurs[] = self::INVALID_EMAIL;
-		}
 	}
 	
 	/**
-	 * Setter pour l'attribut DateAjout.
+	 * Setter pour l'attribut DateSubscription.
 	 *
-	 * @param \DateTime $DateAjout
+	 * @param \DateTime $DateSubscription
 	 */
-	public function setDateAjout( \DateTime $DateAjout ) {
-		$this->DateAjout = $DateAjout;
-	}
-	
-	/**
-	 * Setter pour l'attribut DateModif.
-	 *
-	 * @param \DateTime $DateModif
-	 */
-	public function setDateModif( \DateTime $DateModif ) {
-		$this->DateModif = $DateModif;
+	public function setDateSubscription( \DateTime $DateSubscription ) {
+		$this->DateSubscription = $DateSubscription;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function auteur() {
-		return $this->auteur;
+	public function login() {
+		return $this->login;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function titre() {
-		return $this->titre;
+	public function password() {
+		return $this->password;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function contenu() {
-		return $this->contenu;
+	public function email() {
+		return $this->email;
 	}
 	
 	/**
 	 * @return \DateTime
 	 */
-	public function DateAjout() {
-		return $this->DateAjout;
-	}
-	
-	/**
-	 * @return \DateTime
-	 */
-	public function DateModif() {
-		return $this->DateModif;
+	public function DateSubscription() {
+		return $this->DateSubscription;
 	}
 }
