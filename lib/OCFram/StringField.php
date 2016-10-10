@@ -19,11 +19,6 @@ class StringField extends Field {
 	 * @var $maxLength int Entier strictement positif, longueur maximale du champ
 	 */
 	protected $maxLength;
-	/**
-	 * Construit le champ de texte.
-	 *
-	 * @return string Code HTML associé au champ de texte.
-	 */
 	
 	/**
 	 * StringField constructor.
@@ -38,6 +33,11 @@ class StringField extends Field {
 		}
 	}
 	
+	/**
+	 * Construit le champ de texte.
+	 *
+	 * @return string Code HTML associé au champ de texte.
+	 */
 	public function buildWidget() {
 		$code = '';
 		if ( !empty( $this->errorMessage ) ) {

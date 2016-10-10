@@ -63,7 +63,7 @@ class UserManagerPDO extends UserManager {
 		/**
 		 * @var $Query \PDOStatement
 		 */
-		$sql   = 'SELECT SUC_login login, SUC_password password, SUC_mail email, SUC_DateSubscription Date_subscription, SUC_fk_SUY type, SUC_fk_SUE_banned banned, SUC_fk_SUE_valid valid
+		$sql   = 'SELECT SUC_id id, SUC_login login, SUC_password password, SUC_mail email, SUC_DateSubscription Date_subscription, SUC_fk_SUY type, SUC_fk_SUE_banned banned, SUC_fk_SUE_valid valid
 			FROM T_SIT_userc
 			WHERE SUC_id = :id';
 		$Query = $this->dao->prepare( $sql );
@@ -71,6 +71,30 @@ class UserManagerPDO extends UserManager {
 		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\User' );
 		$Query->execute();
 		return $Query->fetch();
+	}
+	
+	/**
+	 * Récupère un User à partir de son login.
+	 * Si 2 users ont le même login, la fonction renvoie NULL.
+	 * Si le user n'existe pas, la fonction renvoie NULL.
+	 *
+	 * @param $userc_login
+	 *
+	 * @return User|null
+	 */
+	public function getUsercUsingUsercLogin( $userc_login ) {
+		/**
+		 * @var $Query \PDOStatement
+		 */
+		$sql   = 'SELECT SUC_id id, SUC_login login, SUC_password password, SUC_mail email, SUC_DateSubscription Date_subscription, SUC_fk_SUY type, SUC_fk_SUE_banned banned, SUC_fk_SUE_valid valid
+			FROM T_SIT_userc
+			WHERE SUC_login = :login';
+		$Query = $this->dao->prepare( $sql );
+		$Query->bindValue( ':id', $userc_login);
+		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\User' );
+		$Query->execute();
+		$User = $Query->fetch();
+		return $Query->rowCount() == 1 ? $User : null;
 	}
 	
 	/**

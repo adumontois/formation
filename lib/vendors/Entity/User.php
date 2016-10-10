@@ -55,6 +55,17 @@ class User extends Entity {
 	protected $valid;
 	
 	/**
+	 * Permet de crypter un password à partir d'une clé spécifique passée en paramètre
+	 *
+	 * @param $password string
+	 * @param $crypt_key string Clé de cryptage au format SHA_512
+	 */
+	static public function cryptWithKey($password, $crypt_key) {
+		return crypt($password, $crypt_key);
+	}
+	
+	
+	/**
 	 * Vérifie si les coordonnées de l'utilisateur est valide.
 	 * Les vérifications s'ajoutent aux vérifications effectuées dans le formulaire de création/mise à jour de Entity\User
 	 *
@@ -83,7 +94,7 @@ class User extends Entity {
 	 * @return bool
 	 */
 	public function isCrypted() {
-		return preg_match( '%^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$[.]$', $this->password);
+		return preg_match( '%^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$[.]+$', $this->password);
 	}
 	
 	/**
@@ -202,8 +213,17 @@ class User extends Entity {
 		if ( !$this->isCrypted() ) {
 			return $this->crypt();
 		}
-		
 		return $this->password;
+	}
+	
+	/**
+	 * Renvoie la clé de cryptage utilisée pour un password, ou null si le password n'est pas crypté.
+	 *
+	 * @return string|null
+	 */
+	public function cryptKey() {
+		$matches_a = preg_match( '%(^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$)[.]+$', $this->password);
+		return isset($matches_a[1]) ? $matches_a[1] : null;
 	}
 	
 	/**
