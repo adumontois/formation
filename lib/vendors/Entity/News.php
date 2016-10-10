@@ -20,7 +20,7 @@ use \OCFram\Entity;
  */
 class News extends Entity {
 	/**
-	 * @var $auteur string
+	 * @var $auteur int
 	 */
 	protected $auteur;
 	/**
@@ -52,10 +52,10 @@ class News extends Entity {
 	/**
 	 * Setter pour l'attribut auteur.
 	 *
-	 * @param $auteur string
+	 * @param $auteur int
 	 */
 	public function setAuteur( $auteur ) {
-		if ( !empty( $auteur ) AND is_string( $auteur ) ) {
+		if (is_int($auteur)) {
 			$this->auteur = $auteur;
 		}
 	}
@@ -101,7 +101,7 @@ class News extends Entity {
 	}
 	
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function auteur() {
 		return $this->auteur;

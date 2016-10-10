@@ -53,7 +53,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
-			$this->page->addVar( 'News_list_a', $News_manager->getNewscSortByIdDesc() );
+			$this->page->addVar( 'News_list_a', $News_manager->getNewscAndUsercLoginSortByIdDesc() );
 			$this->page->addVar( 'news_count', $News_manager->countNewscUsingNewscId() );
 		}
 		catch ( \PDOException $Db_error ) {
@@ -75,7 +75,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$News = new News( array(
-				'auteur'  => $Request->postData( 'auteur' ),
+				'auteur'  => $this->app->user()->userId(),
 				'titre'   => $Request->postData( 'titre' ),
 				'contenu' => $Request->postData( 'contenu' ),
 			) );

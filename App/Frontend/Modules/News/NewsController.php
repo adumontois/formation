@@ -49,7 +49,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		
 		// Récupérer la liste des news à afficher
-		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
+		$Liste_news_a = $News_manager->getNewscAndUsercLoginSortByIdDesc( 0, $nombre_news );
 		
 		//
 		foreach ( $Liste_news_a as $News ) {

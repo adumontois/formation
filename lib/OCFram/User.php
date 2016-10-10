@@ -96,7 +96,26 @@ class User extends ApplicationComponent {
 	 * Supprime l'authentification. Alias de setAuthenticationLevel(-1).
 	 */
 	public function unsetAuthentication() {
+		unset($_SESSION['user_id']);
 		$this->setAuthenticationLevel(-1);
+	}
+	
+	/**
+	 * @param int $id ID de T_SIT_userc
+	 */
+	public function setUserId($id) {
+		if ($this->isAuthenticated()) {
+			$this->setAttribute('user_id', $id);
+		}
+	}
+	
+	/**
+	 * Récupère l'ID du User connecté
+	 *
+	 * @return int|null
+	 */
+	public function userId() {
+		return (int) $this->getAttribute('user_id');
 	}
 	
 	/**

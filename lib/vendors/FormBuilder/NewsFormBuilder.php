@@ -40,14 +40,6 @@ class NewsFormBuilder extends FormBuilder {
 	 * Construit le formulaire de news.
 	 */
 	public function build() {
-		$this->form->add( new StringField( array(
-			'label'      => 'Auteur',
-			'maxLength'  => self::AUTHOR_MAX_LENGTH,
-			'validators' => array(
-				new NotNullValidator( 'Author can\'t be unknown' ),
-			),
-		) ) );
-		
 		$this->form->add( new TextField( array(
 			'label'      => 'Contenu',
 			'rows'       => self::TEXTAREA_ROWS,

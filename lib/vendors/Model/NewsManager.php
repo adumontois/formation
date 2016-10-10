@@ -31,7 +31,7 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return News[]
 	 */
-	abstract public function getNewscSortByIdDesc( $start = 0, $count = self::MAX_LIST_SIZE );
+	abstract public function getNewscAndUsercLoginSortByIdDesc( $start = 0, $count = self::MAX_LIST_SIZE );
 	
 	/**
 	 * Récupère la news d'id donné.
