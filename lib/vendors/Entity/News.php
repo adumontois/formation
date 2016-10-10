@@ -92,6 +92,28 @@ class News extends Entity {
 	}
 	
 	/**
+	 * Formate la date d'ajout. Cette méthode modifie l'attribut DateAjout.
+	 */
+	public function formatDateAjout() {
+		$this->DateAjout = $this->DateAjout->format('d/m/Y à H\hi');
+	}
+	
+	/**
+	 * Formate la date de modification. Cette méthode modifie l'attribut DateModif.
+	 */
+	public function formatDateModif() {
+		$this->DateModif = $this->DateModif->format('d/m/Y à H\hi');
+	}
+	
+	/**
+	 * Formate les attributs de l'objet pour affichage à l'écran Cette méthode modifie les dates.
+	 */
+	public function format() {
+		$this->formatDateAjout();
+		$this->formatDateModif();
+	}
+	
+	/**
 	 * Setter pour l'attribut DateModif.
 	 *
 	 * @param \DateTime $DateModif

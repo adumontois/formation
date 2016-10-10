@@ -76,6 +76,8 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		
+		$News->format();
+		
 		// Si la news n'existe pas on redirige vers une erreur 404
 		if ( empty( $News ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
@@ -84,6 +86,9 @@ class NewsController extends BackController {
 		// Afficher les commentaires
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
 		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
+		foreach ($Liste_comments_a as $comment) {
+			$comment->formatDate();
+		}
 		
 		$this->page->addVar( 'title', $News->titre() );
 		$this->page->addVar( 'News', $News );

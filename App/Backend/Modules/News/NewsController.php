@@ -10,6 +10,7 @@ namespace App\Backend\Modules\News;
 
 use Entity\Comment;
 use Entity\News;
+use Entity\User;
 use FormBuilder\CommentFormBuilder;
 use FormBuilder\NewsFormBuilder;
 use Model\CommentsManager;
@@ -49,11 +50,16 @@ class NewsController extends BackController {
 	public function executeBuildIndex() {
 		/**
 		 * @var $News_manager NewsManager
+		 * @var News[] $News_list_a
 		 */
 		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
-			$this->page->addVar( 'News_list_a', $News_manager->getNewscAndUsercLoginSortByIdDesc() );
+			$News_list_a = $News_manager->getNewscAndUsercLoginSortByIdDesc();
+			foreach ($News_list_a as $News) {
+				$News->format();
+			}
+			$this->page->addVar( 'News_list_a', $News_list_a);
 			$this->page->addVar( 'news_count', $News_manager->countNewscUsingNewscId() );
 		}
 		catch ( \PDOException $Db_error ) {
@@ -88,6 +94,10 @@ class NewsController extends BackController {
 			if ( $Request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
 				$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
+				// Seul un superadmin peut modifier les news des autres
+				if ($this->app->user()->userId() != $News->auteur() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN) {
+					$this->app->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous ne pouvez pas modifier la news de quelqu\'un d\'autre !'));
+				}
 			}
 			else {
 				$News = new News();
@@ -160,6 +170,11 @@ class NewsController extends BackController {
 		 * @var $Comments_manager CommentsManager
 		 */
 		$News_manager = $this->managers->getManagerOf();
+
+		$News = $News_manager->getNewscUsingNewscId($Request->getData( 'id' ));
+		if ($News->auteur() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
+			$this->app->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous ne pouvez pas supprimer la news de quelqu\'un d\'autre !'));
+		}
 		// Suppression des commentaires associés à la news
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		$Comments_manager->deleteCommentcUsingNewscId( $Request->getData( 'id' ) );

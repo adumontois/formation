@@ -9,6 +9,7 @@
 /**
  * @var $news_count  integer
  * @var $News_list_a \Entity\News[]
+ * @var $User \OCFram\User
  */
 ?>
 
@@ -33,16 +34,18 @@
 				<?= htmlspecialchars( $News[ 'titre' ] ) ?>
 			</td>
 			<td>
-				le <?= $News[ 'DateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
+				le <?= $News[ 'DateAjout' ] ?>
 			</td>
 			<td>
 				<?php if ( $News[ 'DateAjout' ] != $News[ 'DateModif' ] ): ?>
-					le <?= $News[ 'DateModif' ]->format( 'd/m/Y à H\hi' ); ?>
+					le <?= $News[ 'DateModif' ] ?>
 				<?php endif; ?>
 			</td>
 			<td>
-				<a href="news-update-<?= $News[ 'id' ] ?>.html"><img src="../images/update.png" alt="Modifier" /></a>
-				<a href="news-delete-<?= $News[ 'id' ] ?>.html"><img src="../images/delete.png" alt="Supprimer" /></a>
+				<?php if ($News['auteur'] == $User->userId() OR $User->authenticationLevel() === \Entity\User::USERY_SUPERADMIN): ?>
+					<a href="news-update-<?= $News[ 'id' ] ?>.html"><img src="../images/update.png" alt="Modifier" /></a>
+					<a href="news-delete-<?= $News[ 'id' ] ?>.html"><img src="../images/delete.png" alt="Supprimer" /></a>
+				<?php endif; ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>

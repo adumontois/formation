@@ -49,7 +49,7 @@ class ConnexionController extends BackController {
 			$User_manager = $this->managers->getManagerOf( 'User' );
 			$User_stored  = $User_manager->getUsercUsingUsercLogin( $given_login );
 			// On vérifie si le password passé à la requête crypté avec la même clé que le password en DB correspond au password de l'objet récupéré
-			if ( User::cryptWithKey( $Request->postData( 'password' ), $User_stored->cryptKey() ) === $User_stored->password() ) {
+			if ( $User_stored != NULL AND User::cryptWithKey( $Request->postData( 'password' ), $User_stored->cryptKey() ) === $User_stored->password() ) {
 				// Connexion du client avec son id en variable de session
 				$this->app->user()->setAuthenticationLevel((int) $User_stored->type());
 				$this->app->user()->setUserId($User_stored->id());

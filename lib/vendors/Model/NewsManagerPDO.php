@@ -36,7 +36,7 @@ class NewsManagerPDO extends NewsManager {
 			throw new \InvalidArgumentException( 'Offset and limit values must be positive integers' );
 		}
 		
-		$sql = 'SELECT SNC_id id, SUC_login auteur, SNC_title titre, SNC_content contenu, SNC_dateadd DateAjout, SNC_dateupdate DateModif
+		$sql = 'SELECT SNC_id id, SNC_fk_SUC auteur, SNC_title titre, SNC_content contenu, SNC_dateadd DateAjout, SNC_dateupdate DateModif
            		FROM T_SIT_newsc
            			INNER JOIN T_SIT_userc ON SNC_fk_SUC = SUC_id
            			ORDER BY SNC_id DESC LIMIT ' . $count . ' OFFSET ' . $start;
@@ -71,6 +71,7 @@ class NewsManagerPDO extends NewsManager {
 		 */
 		$sql   = 'SELECT SNC_id id, SNC_fk_SUC auteur, SNC_title titre, SNC_content contenu, SNC_dateadd DateAjout, SNC_dateupdate DateModif
                 FROM T_SIT_newsc
+                	INNER JOIN T_SIT_userc ON SNC_fk_SUC = SUC_id
                 WHERE SNC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', $newsc_id, \PDO::PARAM_INT );
@@ -131,11 +132,10 @@ class NewsManagerPDO extends NewsManager {
 		 * @var $News  News
 		 */
 		$sql   = 'UPDATE T_SIT_newsc
-                SET SNC_fk_SUC = :auteur, SNC_title = :titre, SNC_content = :contenu, SNC_dateupdate = NOW()
+                SET SNC_title = :titre, SNC_content = :contenu, SNC_dateupdate = NOW()
                 WHERE SNC_id = :id';
 		$Query = $this->dao->prepare( $sql );
 		$Query->bindValue( ':id', $News->id(), \PDO::PARAM_INT );
-		$Query->bindValue( ':auteur', $News->auteur(), \PDO::PARAM_STR );
 		$Query->bindValue( ':titre', $News->titre(), \PDO::PARAM_STR );
 		$Query->bindValue( ':contenu', $News->contenu(), \PDO::PARAM_STR );
 		$Query->execute();

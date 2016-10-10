@@ -42,7 +42,7 @@ class Comment extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !empty( $this->news ) AND !empty( $this->auteur ) AND is_string( $this->auteur ) AND !empty( $this->contenu ) AND is_string( $this->contenu );
+		return !empty( $this->news ) AND !empty( $this->contenu ) AND is_string( $this->contenu );
 	}
 	
 	/**
@@ -113,5 +113,14 @@ class Comment extends Entity {
 	 */
 	public function setDate( \DateTime $Date ) {
 		$this->Date = $Date;
+	}
+	
+	/**
+	 * Formate la date pour affichage dans une vue. Cette méthode modifie la valeur de l'attribut date.
+	 *
+	 * @param \DateTime $date
+	 */
+	public function formatDate() {
+		$this->Date = $this->Date->format('d/m/Y à H\hi');
 	}
 }

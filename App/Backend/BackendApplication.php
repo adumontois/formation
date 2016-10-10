@@ -23,7 +23,7 @@ class BackendApplication extends Application {
 	 * Lance l'application Backend
 	 */
 	public function run() {
-		if ( in_array($this->user->authenticationLevel(), array(User::USERY_SUPERADMIN) )) // Si l'utilisateur est authentifié, on récupère le contrôleur souhaité
+		if ($this->user->isAuthenticated()) // Si l'utilisateur est authentifié, on récupère le contrôleur souhaité
 		{
 			$Controller = $this->getController();
 			$Controller->execute();
