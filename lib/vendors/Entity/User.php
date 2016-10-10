@@ -38,9 +38,9 @@ class User extends Entity {
 	 */
 	protected $email;
 	/**
-	 * @var $DateSubscription \DateTime
+	 * @var $Date_subscription \DateTime
 	 */
-	protected $DateSubscription;
+	protected $Date_subscription;
 	/**
 	 * @var $type int Type de l'utilisateur (standard, admin, superadmin...)
 	 */
@@ -142,12 +142,12 @@ class User extends Entity {
 	}
 	
 	/**
-	 * Setter pour l'attribut DateSubscription.
+	 * Setter pour l'attribut Date_subscription.
 	 *
-	 * @param \DateTime $DateSubscription
+	 * @param \DateTime $Date_subscription
 	 */
-	public function setDateSubscription( \DateTime $DateSubscription ) {
-		$this->DateSubscription = $DateSubscription;
+	public function setDate_subscription( \DateTime $Date_subscription ) {
+		$this->Date_subscription = $Date_subscription;
 	}
 	
 	/**
@@ -216,8 +216,8 @@ class User extends Entity {
 	/**
 	 * @return \DateTime
 	 */
-	public function DateSubscription() {
-		return $this->DateSubscription;
+	public function Date_subscription() {
+		return $this->Date_subscription;
 	}
 	
 	/**

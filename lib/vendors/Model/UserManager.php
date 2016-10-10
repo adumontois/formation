@@ -32,7 +32,7 @@ abstract class UserManager extends Manager {
 			}
 			
 			else {
-				$this->updateUserc( $User );
+				$this->updatePasswordAndMailOfUsercUsingId( $User );
 			}
 		}
 	}
@@ -45,12 +45,12 @@ abstract class UserManager extends Manager {
 	 */
 	abstract protected function insertUserc(Entity $User);
 	/**
-	 * Met à jour un utilisateur en base.
+	 * Met à jour le password et le mail d'un utilisateur en base.
 	 * Cette méthode ne devrait pas être appelée directement ; utiliser la méthode save pour y accéder.
 	 *
 	 * @param Entity $User
 	 */
-	abstract protected function updateUserc(Entity $User);
+	abstract protected function updatePasswordAndMailOfUsercUsingId(Entity $User);
 	
 	/**
 	 * Récupère un User à partir de son ID en base.
