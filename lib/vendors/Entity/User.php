@@ -9,11 +9,9 @@
 namespace Entity;
 
 
-use App\Traits\Password;
 use OCFram\Entity;
 
 class User extends Entity {
-	use Password;
 	/**
 	 * State constants
 	 */
@@ -25,10 +23,18 @@ class User extends Entity {
 	 */
 	const USERY_STANDARD   = 1;
 	const USERY_SUPERADMIN = 2;
+	/** Password constant */
+	const CRYPT_KEY = '$6$rounds=457312984$p@__{#5h£y|+7G*-$';
 	/**
 	 * @var $login string
 	 */
 	protected $login;
+	/**
+	 * Le password est géré crypté ; il est stocké en base crypté.
+	 *
+	 * @var $password string
+	 */
+	private $password;
 	/**
 	 * @var $email string
 	 */
@@ -63,6 +69,27 @@ class User extends Entity {
 	}
 	
 	/**
+	 * Vérifie si le password donné est crypté ou non.
+	 * On considère qu'un password est crypté s'il commence par la clé de cryptage
+	 * (qui est suffisamment longue et complexe pour faire cette approximation,
+	 * d'autant qu'il n'existe pas une telle méthode...).
+	 *
+	 * /!\ Il ne faudrait JAMAIS modifier la clé de cryptage !
+	 *
+	 * @return bool
+	 */
+	public function isCrypted() {
+		return  self::CRYPT_KEY === substr($this->password, 0, strlen(self::CRYPT_KEY));
+	}
+	
+	/**
+	 * Crypte le password courant. La méthode de cryptage utilisée est SHA_512.
+	 */
+	public function crypt() {
+		return crypt( $this->password, self::CRYPT_KEY );
+	}
+	
+	/**
 	 * Setter pour l'attribut login.
 	 *
 	 * @param $login string
@@ -71,6 +98,21 @@ class User extends Entity {
 		if ( !empty( $login ) AND is_string( $login ) ) {
 			$this->login = $login;
 		}
+	}
+	
+	/**
+	 * Setter pour l'attribut password.
+	 * Stocke le password directement crypté.
+	 *
+	 * @param $password string password NON crypté
+	 */
+	public function setPassword( $password ) {
+		$this->password = $password;
+		// Si le password n'est pas déjà crypté, on le crypte
+		if ($this->isCrypted())
+			if ( !empty( $password ) AND is_string( $password ) ) {
+				$this->password = $this->crypt();
+			}
 	}
 	
 	/**
@@ -134,6 +176,18 @@ class User extends Entity {
 	 */
 	public function login() {
 		return $this->login;
+	}
+	
+	/**
+	 * Renvoie le password CRYPTE (pour des raisons de sécurité évidentes).
+	 *
+	 * @return string
+	 */
+	public function password() {
+		if (!$this->isCrypted()) {
+			return $this->crypt();
+		}
+		return $this->password;
 	}
 	
 	/**
