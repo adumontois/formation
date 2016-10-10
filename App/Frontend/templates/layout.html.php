@@ -33,22 +33,25 @@
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<li><a href="/admin/">Admin<?= $User->isAuthenticated() ? ' (connecté)' : ' (non connecté)' ?></a></li>
+					<li><a href="/admin/">Admin<?= /*$User->isAuthenticated() ? ' (connecté)' : ' (non connecté)'*/ '' ?></a></li>
 					<?php
-					if ( $User->isAuthenticated() ): ?>
+					//if ( $User->isAuthenticated() ): ?>
 						<li><a href="/admin/logout.html">Déconnexion</a></li>
 						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
 						<?php
-					endif; ?>
+					//else:
+					?>
+						<li><a href="/create-account.html">Inscription</a></li>
+					<?php// endif;?>
 				
 				</ul>
 			</nav>
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?php if ( $User->hasFlash() ):
+					<?php /* if ( $User->hasFlash() ):
 						echo '<p style="text-align: center;">', $User->getFlash(), '</p>';
-					endif; ?>
+					endif; */ ?>
 					<?= $content ?>
 				</section>
 			</div>

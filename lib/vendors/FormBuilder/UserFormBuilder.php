@@ -9,7 +9,9 @@
 namespace FormBuilder;
 
 
+use OCFram\EmailField;
 use OCFram\FormBuilder;
+use OCFram\PasswordField;
 use OCFram\StringField;
 
 class UserFormBuilder extends FormBuilder {
@@ -21,14 +23,14 @@ class UserFormBuilder extends FormBuilder {
 		) ) );
 		$this->form->add( new PasswordField( array(
 			'label' => 'Confirmez le mot de passe',
-			'name'  => 'password_confirm',
+			'name'  => 'password',
 		) ) );
 		$this->form->add( new EmailField( array(
 			'label' => 'Email',
 		) ) );
 		$this->form->add( new EmailField( array(
 			'label' => 'Confirmez l\'email',
-			'name'  => 'email_confirm',
+			'name'  => 'email',
 		) ) );
 	}
 }

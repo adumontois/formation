@@ -6,15 +6,16 @@
  * Time: 09:44
  */
 
-namespace App\Backend\Modules\Connexion;
+namespace App\Frontend\Modules\Connexion;
 
 
 use Entity\User;
+use FormBuilder\UserFormBuilder;
 use Model\UserManager;
 use OCFram\Application;
 use OCFram\BackController;
+use OCFram\FormHandler;
 use OCFram\HTTPRequest;
-use OCFram\HTTPResponse;
 
 class ConnexionController extends BackController {
 	/**
@@ -44,13 +45,13 @@ class ConnexionController extends BackController {
 		 * @var $User_manager UserManager
 		 */
 		if ( $Request->postExists( 'login' ) ) {
-			$given_login = $Request->postData('login');
-			$User_manager = $this->managers->getManagerOf('User');
-			$User_stored = $User_manager->getUsercUsingUsercLogin($given_login);
+			$given_login  = $Request->postData( 'login' );
+			$User_manager = $this->managers->getManagerOf( 'User' );
+			$User_stored  = $User_manager->getUsercUsingUsercLogin( $given_login );
 			// On vérifie si le password passé à la requête crypté avec la même clé que le password en DB correspond au password de l'objet récupéré
-			if (User::cryptWithKey($Request->postData('password'), $User_stored->cryptKey()) === $User_stored->password()) {
+			if ( User::cryptWithKey( $Request->postData( 'password' ), $User_stored->cryptKey() ) === $User_stored->password() ) {
 				$this->app->user()->setAuthenticated();
-				$this->app->user()->setAttribute('authentication_level', $User_stored->type());
+				$this->app->user()->setAttribute( 'authentication_level', $User_stored->type() );
 				$this->app->httpResponse()->redirect( '.' );
 			}
 			else {
@@ -64,63 +65,37 @@ class ConnexionController extends BackController {
 	 *
 	 * @param HTTPRequest $Request
 	 */
-	public function executePutUser(HTTPRequest $Request) {
+	public function executePutUser( HTTPRequest $Request ) {
 		/**
 		 * @var $User_manager UserManager
 		 */
-		$User_manager = $this->managers->getManagerOf('User');
-		if ($Request->method() == HTTPRequest::POST_METHOD ) {
+		$User_manager = $this->managers->getManagerOf( 'User' );
+		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$User = new User( array(
-				'login'  => $Request->postData( 'login' ),
-				'password'   => $Request->postData( 'password' ),
-				'email' => $Request->postData( 'email' ),
+				'login'    => $Request->postData( 'login' ),
+				'password' => $Request->postData( 'password' ),
+				'email'    => $Request->postData( 'email' ),
 			) );
-			// S'il s'agit d'un update, il faut connaître l'id du User qui est donné dans l'url
-			if ( $Request->getExists( 'id' ) ) {
-				$User->setId( $Request->getData( 'id' ) );
-			}
 		}
 		else {
-			if ( $Request->getExists( 'id' ) ) {
-				// Afficher le commentaire en update
-				$User = $User_manager->getUsercUsingUsercId( $Request->getData( 'id' ) );
-			}
-			else {
-				$User = new User();
-			}
-		}
-		// News qui n'existe pas : on redirige vers une erreur 404
-		if ( null === $User ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le User à mettre à jour n\'existe pas !' ) );
+			$User = new User();
 		}
 		
 		// Construction du formulaire
 		$Form_builder = new UserFormBuilder( $User );
 		$Form_builder->build();
-		$Form = $Form_builder->form();;
+		$Form = $Form_builder->form();
+		
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new FormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
-			if ( $News->objectNew() ) {
-				$this->app->user()->setFlash( 'La news a été correctement ajoutée.' );
-			}
-			else {
-				$this->app->user()->setFlash( 'La news a été correctement modifiée.' );
-			};
-			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
+			$this->app->user()->setFlash( 'Vous avez été correctement inscrit.' );
+			//$this->app->httpResponse()->redirect( '.' );
 		}
 		
-		
-		if ( !$Request->getExists( 'id' ) ) {
-			$this->page->addVar( 'title', 'Insertion d\'une news' );
-			$this->page->addVar( 'header', 'Ajouter une news' );
-		}
-		else {
-			$this->page->addVar( 'title', 'Modification d\'une news' );
-			$this->page->addVar( 'header', 'Modifier une news' );
-		}
+		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 		$this->page->addVar( 'form', $Form->createView() );
-		$this->page->addVar( 'News', $News );
+		$this->page->addVar( 'User', $User );
 	}
 	
 	/**

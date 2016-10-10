@@ -38,14 +38,16 @@ class Form {
 	/**
 	 * Ajoute un champ au formulaie passé en paramètre, en assignant la valeur du champ associé de l'netité du formulaire ($this -> entity -> $field_name()).
 	 * Retourne le nouveau formulaire.
+	 * Si la valeur du champ n'est pas donnée, elle est récupérée directement dans l'objet.
 	 *
 	 * @param Field $field
+	 * @param string $value
 	 *
 	 * @return Form
 	 */
 	public function add( Field $field ) {
 		$field_name = $field->name(); // Récupérer le nom du champ
-		$field->setValue( $this->entity->$field_name() );
+		$field->setValue( $this->entity->$field_name());
 		// La value du field est initialisée à la valeur détenue par l'entité
 		$this->fields[] = $field;
 		

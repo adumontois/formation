@@ -78,23 +78,12 @@ class User extends Entity {
 	}
 	
 	/**
-	 * Vérifie si le password donné est crypté ou non.
-	 * On considère qu'un password est crypté s'il commence par la clé de cryptage
-	 * (qui est suffisamment longue et complexe pour faire cette approximation,
-	 * d'autant qu'il n'existe pas une telle méthode...).
-	 *
-	 * /!\ Il ne faudrait JAMAIS modifier la clé de cryptage !
-	 *
-	 * @return bool
-	 */
-	
-	/**
 	 * Vérifie si le password est crypté. La méthode de cryptage utilisée est SHA_512.
 	 *
 	 * @return bool
 	 */
 	public function isCrypted() {
-		return preg_match( '%^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$[.]+$', $this->password);
+		return preg_match( '%^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$[.]{1,}$%', $this->password);
 	}
 	
 	/**
@@ -105,11 +94,13 @@ class User extends Entity {
 	 */
 	public function crypt() {
 		// Générer une clé de cryptage aléatoire
+		// openssl_random_pseudo_bytes nécessite l'activation de la bibliothèque openssl dans le fichier de config
+		// Attention à la fonction openssl (caractères spéciaux)
+		// Ne pas augmenter la valeur max de rand
 		if (!$this->isCrypted()) {
-			$crypt_key = '$6$rounds=' . rand( 1, 999999999 ) . '$' . random_bytes( 16 ) . '$';
+			$crypt_key = '$6$rounds=' . rand( 1, 99999) . '$' . openssl_random_pseudo_bytes(16). '$';
 			return crypt( $this->password, $crypt_key );
 		}
-		
 		// Retourner le champ si le password est déjà crypté.
 		return $this->password;
 	}

@@ -3,4 +3,5 @@
 	<route url="/" module="News" action="buildIndex" />
 	<route url="/news-([0-9]+)\.html" module="News" action="buildNews" vars="id" />
 	<route url="/commenter-([0-9]+)\.html" module="News" action="putInsertComment" vars="id" />
+	<route url="/create-account.html" module="Connexion" action="putUser" />
 </routes>

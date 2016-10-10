@@ -108,7 +108,6 @@ class NewsManagerPDO extends NewsManager {
 		 * @var $Query \PDOStatement
 		 * @var $News  News
 		 */
-		var_dump($News);
 		$sql   = 'INSERT INTO T_SIT_newsc (SNC_author, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate)
                     VALUES (:auteur, :titre, :contenu, NOW(), NOW())';
 		$Query = $this->dao->prepare( $sql );
