@@ -9,7 +9,9 @@
 namespace App\Backend;
 
 
+use Entity\User;
 use OCFram\Application;
+use OCFram\HTTPResponse;
 
 class BackendApplication extends Application {
 	public function __construct() {
@@ -21,16 +23,16 @@ class BackendApplication extends Application {
 	 * Lance l'application Backend
 	 */
 	public function run() {
-		if ( $this->user->isAuthenticated() ) // Si l'utilisateur est authentifié, on récupère le contrôleur souhaité
+		if ( in_array($this->user->authenticationLevel(), array(User::USERY_SUPERADMIN) )) // Si l'utilisateur est authentifié, on récupère le contrôleur souhaité
 		{
 			$Controller = $this->getController();
+			$Controller->execute();
+			$this->httpResponse()->setPage( $Controller->page() );
+			$this->httpResponse()->send();
 		}
-		else // Sinon on récupère le contrôleur d'authentification
+		else // Sinon on renvoie une erreur access denied
 		{
-			$Controller = new Modules\Connexion\ConnexionController( $this, 'Connexion', 'buildIndex' );
+			$this->httpResponse->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous n\'avez pas les droits pour accéder à cette page.'));
 		}
-		$Controller->execute();
-		$this->httpResponse()->setPage( $Controller->page() );
-		$this->httpResponse()->send();
 	}
 }

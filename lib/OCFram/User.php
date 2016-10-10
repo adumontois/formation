@@ -61,7 +61,7 @@ class User extends ApplicationComponent {
 	 * @return bool
 	 */
 	public function isAuthenticated() {
-		return isset( $_SESSION[ 'auth' ] ) AND $_SESSION[ 'auth' ] === true;
+		return isset( $_SESSION[ 'auth' ] );
 	}
 	
 	/**
@@ -75,15 +75,35 @@ class User extends ApplicationComponent {
 	}
 	
 	/**
-	 * Setter pour l'authentification.
+	 * Setter pour l'authentification. Passer '-1' pour déconnecter.
 	 *
-	 * @param bool $authenticated
+	 * @param int $authenticated
 	 */
-	public function setAuthenticated( $authenticated = true ) {
-		if ( !is_bool( $authenticated ) ) {
-			throw new \InvalidArgumentException( 'Authentication value must be a true-or-false boolean' );
+	public function setAuthenticationLevel( $authenticated ) {
+		if ( !is_int( $authenticated ) ) {
+			throw new \InvalidArgumentException( 'Authentication value must be an integer' );
 		}
-		$this->setAttribute( 'auth', $authenticated );
+		
+		if ($authenticated == -1) {
+			unset($_SESSION['auth']);
+		}
+		else {
+			$this->setAttribute( 'auth', $authenticated );
+		}
+	}
+	
+	/**
+	 * Supprime l'authentification. Alias de setAuthenticationLevel(-1).
+	 */
+	public function unsetAuthentication() {
+		$this->setAuthenticationLevel(-1);
+	}
+	
+	/**
+	 * Récupère le niveau d'authentification de l'utilisateur
+	 */
+	public function authenticationLevel() {
+		return $this->getAttribute( 'auth' );
 	}
 	
 	/**

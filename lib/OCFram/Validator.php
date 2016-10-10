@@ -31,9 +31,9 @@ abstract class Validator {
 	}
 	
 	/**
-	 * Vérifie si la valeur du champ respecte la condition spécifiée par le validateur.
+	 * Vérifie si la/les valeur/s du champ respecte/nt la condition spécifiée par le validateur.
 	 *
-	 * @param $value string
+	 * @param $value string|array
 	 *
 	 * @return bool
 	 */

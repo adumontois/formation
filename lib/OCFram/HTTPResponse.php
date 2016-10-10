@@ -19,6 +19,7 @@ class HTTPResponse extends ApplicationComponent {
 	 * @var $page Page
 	 */
 	protected $page;
+	const ACCESS_DENIED = 401;
 	const NOT_FOUND                     = 404;
 	const SERVICE_TEMPORARY_UNAVAILABLE = 503;
 	

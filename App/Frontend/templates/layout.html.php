@@ -15,7 +15,7 @@
 <html>
 	<head>
 		<title>
-			<?= isset( $T_TITLE ) ? $T_TITLE : 'Mon super site' ?>
+			<?= isset( $title ) ? $title : 'Mon super site' ?>
 		</title>
 		
 		<meta charset="utf-8" />
@@ -33,25 +33,25 @@
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<li><a href="/admin/">Admin<?= /*$User->isAuthenticated() ? ' (connecté)' : ' (non connecté)'*/ '' ?></a></li>
-					<?php
-					//if ( $User->isAuthenticated() ): ?>
-						<li><a href="/admin/logout.html">Déconnexion</a></li>
-						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
-						<?php
-					//else:
-					?>
+					<li><a href="/admin/">Admin<?= $User->isAuthenticated() ? ' (connecté)' : ' (non connecté)'?></a></li>
+					<?php if ( $User->isAuthenticated() ): ?>
+						<li><a href="/logout.html">Déconnexion</a></li>
+						<?php if ( $User->authenticationLevel() == \Entity\User::USERY_SUPERADMIN ): ?>
+							<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
+						<?php endif; ?>
+					<?php else: ?>
 						<li><a href="/create-account.html">Inscription</a></li>
-					<?php// endif;?>
+						<li><a href="/connect.html">Connexion</a></li>
+					<?php endif;?>
 				
 				</ul>
 			</nav>
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?php /* if ( $User->hasFlash() ):
-						echo '<p style="text-align: center;">', $User->getFlash(), '</p>';
-					endif; */ ?>
+					<?php if ( $User->hasFlash() ): ?>
+						<p style="text-align: center;"> <?=$User->getFlash()?> </p>
+					<?php endif; ?>
 					<?= $content ?>
 				</section>
 			</div>

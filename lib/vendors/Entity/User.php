@@ -23,6 +23,8 @@ class User extends Entity {
 	 */
 	const USERY_STANDARD   = 1;
 	const USERY_SUPERADMIN = 2;
+	const CRYPTED_PASSWORD_MATCH = '%^(\$6\$rounds=([0-9]){1,9}\$(.){1,16}\$)(.){1,}$%';
+	const CRYPT_KEY_MATCH        = '%^(\$6\$rounds=([0-9]){1,9}\$(.){1,16}\$)%';
 	/**
 	 * @var $login string
 	 */
@@ -53,17 +55,64 @@ class User extends Entity {
 	 * @var $valid int Indique si l'utilisateur a été validé
 	 */
 	protected $valid;
+	/**
+	 * @var $crypt_key string Clé de cryptage actuelle pour les mots de passe
+	 */
+	
+	// Variables de stockage pour la confirmation lors de la création d'un User
+	protected $password_confirm;
+	protected $email_confirm;
+	/**
+	 * @var $crypt_key string Contient la clé de chiffrage actuelle
+	 */
+	static private $crypt_key;
 	
 	/**
-	 * Permet de crypter un password à partir d'une clé spécifique passée en paramètre
+	 * Permet de crypter un password à partir de la clé actuelle, ou de la clé passée en paramètre.
 	 *
-	 * @param $password string
-	 * @param $crypt_key string Clé de cryptage au format SHA_512
+	 * @param $password  string
+	 * @param $crypt_key string La clé à assigner. Si mise à null, utilise la clé courante.
+	 *
+	 * @return string
 	 */
-	static public function cryptWithKey($password, $crypt_key) {
-		return crypt($password, $crypt_key);
+	static public function cryptWithKey( $password, $crypt_key = null ) {
+		self::setCrypt_key( $crypt_key );
+		
+		return crypt( $password, self::$crypt_key );
 	}
 	
+	/**
+	 * Modifie la clé de cryptage à la clé passée en paramètre.
+	 * Si la clé n'est pas donnée, elle est générée aléatoirement.
+	 * Si la clé ne respecte pas le format de clé SHA_512, une exception est levée.
+	 *
+	 * @param $crypt_key string La clé à assigner
+	 */
+	static protected function setCrypt_key( $crypt_key = null ) {
+		if ( null !== $crypt_key ) {
+			if ( !preg_match( self::CRYPT_KEY_MATCH, $crypt_key ) ) {
+				throw new \InvalidArgumentException( 'La clé de chiffrement SHA_512 est invalide.' );
+			}
+			else {
+				self::$crypt_key = $crypt_key;
+			}
+		}
+		else {
+			if ( !isset( self::$crypt_key ) ) {
+				self::$crypt_key = '$6$rounds=' . rand( 1, 99999 ) . '$' . 'abf_89{594' . '$';
+			}
+		}
+	}
+	
+	public function __construct( array $values = array() ) {
+		parent::__construct( $values );
+		if ( isset( $values[ 'password_confirm' ] ) ) {
+			$this->password_confirm = $values[ 'password_confirm' ];
+		}
+		if ( isset( $values[ 'email_confirm' ] ) ) {
+			$this->email_confirm = $values[ 'email_confirm' ];
+		}
+	}
 	
 	/**
 	 * Vérifie si les coordonnées de l'utilisateur est valide.
@@ -83,7 +132,7 @@ class User extends Entity {
 	 * @return bool
 	 */
 	public function isCrypted() {
-		return preg_match( '%^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$[.]{1,}$%', $this->password);
+		return preg_match( self::CRYPTED_PASSWORD_MATCH, $this->password );
 	}
 	
 	/**
@@ -97,10 +146,10 @@ class User extends Entity {
 		// openssl_random_pseudo_bytes nécessite l'activation de la bibliothèque openssl dans le fichier de config
 		// Attention à la fonction openssl (caractères spéciaux)
 		// Ne pas augmenter la valeur max de rand
-		if (!$this->isCrypted()) {
-			$crypt_key = '$6$rounds=' . rand( 1, 99999) . '$' . openssl_random_pseudo_bytes(16). '$';
-			return crypt( $this->password, $crypt_key );
+		if ( !$this->isCrypted() ) {
+			return self::cryptWithKey( $this->password );
 		}
+		
 		// Retourner le champ si le password est déjà crypté.
 		return $this->password;
 	}
@@ -118,18 +167,11 @@ class User extends Entity {
 	
 	/**
 	 * Setter pour l'attribut password.
-	 * Stocke le password directement crypté.
 	 *
 	 * @param $password string password NON crypté
 	 */
 	public function setPassword( $password ) {
 		$this->password = $password;
-		// Si le password n'est pas déjà crypté, on le crypte
-		if ( $this->isCrypted() ) {
-			if ( !empty( $password ) AND is_string( $password ) ) {
-				$this->password = $this->crypt();
-			}
-		}
 	}
 	
 	/**
@@ -196,15 +238,17 @@ class User extends Entity {
 	}
 	
 	/**
-	 * Renvoie le password CRYPTE (pour des raisons de sécurité évidentes).
-	 *
 	 * @return string
 	 */
 	public function password() {
-		if ( !$this->isCrypted() ) {
-			return $this->crypt();
-		}
 		return $this->password;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function password_confirm() {
+		return $this->password_confirm;
 	}
 	
 	/**
@@ -213,8 +257,9 @@ class User extends Entity {
 	 * @return string|null
 	 */
 	public function cryptKey() {
-		$matches_a = preg_match( '%(^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$)[.]+$', $this->password);
-		return isset($matches_a[1]) ? $matches_a[1] : null;
+		preg_match( self::CRYPT_KEY_MATCH, $this->password, $matches_a );
+		
+		return isset( $matches_a[ 1 ] ) ? $matches_a[ 1 ] : null;
 	}
 	
 	/**
@@ -222,6 +267,13 @@ class User extends Entity {
 	 */
 	public function email() {
 		return $this->email;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function email_confirm() {
+		return $this->email_confirm;
 	}
 	
 	/**

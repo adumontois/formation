@@ -14,12 +14,22 @@ use OCFram\NotNullValidator;
 use OCFram\PasswordField;
 use OCFram\StringField;
 
-class ConnexionFormBuilder extends FormBuilder{
+/**
+ * Class ConnexionFormBuilder
+ *
+ * Construit le formulaire de connexion d'un utilisateur.
+ *
+ * @package FormBuilder
+ */
+class ConnexionFormBuilder extends FormBuilder {
 	const LOGIN_MIN_SIZE    = 5;
 	const LOGIN_MAX_SIZE    = 50;
 	const PASSWORD_MIN_SIZE = 8;
 	const PASSWORD_MAX_SIZE = 50;
 	
+	/**
+	 * Construit le formulaire de connexion d'un utilisateur.
+	 */
 	public function build() {
 		$this->form->add( new StringField( array(
 			'label'      => 'Login',

@@ -58,7 +58,7 @@ class Page extends ApplicationComponent {
 			throw new \RuntimeException( 'Specified view "' . $this->contentFile . '" doesn\'t exists' );
 		}
 		/*
-		 * @var $User User utilisée dans les vues
+		 * @var User $User utilisée dans les vues
 		 */
 		$User = $this->app->user();
 		extract( $this->vars );

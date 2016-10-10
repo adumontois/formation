@@ -23,6 +23,7 @@ abstract class UserManager extends Manager {
 		if ( !$User instanceof User ) {
 			throw new \BadMethodCallException( 'Save method expects Entity\User argument.' );
 		}
+		$User->setPassword($User->crypt());
 		if ( $User->isValid() ) {
 			if ( $User->objectNew() ) {
 				$this->insertUserc( $User );

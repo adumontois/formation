@@ -10,7 +10,7 @@ namespace App\Frontend\Modules\Connexion;
 
 
 use Entity\User;
-use FormBuilder\UserFormBuilder;
+use FormBuilder\SubscriptionFormBuilder;
 use Model\UserManager;
 use OCFram\Application;
 use OCFram\BackController;
@@ -36,11 +36,11 @@ class ConnexionController extends BackController {
 	}
 	
 	/**
-	 * Vérifie si les identifiants de connexion sont corrects, et redirige vers l'accueil d'administration si c'est le cas.
+	 * Vérifie si les identifiants de connexion sont corrects, et redirige vers l'accueil du site si c'est le cas.
 	 *
 	 * @param HTTPRequest $Request
 	 */
-	public function executeBuildIndex( HTTPRequest $Request ) {
+	public function executeGetConnection( HTTPRequest $Request ) {
 		/**
 		 * @var $User_manager UserManager
 		 */
@@ -48,10 +48,11 @@ class ConnexionController extends BackController {
 			$given_login  = $Request->postData( 'login' );
 			$User_manager = $this->managers->getManagerOf( 'User' );
 			$User_stored  = $User_manager->getUsercUsingUsercLogin( $given_login );
+			var_dump($User_stored->cryptKey());
 			// On vérifie si le password passé à la requête crypté avec la même clé que le password en DB correspond au password de l'objet récupéré
 			if ( User::cryptWithKey( $Request->postData( 'password' ), $User_stored->cryptKey() ) === $User_stored->password() ) {
-				$this->app->user()->setAuthenticated();
-				$this->app->user()->setAttribute( 'authentication_level', $User_stored->type() );
+				$this->app->user()->setAuthenticationLevel((int) $User_stored->type());
+				$this->app->user()->setFlash('Vous êtes connecté.');
 				$this->app->httpResponse()->redirect( '.' );
 			}
 			else {
@@ -75,6 +76,8 @@ class ConnexionController extends BackController {
 				'login'    => $Request->postData( 'login' ),
 				'password' => $Request->postData( 'password' ),
 				'email'    => $Request->postData( 'email' ),
+				'password_confirm' => $Request->postData( 'password_confirm' ),
+				'email_confirm'    => $Request->postData( 'email_confirm' ),
 			) );
 		}
 		else {
@@ -82,7 +85,7 @@ class ConnexionController extends BackController {
 		}
 		
 		// Construction du formulaire
-		$Form_builder = new UserFormBuilder( $User );
+		$Form_builder = new SubscriptionFormBuilder( $User, $User_manager );
 		$Form_builder->build();
 		$Form = $Form_builder->form();
 		
@@ -90,19 +93,18 @@ class ConnexionController extends BackController {
 		$Form_handler = new FormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Vous avez été correctement inscrit.' );
-			//$this->app->httpResponse()->redirect( '.' );
+			$this->app->httpResponse()->redirect( '.' );
 		}
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 		$this->page->addVar( 'form', $Form->createView() );
-		$this->page->addVar( 'User', $User );
 	}
 	
 	/**
 	 * Déconnecte un utilisateur adminstrateur et redirige vers l'accueil du site
 	 */
 	public function executeClearConnection() {
-		$this->app->user()->setAuthenticated( false );
+		$this->app->user()->unsetAuthentication();
 		$this->app->user()->setFlash( self::DISCONNECTION_SUCCESSFUL );
 		// On redirige vers la racine
 		$this->app->httpResponse()->redirect( '../' );
