@@ -23,8 +23,6 @@ class User extends Entity {
 	 */
 	const USERY_STANDARD   = 1;
 	const USERY_SUPERADMIN = 2;
-	/** Password constant */
-	const CRYPT_KEY = '$6$rounds=457312984$p@__{#5h£y|+7G*-$';
 	/**
 	 * @var $login string
 	 */
@@ -78,15 +76,31 @@ class User extends Entity {
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	 * Vérifie si le password est crypté. La méthode de cryptage utilisée est SHA_512.
+	 *
+	 * @return bool
+	 */
 	public function isCrypted() {
-		return  self::CRYPT_KEY === substr($this->password, 0, strlen(self::CRYPT_KEY));
+		return preg_match( '%^\$6\$rounds=([0-9]){1,9}\$[.]{16}\$[.]$', $this->password);
 	}
 	
 	/**
 	 * Crypte le password courant. La méthode de cryptage utilisée est SHA_512.
+	 * Le password n'est pas crypté : utiliser setPassword pour ce faire.
+	 *
+	 * @return string Le password crypté.
 	 */
 	public function crypt() {
-		return crypt( $this->password, self::CRYPT_KEY );
+		// Générer une clé de cryptage aléatoire
+		if (!$this->isCrypted()) {
+			$crypt_key = '$6$rounds=' . rand( 1, 999999999 ) . '$' . random_bytes( 16 ) . '$';
+			return crypt( $this->password, $crypt_key );
+		}
+		
+		// Retourner le champ si le password est déjà crypté.
+		return $this->password;
 	}
 	
 	/**
@@ -109,10 +123,11 @@ class User extends Entity {
 	public function setPassword( $password ) {
 		$this->password = $password;
 		// Si le password n'est pas déjà crypté, on le crypte
-		if ($this->isCrypted())
+		if ( $this->isCrypted() ) {
 			if ( !empty( $password ) AND is_string( $password ) ) {
 				$this->password = $this->crypt();
 			}
+		}
 	}
 	
 	/**
@@ -140,9 +155,9 @@ class User extends Entity {
 	 *
 	 * @param $SUY_id int Tinyint associé à un type de user existant.
 	 */
-	public function setType($SUY_id) {
-		if (!is_int($SUY_id) OR $SUY_id < 0 OR $SUY_id > 255) {
-			throw new \BadMethodCallException('Le type d\'un User doit être une entier entre 0 et 255');
+	public function setType( $SUY_id ) {
+		if ( !is_int( $SUY_id ) OR $SUY_id < 0 OR $SUY_id > 255 ) {
+			throw new \BadMethodCallException( 'Le type d\'un User doit être une entier entre 0 et 255' );
 		}
 		$this->type = $SUY_id;
 	}
@@ -152,9 +167,9 @@ class User extends Entity {
 	 *
 	 * @param $SUE_id int Tinyint associé à un état de bannissement existant.
 	 */
-	public function setBanned($SUE_id) {
-		if (!is_int($SUE_id) OR $SUE_id < 1 OR $SUE_id > 19) {
-			throw new \BadMethodCallException('L\'état de bannissement d\'un User doit être une entier entre 1 et 19');
+	public function setBanned( $SUE_id ) {
+		if ( !is_int( $SUE_id ) OR $SUE_id < 1 OR $SUE_id > 19 ) {
+			throw new \BadMethodCallException( 'L\'état de bannissement d\'un User doit être une entier entre 1 et 19' );
 		}
 		$this->type = $SUE_id;
 	}
@@ -164,9 +179,9 @@ class User extends Entity {
 	 *
 	 * @param $SUE_id int Tinyint associé à un état de validation existant.
 	 */
-	public function setValid($SUE_id) {
-		if (!is_int($SUE_id) OR $SUE_id < 21 OR $SUE_id > 39) {
-			throw new \BadMethodCallException('L\'état de validation d\'un User doit être une entier entre 21 et 39');
+	public function setValid( $SUE_id ) {
+		if ( !is_int( $SUE_id ) OR $SUE_id < 21 OR $SUE_id > 39 ) {
+			throw new \BadMethodCallException( 'L\'état de validation d\'un User doit être une entier entre 21 et 39' );
 		}
 		$this->type = $SUE_id;
 	}
@@ -184,9 +199,10 @@ class User extends Entity {
 	 * @return string
 	 */
 	public function password() {
-		if (!$this->isCrypted()) {
+		if ( !$this->isCrypted() ) {
 			return $this->crypt();
 		}
+		
 		return $this->password;
 	}
 	
@@ -214,7 +230,7 @@ class User extends Entity {
 	/**
 	 * @return int
 	 */
-	public function	banned() {
+	public function banned() {
 		return $this->banned;
 	}
 	
