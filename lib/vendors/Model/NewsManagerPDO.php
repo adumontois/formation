@@ -33,7 +33,7 @@ class NewsManagerPDO extends NewsManager {
 			throw new \InvalidArgumentException( 'Offset and limit values must be positive integers' );
 		}
 		
-		$sql = 'SELECT SNC_id, SNC_fk_SUC, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate, SUC_id, SUC_login, SUC_mail, SUC_datesubscription, SUC_fk_SUE_banned, SUC_fk_SUE_valid, SUC_fk_SUY
+		$sql = 'SELECT SNC_id, SNC_fk_SUC, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate, SUC_id, SUC_login, SUC_email, SUC_datesubscription, SUC_fk_SUE_banned, SUC_fk_SUE_valid, SUC_fk_SUY
            		FROM T_SIT_newsc
 				INNER JOIN T_SIT_userc ON SNC_fk_SUC = SUC_id
 				ORDER BY SNC_id DESC LIMIT :count OFFSET :start';
@@ -55,7 +55,7 @@ class NewsManagerPDO extends NewsManager {
 			] ) )->setUser( new User( [
 				'id'               => $line[ 'SUC_id' ],
 				'login'            => $line[ 'SUC_login' ],
-				'mail'             => $line[ 'SUC_mail' ],
+				'mail'             => $line[ 'SUC_email' ],
 				'datesubscription' => $line[ 'SUC_datesubscription' ],
 				'fk_SUE_banned'    => $line[ 'SUC_fk_SUE_banned' ],
 				'fk_SUE_valid'     => $line[ 'SUC_fk_SUE_valid' ],
@@ -76,16 +76,16 @@ class NewsManagerPDO extends NewsManager {
 	 */
 	public function getNewscUsingNewscId( $newsc_id ) {
 		/**
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
-		$sql  = 'SELECT SNC_id, SNC_fk_SUC, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate, SUC_id, SUC_login, SUC_mail, SUC_datesubscription, SUC_fk_SUE_banned, SUC_fk_SUE_valid, SUC_fk_SUY
+		$sql  = 'SELECT SNC_id, SNC_fk_SUC, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate, SUC_id, SUC_login, SUC_email, SUC_datesubscription, SUC_fk_SUE_banned, SUC_fk_SUE_valid, SUC_fk_SUY
                 FROM T_SIT_newsc
                 	INNER JOIN T_SIT_userc ON SNC_fk_SUC = SUC_id
                 WHERE SNC_id = :id';
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':id', $newsc_id, \PDO::PARAM_INT );
 		$stmt->execute();
-		if ( $line = $Query->fetch( \PDO::FETCH_ASSOC ) ) {
+		if ( $line = $stmt->fetch( \PDO::FETCH_ASSOC ) ) {
 			$News = ( new News( [
 				'id'         => $line[ 'SNC_id' ],
 				'fk_SUC'     => $line[ 'SNC_fk_SUC' ],
@@ -96,7 +96,7 @@ class NewsManagerPDO extends NewsManager {
 			] ) )->setUser( new User( [
 				'id'               => $line[ 'SUC_id' ],
 				'login'            => $line[ 'SUC_login' ],
-				'mail'             => $line[ 'SUC_mail' ],
+				'mail'             => $line[ 'SUC_email' ],
 				'datesubscription' => $line[ 'SUC_datesubscription' ],
 				'fk_SUE_banned'    => $line[ 'SUC_fk_SUE_banned' ],
 				'fk_SUE_valid'     => $line[ 'SUC_fk_SUE_valid' ],
@@ -133,16 +133,16 @@ function countNewscUsingNewscId() {
 protected
 function insertNewsc( News $News ) {
 	/**
-	 * @var $Query \PDOStatement
+	 * @var $stmt \PDOStatement
 	 * @var $News  News
 	 */
 	$sql   = 'INSERT INTO T_SIT_newsc (SNC_fk_SUC, SNC_title, SNC_content, SNC_dateadd, SNC_dateupdate)
                     VALUES (:fk_SUC, :title, :content, NOW(), NOW())';
-	$Query = $this->dao->prepare( $sql );
-	$Query->bindValue( ':fk_SUC', $News->fk_SUC(), \PDO::PARAM_STR );
-	$Query->bindValue( ':title', $News->title(), \PDO::PARAM_STR );
-	$Query->bindValue( ':content', $News->content(), \PDO::PARAM_STR );
-	$Query->execute();
+	$stmt = $this->dao->prepare( $sql );
+	$stmt->bindValue( ':fk_SUC', $News->fk_SUC(), \PDO::PARAM_STR );
+	$stmt->bindValue( ':title', $News->title(), \PDO::PARAM_STR );
+	$stmt->bindValue( ':content', $News->content(), \PDO::PARAM_STR );
+	$stmt->execute();
 }
 
 /**
@@ -153,17 +153,17 @@ function insertNewsc( News $News ) {
  */
 protected function updateNewsc( News $News ) {
 	/**
-	 * @var $Query \PDOStatement
+	 * @var $stmt \PDOStatement
 	 * @var $News  News
 	 */
 	$sql   = 'UPDATE T_SIT_newsc
                 SET SNC_title = :titre, SNC_content = :contenu, SNC_dateupdate = NOW()
                 WHERE SNC_id = :id';
-	$Query = $this->dao->prepare( $sql );
-	$Query->bindValue( ':id', $News->id(), \PDO::PARAM_INT );
-	$Query->bindValue( ':titre', $News->title(), \PDO::PARAM_STR );
-	$Query->bindValue( ':contenu', $News->content(), \PDO::PARAM_STR );
-	$Query->execute();
+	$stmt = $this->dao->prepare( $sql );
+	$stmt->bindValue( ':id', $News->id(), \PDO::PARAM_INT );
+	$stmt->bindValue( ':titre', $News->title(), \PDO::PARAM_STR );
+	$stmt->bindValue( ':contenu', $News->content(), \PDO::PARAM_STR );
+	$stmt->execute();
 }
 
 /**
@@ -177,14 +177,14 @@ protected function updateNewsc( News $News ) {
 public
 function deleteNewscUsingNewscId( $id ) {
 	/**
-	 * @var $Query \PDOStatement
+	 * @var $stmt \PDOStatement
 	 */
 	$sql   = 'DELETE FROM T_SIT_newsc
                 WHERE SNC_id = :id';
-	$Query = $this->dao->prepare( $sql );
-	$Query->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
-	$Query->execute();
+	$stmt = $this->dao->prepare( $sql );
+	$stmt->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
+	$stmt->execute();
 	
-	return (bool)$Query->rowCount();
+	return (bool)$stmt->rowCount();
 }
 }

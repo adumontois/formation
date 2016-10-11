@@ -22,19 +22,19 @@ class UserManagerPDO extends UserManager {
 	protected function insertUserc( Entity $User ) {
 		/**
 		 * @var $User  User
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
-		$sql = 'INSERT INTO T_SIT_userc (SUC_login, SUC_password, SUC_mail, SUC_DateSubscription, SUC_fk_SUY, SUC_fk_SUE_banned, SUC_fk_SUE_valid)
-				VALUES (:login, :password, :mail, NOW(), :type, :banned, :valid)';
+		$sql = 'INSERT INTO T_SIT_userc (SUC_login, SUC_password, SUC_email, SUC_DateSubscription, SUC_fk_SUY, SUC_fk_SUE_banned, SUC_fk_SUE_valid)
+				VALUES (:login, :password, :email, NOW(), :fk_SUY, :fk_SUE_banned, :fk_SUE_valid)';
 		
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':login', $User->login() );
-		$Query->bindValue( ':password', $User->password() );
-		$Query->bindValue( ':mail', $User->email());
-		$Query->bindValue( ':type', User::USERY_STANDARD, \PDO::PARAM_INT);
-		$Query->bindValue( ':banned', User::USERE_BANNED_NOT_BANNED, \PDO::PARAM_INT);
-		$Query->bindValue( ':valid', User::USERE_VALID_VALIDATED_BY_FORM, \PDO::PARAM_INT);
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':login', $User->login() );
+		$stmt->bindValue( ':password', $User->password() );
+		$stmt->bindValue( ':email', $User->email());
+		$stmt->bindValue( ':fk_SUY', User::USERY_STANDARD, \PDO::PARAM_INT);
+		$stmt->bindValue( ':fk_SUE_banned', User::USERE_BANNED_NOT_BANNED, \PDO::PARAM_INT);
+		$stmt->bindValue( ':fk_SUE_valid', User::USERE_VALID_VALIDATED_BY_FORM, \PDO::PARAM_INT);
+		$stmt->execute();
 	}
 	
 	/**
@@ -46,16 +46,16 @@ class UserManagerPDO extends UserManager {
 	protected function updatePasswordAndMailOfUsercUsingId( Entity $User ) {
 		/**
 		 * @var $User  User
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
 		$sql   = 'UPDATE T_SIT_userc
-				SET SUC_password = :password, SUC_mail = :mail
+				SET SUC_password = :password, SUC_email = :email
 				WHERE SUC_id = :id';
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':password', $User->password() );
-		$Query->bindValue( ':mail', $User->email() );
-		$Query->bindValue( ':id', $User->id(), \PDO::PARAM_INT );
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':password', $User->password() );
+		$stmt->bindValue( ':email', $User->email() );
+		$stmt->bindValue( ':id', $User->id(), \PDO::PARAM_INT );
+		$stmt->execute();
 	}
 	
 	/**
@@ -67,18 +67,22 @@ class UserManagerPDO extends UserManager {
 	 */
 	public function getUsercUsingUsercId( $userc_id ) {
 		/**
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
+		 * @var $User User
 		 */
-		$sql = 'SELECT SUC_id id, SUC_login login, SUC_password password, SUC_mail email, SUC_DateSubscription Date_subscription, SUC_fk_SUY type, SUC_fk_SUE_banned banned, SUC_fk_SUE_valid valid
+		$sql = 'SELECT SUC_id id, SUC_login login, SUC_password password, SUC_email email, SUC_DateSubscription datesubscription, SUC_fk_SUY fk_SUY, SUC_fk_SUE_banned fk_SUE_banned, SUC_fk_SUE_valid fk_SUE_valid
 				FROM T_SIT_userc
 				WHERE SUC_id = :id';
 		
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':id', $userc_id, \PDO::PARAM_INT );
-		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\User' );
-		$Query->execute();
-		
-		return $Query->fetch();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':id', $userc_id, \PDO::PARAM_INT );
+		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\User' );
+		$stmt->execute();
+		$User = $stmt->fetch();
+		if (null != $User) {
+			$User->setDatesubscription(new \DateTime($User->datesubscription()));
+		}
+		return $User;
 	}
 	
 	/**
@@ -92,18 +96,21 @@ class UserManagerPDO extends UserManager {
 	 */
 	public function getUsercUsingUsercLogin( $userc_login ) {
 		/**
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
-		$sql = 'SELECT SUC_id id, SUC_login login, SUC_password password, SUC_mail email, SUC_DateSubscription Date_subscription, SUC_fk_SUY type, SUC_fk_SUE_banned banned, SUC_fk_SUE_valid valid
+		$sql = 'SELECT SUC_id id, SUC_login login, SUC_password password, SUC_email email, SUC_DateSubscription datesubscription, SUC_fk_SUY fk_SUY, SUC_fk_SUE_banned fk_SUE_banned, SUC_fk_SUE_valid fk_SUE_valid
 				FROM T_SIT_userc
 				WHERE SUC_login = :login';
 		
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':login', $userc_login );
-		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\User' );
-		$Query->execute();
-		$User = $Query->fetch();
-		return $Query->rowCount() == 1 ? $User : null;
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':login', $userc_login );
+		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\User' );
+		$stmt->execute();
+		$User = $stmt->fetch();
+		if (null != $User) {
+			$User->setDatesubscription(new \DateTime($User->datesubscription()));
+		}
+		return $stmt->rowCount() == 1 ? $User : null;
 	}
 	
 	/**
@@ -115,16 +122,16 @@ class UserManagerPDO extends UserManager {
 	public function updateUsercBannedUsingUsercId( $userc_id, $userc_banned ) {
 		/**
 		 * @var $User  User
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
 		$sql = 'UPDATE T_SIT_userc
 				SET SUC_fk_SUE_banned = :ban
 				WHERE SUC_id = :id';
 		
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':id', $userc_id, \PDO::PARAM_INT );
-		$Query->bindValue( ':ban', $userc_banned, \PDO::PARAM_INT );
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':id', $userc_id, \PDO::PARAM_INT );
+		$stmt->bindValue( ':ban', $userc_banned, \PDO::PARAM_INT );
+		$stmt->execute();
 	}
 	
 	/**
@@ -136,6 +143,6 @@ class UserManagerPDO extends UserManager {
 		$sql = 'SELECT COUNT(*)
 				FROM T_SIT_userc';
 		
-		return $this->dao->exec( $sql )->fetchColumn();
+		return $this->dao->query( $sql )->fetchColumn();
 	}
 }

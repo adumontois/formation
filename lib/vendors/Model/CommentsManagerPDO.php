@@ -26,18 +26,18 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	protected function insertCommentc( Comment $Comment ) {
 		/**
-		 * @var $Query   \PDOStatement
+		 * @var $stmt   \PDOStatement
 		 * @var $Comment Comment
 		 */
 		$sql = 'INSERT INTO T_SIT_commentc
                     (SCC_fk_SNC, SCC_author, SCC_content, SCC_date)
                 VALUES (:fk_SNC, :author, :content, NOW())';
 		
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
-		$Query->bindValue( ':author', $Comment->fk_SNC(), \PDO::PARAM_STR );
-		$Query->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
+		$stmt->bindValue( ':author', $Comment->fk_SNC(), \PDO::PARAM_STR );
+		$stmt->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
+		$stmt->execute();
 		$Comment->setId( $this->dao->lastInsertId() );
 	}
 	
@@ -49,18 +49,18 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	protected function updateCommentc( Comment $Comment ) {
 		/**
-		 * @var $Query   \PDOStatement
+		 * @var $stmt   \PDOStatement
 		 * @var $Comment Comment
 		 */
 		$sql   = 'UPDATE T_SIT_commentc
                 SET SCC_fk_SNC = :fk_SNC, SCC_author = :fk_SNC, SCC_content = :contenu
                 WHERE SCC_id = :id';
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
-		$Query->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_STR );
-		$Query->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
-		$Query->bindValue( ':id', $Comment->id(), \PDO::PARAM_INT );
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
+		$stmt->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_STR );
+		$stmt->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
+		$stmt->bindValue( ':id', $Comment->id(), \PDO::PARAM_INT );
+		$stmt->execute();
 	}
 	
 	/**
@@ -72,7 +72,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	public function getCommentcUsingNewscIdSortByIdDesc( $newsc_id ) {
 		/**
-		 * @var $Query            \PDOStatement
+		 * @var $stmt            \PDOStatement
 		 * @var $Liste_comments_a Comment[]
 		 */
 		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_date date
@@ -80,15 +80,15 @@ class CommentsManagerPDO extends CommentsManager {
                 WHERE SCC_fk_SNC = :fk_SNC
                 ORDER BY SCC_id DESC';
 		
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
-		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
-		$Query->execute();
-		$Liste_comments_a = $Query->fetchAll();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
+		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
+		$stmt->execute();
+		$Liste_comments_a = $stmt->fetchAll();
 		foreach ( $Liste_comments_a as $Comment ) {
 			$Comment->setDate( new \DateTime( $Comment->date() ) );
 		}
-		$Query->closeCursor();
+		$stmt->closeCursor();
 		
 		return $Liste_comments_a;
 	}
@@ -102,21 +102,21 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	public function getCommentcUsingCommentcId( $commentc_id ) {
 		/**
-		 * @var         $Query \PDOStatement
+		 * @var         $stmt \PDOStatement
 		 * @var Comment $Comment
 		 */
 		$sql   = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_date date
                 FROM T_SIT_commentc
                 WHERE SCC_id = :id';
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
-		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
-		$Query->execute();
-		$Comment = $Query->fetch();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
+		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
+		$stmt->execute();
+		$Comment = $stmt->fetch();
 		if ( $Comment != null ) {
 			$Comment->setDate( new \DateTime( $Comment->date() ) );
 		}
-		$Query->closeCursor();
+		$stmt->closeCursor();
 		
 		return $Comment;
 	}
@@ -131,15 +131,15 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	public function deleteCommentcUsingCommentcId( $commentc_id ) {
 		/**
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
 		$sql   = 'DELETE FROM T_SIT_commentc
                 WHERE SCC_id = :id';
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
+		$stmt->execute();
 		
-		return (bool)$Query->rowCount();
+		return (bool)$stmt->rowCount();
 	}
 	
 	/**
@@ -149,12 +149,12 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	public function deleteCommentcUsingNewscId( $newsc_id ) {
 		/**
-		 * @var $Query \PDOStatement
+		 * @var $stmt \PDOStatement
 		 */
 		$sql   = 'DELETE FROM T_SIT_commentc
                 WHERE SCC_fk_SNC = :fk_SNC';
-		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
-		$Query->execute();
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
+		$stmt->execute();
 	}
 }
