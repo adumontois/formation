@@ -62,12 +62,12 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
-			$News_list_a = $News_manager->getNewscAndUsercLoginSortByIdDesc();
+			$News_list_a = $News_manager->getNewscSortByIdDesc();
 			$action_a = array();
 			foreach ($News_list_a as $News) {
 				$News->format();
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
-				if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->auteur()) {
+				if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id()) {
 					$action_a[$News->id()] = '<a href="news-update-'.$News->id().'.html"><img src="../images/update.png" alt="Modifier" /></a>
 						<a href="news-delete-'.$News->id().'html"><img src="../images/delete.png" alt="Supprimer" /></a>';
 				}
@@ -99,9 +99,9 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$News = new News( array(
-				'auteur'  => $this->app->user()->userId(),
-				'titre'   => $Request->postData( 'titre' ),
-				'contenu' => $Request->postData( 'contenu' ),
+				'fk_SUC'  => $this->app->user()->userId(),
+				'title'   => $Request->postData( 'title' ),
+				'content' => $Request->postData( 'content' ),
 			) );
 			// S'il s'agit d'un update, il faut connaître l'id de la news qui est donné dans l'url
 			if ( $Request->getExists( 'id' ) ) {
@@ -113,7 +113,7 @@ class NewsController extends BackController {
 				// Afficher le commentaire en update
 				$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 				// Seul un superadmin peut modifier les news des autres
-				if ($this->app->user()->userId() != $News->auteur() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN) {
+				if ($this->app->user()->userId() != $News->fk_SUC() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN) {
 					$this->app->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous ne pouvez pas modifier la news de quelqu\'un d\'autre !'));
 				}
 			}
@@ -192,7 +192,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 
 		$News = $News_manager->getNewscUsingNewscId($Request->getData( 'id' ));
-		if ($News->auteur() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
+		if ($News->fk_SUC() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
 			$this->app->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous ne pouvez pas supprimer la news de quelqu\'un d\'autre !'));
 		}
 		// Suppression des commentaires associés à la news
@@ -223,9 +223,9 @@ class NewsController extends BackController {
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$Comment = new Comment( array(
 				'id'      => $Request->getData( 'id' ),
-				'news'    => $Request->postData( 'news' ),
-				'auteur'  => $Request->postData( 'auteur' ),
-				'contenu' => $Request->postData( 'contenu' ),
+				'fk_SNC'    => $Request->postData( 'news' ),
+				'author'  => $Request->postData( 'author' ),
+				'content' => $Request->postData( 'content' ),
 			) );
 		}
 		else {
@@ -267,6 +267,9 @@ class NewsController extends BackController {
 		/**
 		 * @var $Comments_manager CommentsManager
 		 */
+		if ($this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \RuntimeException( 'Vous n\'avez pas l\'autorisation de supprimer un commentaire.' ) );
+		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( !$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );

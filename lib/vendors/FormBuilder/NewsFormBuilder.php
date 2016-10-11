@@ -42,6 +42,7 @@ class NewsFormBuilder extends FormBuilder {
 	public function build() {
 		$this->form->add( new TextField( array(
 			'label'      => 'Contenu',
+			'name'       => 'content',
 			'rows'       => self::TEXTAREA_ROWS,
 			'cols'       => self::TEXTAREA_COLS,
 			'validators' => array(
@@ -51,6 +52,7 @@ class NewsFormBuilder extends FormBuilder {
 		
 		$this->form->add( new StringField( array(
 			'label'      => 'Titre',
+			'name'       => 'title',
 			'maxLength'  => self::TITLE_MAX_LENGTH,
 			'validators' => array(
 				new NotNullValidator( 'Title can\'t be undefined' ),

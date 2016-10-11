@@ -26,6 +26,7 @@ trait AppController {
 		/**
 		 * @var $this BackController
 		 */
+		// Générer le menu de boutons-liens
 		$menu = '<li><a href="/">Accueil</a></li>';
 		if ( $this->app()->user()->isAuthenticated() ) {
 			$menu .= '<li><a href="/admin/">' . ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ' (connecté)</a></li>
@@ -37,5 +38,14 @@ trait AppController {
 				<li><a href="/connect.html">Connexion</a></li>';
 		}
 		$this->page()->addVar( 'menu', $menu );
+		
+		// Générer le flash
+		if ( $this->app()->user()->hasFlash() ) {
+			$flash = '<p style="text-align: center;">' . $this->app()->user()->getFlash() . '</p>';
+		}
+		else {
+			$flash = '';
+		}
+		$this->page()->addVar('flash', $flash);
 	}
 }

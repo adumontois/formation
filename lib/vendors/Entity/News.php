@@ -20,25 +20,29 @@ use \OCFram\Entity;
  */
 class News extends Entity {
 	/**
-	 * @var $auteur int
+	 * @var $User User
 	 */
-	protected $auteur;
+	protected $User;
 	/**
-	 * @var $titre string
+	 * @var $title string
 	 */
-	protected $titre;
+	protected $title;
 	/**
-	 * @var $contenu string
+	 * @var $fk_SUC int
 	 */
-	protected $contenu;
+	protected $fk_SUC;
 	/**
-	 * @var $DateAjout \DateTime
+	 * @var $content string
 	 */
-	protected $DateAjout;
+	protected $content;
 	/**
-	 * @var $DateModif \DateTime
+	 * @var $Dateadd \DateTime
 	 */
-	protected $DateModif;
+	protected $Dateadd;
+	/**
+	 * @var $Dateupdate \DateTime
+	 */
+	protected $Dateupdate;
 	
 	/**
 	 * Vérifie si la news est valide.
@@ -46,114 +50,118 @@ class News extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !empty( $this->auteur ) AND !empty( $this->titre ) AND !empty( $this->contenu );
+		return $this->User->isValid() AND !empty( $this->title ) AND !empty( $this->content );
 	}
 	
 	/**
-	 * Setter pour l'attribut auteur.
+	 * Setter pour l'attribut User.
 	 *
-	 * @param $auteur int
+	 * @param $User User
 	 */
-	public function setAuteur( $auteur ) {
-		if (is_int($auteur)) {
-			$this->auteur = $auteur;
+	public function setUser( $User ) {
+		if ($User->isValid()) {
+			$this->User = $User;
 		}
 	}
 	
 	/**
-	 * Setter pour l'attribut titre.
+	 * Setter pour l'attribut title.
 	 *
-	 * @param $titre string
+	 * @param $title string
 	 */
-	public function setTitre( $titre ) {
-		if ( !empty( $titre ) AND is_string( $titre ) ) {
-			$this->titre = $titre;
+	public function setTitle( $title ) {
+		if ( !empty( $title ) AND is_string( $title ) ) {
+			$this->title = $title;
 		}
 	}
 	
 	/**
-	 * Setter pour l'attribut contenu.
+	 * Setter pour l'attribut content.
 	 *
-	 * @param $contenu string
+	 * @param $content string
 	 */
-	public function setContenu( $contenu ) {
-		if ( !empty( $contenu ) AND is_string( $contenu ) ) {
-			$this->contenu = $contenu;
+	public function setContent( $content ) {
+		if ( !empty( $content ) AND is_string( $content ) ) {
+			$this->content = $content;
 		}
 	}
 	
 	/**
-	 * Setter pour l'attribut DateAjout.
+	 * Setter pour l'attribut Dateadd.
 	 *
-	 * @param \DateTime $DateAjout
+	 * @param \DateTime $Dateadd
 	 */
-	public function setDateAjout( \DateTime $DateAjout ) {
-		$this->DateAjout = $DateAjout;
+	public function setDateadd( \DateTime $Dateadd ) {
+		$this->Dateadd = $Dateadd;
 	}
 	
 	/**
-	 * Formate la date d'ajout. Cette méthode modifie l'attribut DateAjout.
+	 * Formate la date d'ajout. Cette méthode modifie l'attribut Dateadd.
 	 */
-	public function formatDateAjout() {
-		$this->DateAjout = $this->DateAjout->format('d/m/Y à H\hi');
+	public function formatDateadd() {
+		$this->Dateadd = $this->Dateadd->format('d/m/Y à H\hi');
 	}
 	
 	/**
-	 * Formate la date de modification. Cette méthode modifie l'attribut DateModif.
+	 * Setter pour l'attribut Dateupdate.
+	 *
+	 * @param \DateTime $Dateupdate
 	 */
-	public function formatDateModif() {
-		$this->DateModif = $this->DateModif->format('d/m/Y à H\hi');
+	public function setDateupdate( \DateTime $Dateupdate ) {
+		$this->Dateupdate = $Dateupdate;
+	}
+	
+	/**
+	 * Formate la date de modification. Cette méthode modifie l'attribut Dateupdate.
+	 */
+	public function formatDateupdate() {
+		$this->Dateupdate = $this->Dateupdate->format('d/m/Y à H\hi');
 	}
 	
 	/**
 	 * Formate les attributs de l'objet pour affichage à l'écran Cette méthode modifie les dates.
 	 */
 	public function format() {
-		$this->formatDateAjout();
-		$this->formatDateModif();
+		$this->formatDateadd();
+		$this->formatDateupdate();
 	}
 	
 	/**
-	 * Setter pour l'attribut DateModif.
-	 *
-	 * @param \DateTime $DateModif
+	 * @return User
 	 */
-	public function setDateModif( \DateTime $DateModif ) {
-		$this->DateModif = $DateModif;
+	public function User() {
+		return $this->User;
 	}
 	
-	/**
-	 * @return int
-	 */
-	public function auteur() {
-		return $this->auteur;
+	public function fk_SUC() {
+		return $this->fk_SUC;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function titre() {
-		return $this->titre;
+	public function title() {
+		return $this->title;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function contenu() {
-		return $this->contenu;
+	public function content() {
+		return $this->content;
 	}
 	
 	/**
 	 * @return \DateTime
 	 */
-	public function DateAjout() {
-		return $this->DateAjout;
+	public function Dateadd() {
+		return $this->Dateadd;
 	}
 	
 	/**
 	 * @return \DateTime
 	 */
-	public function DateModif() {
-		return $this->DateModif;
+	public function Dateupdate() {
+		return $this->Dateupdate;
 	}
 }

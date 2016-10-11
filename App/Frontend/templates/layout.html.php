@@ -8,6 +8,7 @@
  * @var $User    \OCFram\User Session utilisateur
  * @var $content string Contenu de la page générée
  * @var $menu string Panneau menu personnalisé en fonction de l'authentification
+ * @var $flash string Affichage du flash (message à l'utilisateur)
  */
 
 ?>
@@ -39,9 +40,7 @@
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?php if ( $User->hasFlash() ): ?>
-						<p style="text-align: center;"> <?= $User->getFlash() ?> </p>
-					<?php endif; ?>
+					<?= $flash ?>
 					<?= $content ?>
 				</section>
 			</div>

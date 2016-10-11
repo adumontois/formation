@@ -20,10 +20,10 @@ use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
 
-class ConnexionController extends BackController {
+class ConnectionController extends BackController {
 	use AppController;
 	/**
-	 * ConnexionController constructor.
+	 * ConnectionController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
 	 *
 	 * @param Application $App
@@ -55,7 +55,7 @@ class ConnexionController extends BackController {
 			) );
 		}
 		else {
-			$User = new User;
+			$User = new User();
 		}
 		
 		// Construction du formulaire

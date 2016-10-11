@@ -15,13 +15,13 @@ use OCFram\PasswordField;
 use OCFram\StringField;
 
 /**
- * Class ConnexionFormBuilder
+ * Class ConnectionFormBuilder
  *
  * Construit le formulaire de connexion d'un utilisateur.
  *
  * @package FormBuilder
  */
-class ConnexionFormBuilder extends FormBuilder {
+class ConnectionFormBuilder extends FormBuilder {
 	const LOGIN_MIN_SIZE    = 5;
 	const LOGIN_MAX_SIZE    = 50;
 	const PASSWORD_MIN_SIZE = 8;

@@ -16,7 +16,7 @@
 <form action="" method="post">
 	<p>
 		<?= $form ?>
-		<input type="hidden" name="news" value="<?= $Comment[ 'news' ] ?>" />
+		<input type="hidden" name="news" value="<?= $Comment[ 'fk_SNC' ] ?>" />
 		<input type="submit" value="Modifier" />
 	</p>
 </form>

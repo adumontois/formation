@@ -30,7 +30,7 @@ class User extends Entity {
 	 */
 	protected $login;
 	/**
-	 * Le password est géré crypté ; il est stocké en base crypté.
+	 * Le password est stocké en base crypté.
 	 *
 	 * @var $password string
 	 */
@@ -40,24 +40,21 @@ class User extends Entity {
 	 */
 	protected $email;
 	/**
-	 * @var $Date_subscription \DateTime
+	 * @var $datesubscription \DateTime
 	 */
-	protected $Date_subscription;
+	protected $datesubscription;
 	/**
 	 * @var $type int Type de l'utilisateur (standard, admin, superadmin...)
 	 */
-	protected $type;
+	protected $fk_SUY;
 	/**
 	 * @var $banned int Indique si l'utilisateur est banni
 	 */
-	protected $banned;
+	protected $fk_SUE_banned;
 	/**
 	 * @var $valid int Indique si l'utilisateur a été validé
 	 */
-	protected $valid;
-	/**
-	 * @var $crypt_key string Clé de cryptage actuelle pour les mots de passe
-	 */
+	protected $fk_SUE_valid;
 	
 	// Variables de stockage pour la confirmation lors de la création d'un User
 	protected $password_confirm;
@@ -107,21 +104,21 @@ class User extends Entity {
 	/**
 	 * Récupère le texte descriptif d'un type de User.
 	 *
-	 * @param $type int Type du User en chiffre ($this->type())
+	 * @param $fk_SUY int Type du User en chiffre ($this->Fk_SUY)
 	 *
 	 * @return string
 	 */
-	static public function getTextualStatus($type) {
-		if (!is_int($type)) {
+	static public function getTextualStatus($fk_SUY) {
+		if (!is_int($fk_SUY)) {
 			throw new \InvalidArgumentException('Le type d\'un User doit être un entier !');
 		}
-		switch ($type) {
+		switch ($fk_SUY) {
 			case 1 :
 				return 'simple écrivain';
 			case 2 :
 				return 'superadmin';
 			default :
-				throw new \InvalidArgumentException('Le type de User '.$type.' n\'existe pas !');
+				throw new \InvalidArgumentException('Le type de User '.$fk_SUY.' n\'existe pas !');
 		}
 	}
 	
@@ -138,6 +135,14 @@ class User extends Entity {
 		if ( isset( $values[ 'email_confirm' ] ) ) {
 			$this->email_confirm = $values[ 'email_confirm' ];
 		}
+	}
+	
+	/**
+	 * Conversion en string d'un User
+	 * @return string
+	 */
+	public function __toString() {
+		return $this->login().'('.$this->email().')';
 	}
 	
 	/**
@@ -212,48 +217,48 @@ class User extends Entity {
 	}
 	
 	/**
-	 * Setter pour l'attribut Date_subscription.
+	 * Setter pour l'attribut datesubscription.
 	 *
-	 * @param \DateTime $Date_subscription
+	 * @param \DateTime $datesubscription
 	 */
-	public function setDate_subscription( \DateTime $Date_subscription ) {
-		$this->Date_subscription = $Date_subscription;
+	public function setDatesubscription( \DateTime $datesubscription ) {
+		$this->datesubscription = $datesubscription;
 	}
 	
 	/**
-	 * Setter pour l'attribut type.
+	 * Setter pour l'attribut fk_SUY.
 	 *
-	 * @param $SUY_id int Tinyint associé à un type de user existant.
+	 * @param $fk_SUY int Tinyint associé à un type de user existant.
 	 */
-	public function setType( $SUY_id ) {
-		if ( !is_int( $SUY_id ) OR $SUY_id < 0 OR $SUY_id > 255 ) {
-			throw new \BadMethodCallException( 'Le type d\'un User doit être une entier entre 0 et 255' );
+	public function setFk_SUY( $fk_SUY ) {
+		if ( !is_int( $fk_SUY ) OR $fk_SUY < 0 OR $fk_SUY > 255 ) {
+			throw new \InvalidArgumentException( 'Le type d\'un User doit être une entier entre 0 et 255' );
 		}
-		$this->type = $SUY_id;
+		$this->type = $fk_SUY;
 	}
 	
 	/**
-	 * Setter pour l'attribut banned.
+	 * Setter pour l'attribut $fk_SUE_banned.
 	 *
-	 * @param $SUE_id int Tinyint associé à un état de bannissement existant.
+	 * @param $fk_SUE_banned int Tinyint associé à un état de bannissement existant.
 	 */
-	public function setBanned( $SUE_id ) {
-		if ( !is_int( $SUE_id ) OR $SUE_id < 1 OR $SUE_id > 19 ) {
+	public function setFk_SUE_banned( $fk_SUE_banned ) {
+		if ( !is_int( $fk_SUE_banned ) OR $fk_SUE_banned < 1 OR $fk_SUE_banned > 19 ) {
 			throw new \BadMethodCallException( 'L\'état de bannissement d\'un User doit être une entier entre 1 et 19' );
 		}
-		$this->type = $SUE_id;
+		$this->fk_SUE_banned = $fk_SUE_banned;
 	}
 	
 	/**
-	 * Setter pour l'attribut valid.
+	 * Setter pour l'attribut fk_SUE_valid.
 	 *
-	 * @param $SUE_id int Tinyint associé à un état de validation existant.
+	 * @param $fk_SUE_valid int Tinyint associé à un état de validation existant.
 	 */
-	public function setValid( $SUE_id ) {
-		if ( !is_int( $SUE_id ) OR $SUE_id < 21 OR $SUE_id > 39 ) {
-			throw new \BadMethodCallException( 'L\'état de validation d\'un User doit être une entier entre 21 et 39' );
+	public function setFk_SUE_valid( $fk_SUE_valid ) {
+		if ( !is_int( $fk_SUE_valid ) OR $fk_SUE_valid < 21 OR $fk_SUE_valid > 39 ) {
+			throw new \InvalidArgumentException( 'L\'état de validation d\'un User doit être une entier entre 21 et 39' );
 		}
-		$this->type = $SUE_id;
+		$this->fk_SUE_valid = $fk_SUE_valid;
 	}
 	
 	/**
@@ -305,22 +310,22 @@ class User extends Entity {
 	/**
 	 * @return \DateTime
 	 */
-	public function Date_subscription() {
-		return $this->Date_subscription;
+	public function datesubscription() {
+		return $this->datesubscription;
 	}
 	
 	/**
 	 * @return int
 	 */
-	public function type() {
-		return $this->type;
+	public function fk_SUY() {
+		return $this->fk_SUY;
 	}
 	
 	/**
 	 * @return int
 	 */
-	public function banned() {
-		return $this->banned;
+	public function fk_SUE_banned() {
+		return $this->fk_SUE_banned;
 	}
 	
 	/**
@@ -330,7 +335,7 @@ class User extends Entity {
 	 *
 	 * @return int
 	 */
-	public function valid() {
-		return $this->valid;
+	public function fk_SUE_valid() {
+		return $this->fk_SUE_valid;
 	}
 }

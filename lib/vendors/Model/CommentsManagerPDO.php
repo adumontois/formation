@@ -31,12 +31,12 @@ class CommentsManagerPDO extends CommentsManager {
 		 */
 		$sql = 'INSERT INTO T_SIT_commentc
                     (SCC_fk_SNC, SCC_author, SCC_content, SCC_date)
-                VALUES (:news, :auteur, :contenu, NOW())';
+                VALUES (:fk_SNC, :author, :content, NOW())';
 		
 		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':news', $Comment->news(), \PDO::PARAM_INT );
-		$Query->bindValue( ':auteur', $Comment->auteur(), \PDO::PARAM_STR );
-		$Query->bindValue( ':contenu', $Comment->contenu(), \PDO::PARAM_STR );
+		$Query->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
+		$Query->bindValue( ':author', $Comment->fk_SNC(), \PDO::PARAM_STR );
+		$Query->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
 		$Query->execute();
 		$Comment->setId( $this->dao->lastInsertId() );
 	}
@@ -53,12 +53,12 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Comment Comment
 		 */
 		$sql   = 'UPDATE T_SIT_commentc
-                SET SCC_fk_SNC = :news, SCC_author = :auteur, SCC_content = :contenu
+                SET SCC_fk_SNC = :fk_SNC, SCC_author = :fk_SNC, SCC_content = :contenu
                 WHERE SCC_id = :id';
 		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':news', $Comment->news(), \PDO::PARAM_INT );
-		$Query->bindValue( ':auteur', $Comment->auteur(), \PDO::PARAM_STR );
-		$Query->bindValue( ':contenu', $Comment->contenu(), \PDO::PARAM_STR );
+		$Query->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
+		$Query->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_STR );
+		$Query->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
 		$Query->bindValue( ':id', $Comment->id(), \PDO::PARAM_INT );
 		$Query->execute();
 	}
@@ -75,18 +75,18 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Query            \PDOStatement
 		 * @var $Liste_comments_a Comment[]
 		 */
-		$sql = 'SELECT SCC_id id, SCC_fk_SNC news, SCC_author auteur, SCC_content contenu, SCC_date Date
+		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_date date
                 FROM T_SIT_commentc
-                WHERE SCC_fk_SNC = :news
+                WHERE SCC_fk_SNC = :fk_SNC
                 ORDER BY SCC_id DESC';
 		
 		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':news', (int)$newsc_id, \PDO::PARAM_INT );
-		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
+		$Query->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
+		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
 		$Query->execute();
 		$Liste_comments_a = $Query->fetchAll();
 		foreach ( $Liste_comments_a as $Comment ) {
-			$Comment->setDate( new \DateTime( $Comment->Date() ) );
+			$Comment->setDate( new \DateTime( $Comment->date() ) );
 		}
 		$Query->closeCursor();
 		
@@ -102,9 +102,10 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	public function getCommentcUsingCommentcId( $commentc_id ) {
 		/**
-		 * @var $Query \PDOStatement
+		 * @var         $Query \PDOStatement
+		 * @var Comment $Comment
 		 */
-		$sql   = 'SELECT SCC_id id, SCC_fk_SNC news, SCC_author auteur, SCC_content contenu, SCC_date Date
+		$sql   = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_date date
                 FROM T_SIT_commentc
                 WHERE SCC_id = :id';
 		$Query = $this->dao->prepare( $sql );
@@ -112,6 +113,9 @@ class CommentsManagerPDO extends CommentsManager {
 		$Query->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // Incohérence avec la doc PHP
 		$Query->execute();
 		$Comment = $Query->fetch();
+		if ( $Comment != null ) {
+			$Comment->setDate( new \DateTime( $Comment->date() ) );
+		}
 		$Query->closeCursor();
 		
 		return $Comment;
@@ -148,9 +152,9 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Query \PDOStatement
 		 */
 		$sql   = 'DELETE FROM T_SIT_commentc
-                WHERE SCC_fk_SNC = :id';
+                WHERE SCC_fk_SNC = :fk_SNC';
 		$Query = $this->dao->prepare( $sql );
-		$Query->bindValue( ':id', (int)$newsc_id, \PDO::PARAM_INT );
+		$Query->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
 		$Query->execute();
 	}
 }

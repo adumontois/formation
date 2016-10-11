@@ -19,14 +19,14 @@
 ?>
 
 <p>
-	Par <em><?= htmlspecialchars( $News[ 'auteur' ] ) ?></em>, le <?= $News[ 'DateAjout' ] ?>
+	Par <em><?= htmlspecialchars( $News[ 'User' ] ) ?></em>, le <?= $News[ 'dateadd' ] ?>
 </p>
-<h2><?= htmlspecialchars( $News[ 'titre' ] ) ?></h2>
-<p><?= nl2br( htmlspecialchars( $News[ 'contenu' ] ) ) ?></p>
+<h2><?= htmlspecialchars( $News[ 'title' ] ) ?></h2>
+<p><?= nl2br( htmlspecialchars( $News[ 'content' ] ) ) ?></p>
 
-<?php if ( $News[ 'DateAjout' ] != $News[ 'DateModif' ] ): ?>
+<?php if ( $News[ 'dateadd' ] != $News[ 'dateupdate' ] ): ?>
 	<p style="text-align: right;">
-		<small><em>Modifiée le <?= $News[ 'DateModif' ] ?></em></small>
+		<small><em>Modifiée le <?= $News[ 'dateupdate' ] ?></em></small>
 	</p>
 <?php endif; ?>
 
@@ -43,14 +43,15 @@
 <?php foreach ( $Comment_list_a as $Comment ): ?>
 	<fieldset>
 		<legend>
-			Posté par <strong><?= htmlspecialchars( $Comment[ 'auteur' ] ) ?></strong> le <?= $Comment[ 'Date' ] ?>
+			Posté par <strong><?= htmlspecialchars( $Comment[ 'User' ] ) ?></strong> le <?= $Comment[ 'date' ] ?>
+			<!-- A modifier, à mettre dans le contrôleur -->
 			<?php if ( $User->authenticationLevel() == \Entity\User::USERY_SUPERADMIN ): ?>
 				- <a href="admin/comment-update-<?= $Comment[ 'id' ] ?>.html">Modifier</a> |
 				<a href="admin/comment-delete-<?= $Comment[ 'id' ] ?>.html">Supprimer</a>
 			<?php endif; ?>
 		</legend>
 		<p>
-			<?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?>
+			<?= nl2br( htmlspecialchars( $Comment[ 'content' ] ) ) ?>
 		</p>
 	</fieldset>
 <?php endforeach; ?>

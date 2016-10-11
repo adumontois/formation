@@ -20,21 +20,21 @@ use OCFram\Entity;
  */
 class Comment extends Entity {
 	/**
-	 * @var $news int
+	 * @var $fk_SNC int
 	 */
-	protected $news;
+	protected $fk_SNC;
 	/**
-	 * @var $auteur string
+	 * @var $author string
 	 */
-	protected $auteur;
+	protected $author;
 	/**
-	 * @var $contenu string
+	 * @var $content string
 	 */
-	protected $contenu;
+	protected $content;
 	/**
-	 * @var $Date \DateTime
+	 * @var $date \DateTime
 	 */
-	protected $Date;
+	protected $date;
 	
 	/**
 	 * Vérifie si le commentaire est valide.
@@ -42,85 +42,83 @@ class Comment extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !empty( $this->news ) AND !empty( $this->contenu ) AND is_string( $this->contenu );
+		return !empty( $this->fk_SNC ) AND !empty( $this->content ) AND is_string( $this->content );
 	}
 	
 	/**
 	 * @return int
 	 */
-	public function news() {
-		return $this->news;
+	public function fk_SNC() {
+		return $this->fk_SNC;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function auteur() {
-		return $this->auteur;
+	public function author() {
+		return $this->author;
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function contenu() {
-		return $this->contenu;
+	public function content() {
+		return $this->content;
 	}
 	
 	/**
 	 * @return \DateTime
 	 */
-	public function Date() {
-		return $this->Date;
+	public function date() {
+		return $this->date;
 	}
 	
 	/**
-	 * Setter pour l'attribut news.
+	 * Setter pour l'attribut fk_SNC.
 	 *
-	 * @param $news int
+	 * @param $fk_SNC int
 	 */
-	public function setNews( $news ) {
-		if ( (int)$news > 0 ) {
-			$this->news = $news;
+	public function setFk_SNC( $fk_SNC ) {
+		if ( (int)$fk_SNC > 0 ) {
+			$this->fk_SNC = $fk_SNC;
 		}
 	}
 	
 	/**
-	 * Setter pour l'attribut auteur.
+	 * Setter pour l'attribut author.
 	 *
-	 * @param $auteur string
+	 * @param $author string
 	 */
-	public function setAuteur( $auteur ) {
-		if ( is_string( $auteur ) AND !empty( $auteur ) ) {
-			$this->auteur = $auteur;
+	public function setAuthor( $author ) {
+		if ( is_string( $author ) AND !empty( $author ) ) {
+			$this->author = $author;
 		}
 	}
 	
 	/**
-	 * Setter pour l'attribut contenu.
+	 * Setter pour l'attribut content.
 	 *
-	 * @param $contenu string
+	 * @param $content string
 	 */
-	public function setContenu( $contenu ) {
-		if ( is_string( $contenu ) AND !empty( $contenu ) ) {
-			$this->contenu = $contenu;
+	public function setContent( $content ) {
+		if ( is_string( $content ) AND !empty( $content ) ) {
+			$this->content = $content;
 		}
 	}
 	
 	/**
-	 * Setter pour l'attribut Date.
+	 * Setter pour l'attribut date.
 	 *
-	 * @param \DateTime $Date
+	 * @param \DateTime $date
 	 */
-	public function setDate( \DateTime $Date ) {
-		$this->Date = $Date;
+	public function setDate( \DateTime $date ) {
+		$this->date = $date;
 	}
 	
 	/**
 	 * Formate la date pour affichage dans une vue. Cette méthode modifie la valeur de l'attribut date.
-	 *
-	 * @param \DateTime $date
 	 */
 	public function formatDate() {
-		$this->Date = $this->Date->format('d/m/Y à H\hi');
+		$this->date = $this->date->format('d/m/Y à H\hi');
 	}
 }

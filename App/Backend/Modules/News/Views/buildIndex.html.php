@@ -20,7 +20,7 @@
 
 <table>
 	<tr>
-		<th>Auteur</th>
+		<th>User</th>
 		<th>Titre</th>
 		<th>Date d'ajout</th>
 		<th>Dernière modification</th>
@@ -29,17 +29,17 @@
 	<?php foreach ( $News_list_a as $News ): ?>
 		<tr>
 			<td>
-				<?= htmlspecialchars( $News[ 'auteur' ] ) ?>
+				<?= htmlspecialchars( $News[ 'User' ] ) ?>
 			</td>
 			<td>
-				<?= htmlspecialchars( $News[ 'titre' ] ) ?>
+				<?= htmlspecialchars( $News[ 'title' ] ) ?>
 			</td>
 			<td>
-				le <?= $News[ 'DateAjout' ] ?>
+				le <?= $News[ 'dateadd' ] ?>
 			</td>
 			<td>
-				<?php if ( $News[ 'DateAjout' ] != $News[ 'DateModif' ] ): ?>
-					le <?= $News[ 'DateModif' ] ?>
+				<?php if ( $News[ 'dateadd' ] != $News[ 'dateupdate' ] ): ?>
+					le <?= $News[ 'dateupdate' ] ?>
 				<?php endif; ?>
 			</td>
 			<td>

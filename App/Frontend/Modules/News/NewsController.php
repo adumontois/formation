@@ -52,14 +52,14 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		
 		// Récupérer la liste des news à afficher
-		$Liste_news_a = $News_manager->getNewscAndUsercLoginSortByIdDesc( 0, $nombre_news );
+		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
 		
 		//
 		foreach ( $Liste_news_a as $News ) {
 			// Prendre le nombre de caractères nécessaires
-			$News->setContenu( substr( $News->contenu(), 0, $longueur_news ) );
-			if ( strlen( $News->contenu() ) == $longueur_news ) {
-				$News->setContenu( substr( $News->contenu(), 0, strrpos( $News->contenu(), ' ' ) ) . '...' );
+			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
+			if ( strlen( $News->content() ) == $longueur_news ) {
+				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
 			}
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
@@ -110,9 +110,9 @@ class NewsController extends BackController {
 	public function executePutInsertComment( HTTPRequest $Request ) {
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$Commentaire = new Comment( array(
-				'news'    => $Request->getData( 'id' ),
-				'auteur'  => $Request->postData( 'auteur' ),
-				'contenu' => $Request->postData( 'contenu' ),
+				'fk_SNC'    => $Request->getData( 'id' ),
+				'author'  => $Request->postData( 'author' ),
+				'content' => $Request->postData( 'content' ),
 			) );
 		}
 		else {

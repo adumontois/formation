@@ -16,7 +16,7 @@ namespace OCFram;
  */
 abstract class Manager {
 	/**
-	 * @var $dao mixed Data Access Object for DB queries
+	 * @var $dao \PDO Data Access Object for DB queries
 	 */
 	protected $dao;
 	

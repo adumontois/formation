@@ -8,11 +8,9 @@
 /**
  * @var $News_list_a \Entity\News[]
  */
-foreach ( $News_list_a as $News ):
-	?>
-	<h2><a href="news-<?= $News[ 'id' ] ?>.html"><?= htmlspecialchars( $News[ 'titre' ] ) ?></a></h2>
-	<?php // Besoin de nl2br pour afficher les contenus
-	?>
-	<p><?= nl2br( htmlspecialchars( $News[ 'contenu' ] ) ) ?></p>
-	<?php
-endforeach;
+?>
+
+<?php foreach ( $News_list_a as $News ): ?>
+	<h2><a href="news-<?= $News[ 'id' ] ?>.html"><?= htmlspecialchars( $News[ 'title' ] ) ?></a> par <?= $News[ 'User' ] ?></h2>
+	<p><?= nl2br( htmlspecialchars( $News[ 'content' ] ) ) ?></p>
+<?php endforeach;
