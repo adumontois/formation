@@ -44,7 +44,7 @@
 	<fieldset>
 		<legend>
 			Posté par <strong><?= htmlspecialchars( $Comment[ 'auteur' ] ) ?></strong> le <?= $Comment[ 'Date' ] ?>
-			<?php if ( $User->isAuthenticated() ): ?>
+			<?php if ( $User->authenticationLevel() == \Entity\User::USERY_SUPERADMIN ): ?>
 				- <a href="admin/comment-update-<?= $Comment[ 'id' ] ?>.html">Modifier</a> |
 				<a href="admin/comment-delete-<?= $Comment[ 'id' ] ?>.html">Supprimer</a>
 			<?php endif; ?>

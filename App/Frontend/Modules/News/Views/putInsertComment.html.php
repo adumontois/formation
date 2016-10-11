@@ -15,7 +15,6 @@
 	Ajouter un commentaire
 </h2>
 <form action="" method="post">
-	<!-- Action vide = déclencher la page courante -->
 	<p>
 		<?= $form ?>
 		<input type="submit" value="Commenter" />
