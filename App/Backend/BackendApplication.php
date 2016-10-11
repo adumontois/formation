@@ -31,7 +31,7 @@ class BackendApplication extends Application {
 		}
 		else // Sinon on renvoie une erreur access denied
 		{
-			$this->httpResponse->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous n\'avez pas les droits pour accéder à cette page.'));
+			$this->httpResponse->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous devez être connecté(e) pour accéder à cette page.'));
 		}
 	}
 }

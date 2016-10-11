@@ -15,6 +15,7 @@ use Entity\User;
 use FormBuilder\CommentFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
+use Model\UserManagerPDO;
 use OCFram\Application;
 use \OCFram\BackController;
 use OCFram\FormHandler;
@@ -94,7 +95,7 @@ class NewsController extends BackController {
 		foreach ($Liste_comments_a as $Comment) {
 			$Comment->formatDate();
 			// Générer les actions dans tous les cas
-			$action_a[$Comment->id()] = '- <a href="admin/comment-update-'.$Comment->id().'html">Modifier</a>
+			$action_a[$Comment->id()] = '- <a href="admin/comment-update-'.$Comment->id().'.html">Modifier</a>
 				| <a href="admin/comment-delete-'.$Comment->id().'.html">Supprimer</a>';
 		}
 		
@@ -118,6 +119,10 @@ class NewsController extends BackController {
 	 * Insère un commentaire
 	 */
 	public function executePutInsertComment( HTTPRequest $Request ) {
+		/**
+		 * @var UserManagerPDO $User_manager
+		 * @var User $User
+		 */
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$Commentaire = new Comment( array(
 				'fk_SNC'    => $Request->getData( 'id' ),
@@ -127,6 +132,14 @@ class NewsController extends BackController {
 		}
 		else {
 			$Commentaire = new Comment();
+			// Préremplir le champ auteur si l'utilisateur est connecté
+			if ($this->app->user()->isAuthenticated()) {
+				$User_manager = $this->managers->getManagerOf('User');
+				$User = $User_manager->getUsercUsingUsercId($this->app->user()->userId());
+				if (null != $User) {
+					$Commentaire->setAuthor($User->login());
+				}
+			}
 		}
 		// Construction du formulaire
 		// 1) Données values

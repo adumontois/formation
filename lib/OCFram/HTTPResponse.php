@@ -7,6 +7,7 @@
  */
 
 namespace OCFram;
+use App\Traits\AppController;
 
 /**
  * Class HTTPResponse

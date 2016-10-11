@@ -34,13 +34,13 @@
 			
 			<nav>
 				<ul>
-					<?= $menu ?>
+					<?= isset($menu) ? $menu : '' ?>
 				</ul>
 			</nav>
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?= $flash ?>
+					<?= isset($flash) ? $flash : '' ?>
 					<?= $content ?>
 				</section>
 			</div>

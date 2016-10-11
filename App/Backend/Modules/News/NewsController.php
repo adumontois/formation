@@ -219,6 +219,9 @@ class NewsController extends BackController {
 		/**
 		 * @var $Comments_manager CommentsManager
 		 */
+		if ($this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN) {
+			$this->app->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous devez être '.User::getTextualStatus(User::USERY_SUPERADMIN).' pour éditer les commentaires.'));
+		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$Comment = new Comment( array(
@@ -268,7 +271,7 @@ class NewsController extends BackController {
 		 * @var $Comments_manager CommentsManager
 		 */
 		if ($this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \RuntimeException( 'Vous n\'avez pas l\'autorisation de supprimer un commentaire.' ) );
+			$this->app->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \Exception('Vous devez être '.User::getTextualStatus(User::USERY_SUPERADMIN).' pour supprimer les commentaires.'));
 		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( !$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
