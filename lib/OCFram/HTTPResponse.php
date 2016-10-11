@@ -20,7 +20,8 @@ class HTTPResponse extends ApplicationComponent {
 	 * @var $page Page
 	 */
 	protected $page;
-	const ACCESS_DENIED = 401;
+	const ACCESS_DENIED                 = 401;
+	const FORBIDDEN                     = 403;
 	const NOT_FOUND                     = 404;
 	const SERVICE_TEMPORARY_UNAVAILABLE = 503;
 	
@@ -49,7 +50,7 @@ class HTTPResponse extends ApplicationComponent {
 	 * Crée une redirection vers une erreur
 	 *
 	 * @param $error_number int
-	 * @param $error \Exception L'erreur à retourner
+	 * @param $error        \Exception L'erreur à retourner
 	 */
 	public function redirectError( $error_number, \Exception $error ) {
 		$this->page = new Page( $this->app() );

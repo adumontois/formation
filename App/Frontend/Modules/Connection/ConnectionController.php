@@ -19,6 +19,7 @@ use OCFram\Application;
 use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
+use OCFram\HTTPResponse;
 
 class ConnectionController extends BackController {
 	use AppController;
@@ -48,6 +49,10 @@ class ConnectionController extends BackController {
 		/**
 		 * @var $User_manager UserManager
 		 */
+		// Si l'utilisateur est connecté, on le déconnecte
+		if ($this->app->user()->isAuthenticated()) {
+			$this->app->user()->unsetAuthentication();
+		}
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$User = new User ( array( 'login'    => $Request->postData( 'login' ),
@@ -71,7 +76,6 @@ class ConnectionController extends BackController {
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 		$this->page->addVar( 'form', $Form->createView() );
-		
 		$this->run();
 	}
 	
@@ -84,6 +88,9 @@ class ConnectionController extends BackController {
 		/**
 		 * @var $User_manager UserManager
 		 */
+		if ($this->app->user()->isAuthenticated()) {
+			$this->app->httpResponse()->redirectError(HTTPResponse::FORBIDDEN, new \Exception('Vous devez vous déconnecter avant de pouvoir inscrire un compte.'));
+		}
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$User = new User( array(
@@ -112,7 +119,6 @@ class ConnectionController extends BackController {
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 		$this->page->addVar( 'form', $Form->createView() );
-		
 		$this->run();
 	}
 	
