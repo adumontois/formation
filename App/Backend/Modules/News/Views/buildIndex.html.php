@@ -24,7 +24,7 @@
 		<th>Titre</th>
 		<th>Date d'ajout</th>
 		<th>Dernière modification</th>
-		<th>Action</th>
+		<th class="action">Action</th>
 	</tr>
 	<?php foreach ( $News_list_a as $News ): ?>
 		<tr>
@@ -42,7 +42,7 @@
 					le <?= $News[ 'dateupdate' ] ?>
 				<?php endif; ?>
 			</td>
-			<td>
+			<td class="action">
 				<?= $action_a[$News['id']] ?>
 			</td>
 		</tr>

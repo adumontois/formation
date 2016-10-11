@@ -97,7 +97,9 @@ blockquote {
 /* start - table */
 table {
 	border-collapse: collapse;
-	margin: 10px;	
+	margin: 10px;
+	table-layout: fixed;
+	width: 95%;
 }
 th strong {
 	color: #fff;
@@ -117,6 +119,8 @@ form th {
 }
 tr {
 	height: 30px;
+	overflow: hidden;
+	text-overflow: clip;
 }
 td {
 	padding-left: 5px;
@@ -124,6 +128,20 @@ td {
 	border-left: 1px solid #FFF;
 	border-bottom: solid 1px #ffffff;
     text-align: center;
+	overflow-x: hidden;
+	text-overflow: clip;
+}
+td.action, th.action {
+	display: inline-block;
+	width: 50px;
+	border-top: solid 3px #ffffff;
+	border-bottom: solid 3px #ffffff;
+}
+th.action {
+	display: inline-block;
+	width: 50px;
+	border-top: solid 1px #8eb50c;
+	border-bottom: solid 2px #8eb50c;
 }
 form td {
     text-align: left;
@@ -138,6 +156,7 @@ tr.row-b {
 	background: #EFEFEF;
 }
 /* end - table */
+
 
 /* form elements */
 form {
@@ -269,7 +288,7 @@ nav {
 	background: url(../images/menu.jpg) repeat-x 0 0;	
 	font: bold 12px/37px Verdana, Arial, Tahoma, Sans-serif;
 	height: 37px;
-	width: 780px;	
+	width: 780px;
 }
 nav ul {
 	float: right;
@@ -320,6 +339,10 @@ nav ul li#current a {
 
 #main ul li {
 	list-style-image: url(../images/bullet.gif);
+}
+
+#main p {
+	word-wrap: break-word;
 }
 
 .post-footer {
