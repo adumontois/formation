@@ -20,6 +20,7 @@ class HTTPResponse extends ApplicationComponent {
 	 * @var $page Page
 	 */
 	protected $page;
+	const BAD_REQUEST                   = 400;
 	const ACCESS_DENIED                 = 401;
 	const FORBIDDEN                     = 403;
 	const NOT_FOUND                     = 404;
@@ -57,9 +58,16 @@ class HTTPResponse extends ApplicationComponent {
 		$this->page->setContentFile( __DIR__ . '\..\..\Errors\\' . $error_number . '.html' );
 		$this->page->addVar( 'erreur', $error->getMessage() );
 		switch ( $error_number ) {
-			case 404:
-			
-			case 503:
+			case self::BAD_REQUEST:
+				$this->addHeader( 'HTTP/1.0 400 Bad Request');
+				break;
+			case self::ACCESS_DENIED:
+				$this->addHeader( 'HTTP/1.0 401 Access Denied');
+				break;
+			case self::FORBIDDEN:
+				$this->addHeader( 'HTTP/1.0 403 Forbidden');
+				break;
+			case self::SERVICE_TEMPORARY_UNAVAILABLE:
 				$this->addHeader( 'HTTP/1.0 503 Service Temporarily Unavailable' );
 				break;
 			default:

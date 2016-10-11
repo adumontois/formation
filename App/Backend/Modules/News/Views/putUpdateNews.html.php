@@ -18,7 +18,6 @@
 <form action="" method="post">
 	<p>
 		<?= $form ?>
-		<input type="hidden" name="id" value="<?= $News[ 'id' ] ?>" />
 		<input type="submit" value="Modifier" name="modifier" />
 	</p>
 </form>

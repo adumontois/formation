@@ -8,6 +8,7 @@
 
 /**
  * @var $form string Formulaire généré
+ * @var $user_count int
  */
 ?>
 

@@ -35,7 +35,7 @@ class CommentsManagerPDO extends CommentsManager {
 		
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
-		$stmt->bindValue( ':author', $Comment->fk_SNC(), \PDO::PARAM_STR );
+		$stmt->bindValue( ':author', $Comment->author(), \PDO::PARAM_STR );
 		$stmt->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
 		$stmt->execute();
 		$Comment->setId( $this->dao->lastInsertId() );
@@ -53,11 +53,11 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var $Comment Comment
 		 */
 		$sql   = 'UPDATE T_SIT_commentc
-                SET SCC_fk_SNC = :fk_SNC, SCC_author = :fk_SNC, SCC_content = :contenu
+                SET SCC_fk_SNC = :fk_SNC, SCC_author = :author, SCC_content = :content
                 WHERE SCC_id = :id';
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_INT );
-		$stmt->bindValue( ':fk_SNC', $Comment->fk_SNC(), \PDO::PARAM_STR );
+		$stmt->bindValue( ':author', $Comment->author(), \PDO::PARAM_STR );
 		$stmt->bindValue( ':content', $Comment->content(), \PDO::PARAM_STR );
 		$stmt->bindValue( ':id', $Comment->id(), \PDO::PARAM_INT );
 		$stmt->execute();
@@ -156,5 +156,25 @@ class CommentsManagerPDO extends CommentsManager {
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
 		$stmt->execute();
+	}
+	
+	/**
+	 * Vérifie si le commentaire d'id donné existe en base.
+	 *
+	 * @param $commentc_id int
+	 *
+	 * @return bool
+	 */
+	public function existsCommentcUsingCommentcId($commentc_id) {
+		$sql = 'SELECT *
+				FROM T_SIT_commentc
+				WHERE SCC_id = :id';
+		
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
+		$stmt->execute();
+		$return = (bool)$stmt->fetch();
+		$stmt->closeCursor();
+		return (bool)$return;
 	}
 }

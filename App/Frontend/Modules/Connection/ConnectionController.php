@@ -130,7 +130,7 @@ class ConnectionController extends BackController {
 	 */
 	public function executeClearConnection() {
 		$this->app->user()->unsetAuthentication();
-		$this->app->user()->setFlash( self::DISCONNECTION_SUCCESSFUL );
+		$this->app->user()->setFlash( htmlspecialchars(self::DISCONNECTION_SUCCESSFUL) );
 		// On redirige vers la racine
 		$this->app->httpResponse()->redirect( '../' );
 		$this->run();

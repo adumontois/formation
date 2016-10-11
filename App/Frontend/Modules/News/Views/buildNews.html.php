@@ -40,7 +40,7 @@
 <?php foreach ( $Comment_list_a as $Comment ): ?>
 	<fieldset>
 		<legend>
-			Posté par <strong><?= htmlspecialchars( $Comment[ 'User' ] ) ?></strong> le <?= $Comment[ 'date' ] ?>
+			Posté par <strong><?= htmlspecialchars( $Comment[ 'author' ] ) ?></strong> le <?= $Comment[ 'date' ] ?>
 			<?= $action_a[$Comment['id']] ?>
 		</legend>
 		<p>

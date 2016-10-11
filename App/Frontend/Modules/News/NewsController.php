@@ -81,9 +81,8 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		$News->format();
-		
 		// Si la news n'existe pas on redirige vers une erreur 404
-		if ( empty( $News ) ) {
+		if ( null == $News ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
 		}
 		
@@ -120,10 +119,16 @@ class NewsController extends BackController {
 	 */
 	public function executePutInsertComment( HTTPRequest $Request ) {
 		/**
+		 * @var NewsManager $News_manager
 		 * @var UserManagerPDO $User_manager
 		 * @var User $User
 		 */
+
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			$News_manager= $this->managers->getManagerOf();
+			if (!$News_manager->existsNewscUsingNewscId($Request->getData( 'id' ))) {
+				$this->app->httpResponse()->redirectError(HTTPResponse::NOT_FOUND, new \Exception('Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !'));
+			}
 			$Commentaire = new Comment( array(
 				'fk_SNC'    => $Request->getData( 'id' ),
 				'author'  => $Request->postData( 'author' ),
@@ -141,6 +146,7 @@ class NewsController extends BackController {
 				}
 			}
 		}
+		
 		// Construction du formulaire
 		// 1) Données values
 		$Form_builder = new CommentFormBuilder( $Commentaire );
@@ -152,7 +158,7 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
+			//$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

@@ -92,4 +92,13 @@ abstract class CommentsManager extends Manager {
 	 * @param Comment $Comment
 	 */
 	abstract protected function updateCommentc( Comment $Comment );
+	
+	/**
+	 * Vérifie si le commentaire d'id donné existe en base.
+	 *
+	 * @param $commentc_id int
+	 *
+	 * @return bool
+	 */
+	abstract public function existsCommentcUsingCommentcId($commentc_id);
 }

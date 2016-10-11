@@ -47,7 +47,7 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return int
 	 */
-	abstract public function countNewscUsingNewscId();
+	abstract public function countNewsc();
 	
 	/**
 	 * Supprime la news d'id donné de la DB.
@@ -95,4 +95,11 @@ abstract class NewsManager extends Manager {
 	 * @param News $News
 	 */
 	abstract protected function updateNewsc( News $News );
+	
+	/**
+	 * Vérifie si la news d'id donné existe. Renvoie true si elle existe, false sinon.
+	 *
+	 * @param $newsc_id int
+	 */
+	abstract public function existsNewscUsingNewscId($newsc_id);
 }

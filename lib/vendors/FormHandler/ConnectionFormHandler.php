@@ -42,11 +42,11 @@ class ConnectionFormHandler extends FormHandler {
 			if ($User_stored != NULL AND User::cryptWithKey( $User->password(), $User_stored->cryptKey() ) === $User_stored->password()) {
 				$this->request->app()->user()->setAuthenticationLevel((int) $User_stored->fk_SUY());
 				$this->request->app()->user()->setUserId($User_stored->id());
-				$this->request->app()->user()->setFlash( 'Vous êtes connecté(e) en tant que ' . User::getTextualStatus((int)$User_stored->fk_SUY()) . '.');
+				$this->request->app()->user()->setFlash( 'Vous êtes connecté(e) en tant que ' . htmlspecialchars(User::getTextualStatus((int)$User_stored->fk_SUY())) . '.');
 				return true;
 			}
 			else {
-				$this->request->app()->user()->setFlash( ConnectionController::REFUSED_CONNECTION );
+				$this->request->app()->user()->setFlash( htmlspecialchars(ConnectionController::REFUSED_CONNECTION ));
 			}
 		}
 		return false;
