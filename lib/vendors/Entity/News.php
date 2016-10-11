@@ -36,13 +36,13 @@ class News extends Entity {
 	 */
 	protected $content;
 	/**
-	 * @var $Dateadd \DateTime
+	 * @var $dateadd \DateTime
 	 */
-	protected $Dateadd;
+	protected $dateadd;
 	/**
-	 * @var $Dateupdate \DateTime
+	 * @var $dateupdate \DateTime
 	 */
-	protected $Dateupdate;
+	protected $dateupdate;
 	
 	/**
 	 * Vérifie si la news est valide.
@@ -58,10 +58,19 @@ class News extends Entity {
 	 *
 	 * @param $User User
 	 */
-	public function setUser( $User ) {
+	public function setUser( User $User ) {
 		if ($User->isValid()) {
 			$this->User = $User;
 		}
+	}
+	
+	/**
+	 * Setter pour l'attribut fk_SUC
+	 *
+	 * @param $fk_SUC int
+	 */
+	public function setFk_SUC($fk_SUC) {
+		$this->fk_SUC = $fk_SUC;
 	}
 	
 	/**
@@ -87,35 +96,35 @@ class News extends Entity {
 	}
 	
 	/**
-	 * Setter pour l'attribut Dateadd.
+	 * Setter pour l'attribut dateadd.
 	 *
-	 * @param \DateTime $Dateadd
+	 * @param \DateTime $dateadd
 	 */
-	public function setDateadd( \DateTime $Dateadd ) {
-		$this->Dateadd = $Dateadd;
+	public function setDateadd( \DateTime $dateadd ) {
+		$this->dateadd = $dateadd;
 	}
 	
 	/**
-	 * Formate la date d'ajout. Cette méthode modifie l'attribut Dateadd.
+	 * Formate la date d'ajout. Cette méthode modifie l'attribut dateadd.
 	 */
 	public function formatDateadd() {
-		$this->Dateadd = $this->Dateadd->format('d/m/Y à H\hi');
+		$this->dateadd = $this->dateadd->format('d/m/Y à H\hi');
 	}
 	
 	/**
-	 * Setter pour l'attribut Dateupdate.
+	 * Setter pour l'attribut dateupdate.
 	 *
-	 * @param \DateTime $Dateupdate
+	 * @param \DateTime $dateupdate
 	 */
-	public function setDateupdate( \DateTime $Dateupdate ) {
-		$this->Dateupdate = $Dateupdate;
+	public function setDateupdate( \DateTime $dateupdate ) {
+		$this->dateupdate = $dateupdate;
 	}
 	
 	/**
-	 * Formate la date de modification. Cette méthode modifie l'attribut Dateupdate.
+	 * Formate la date de modification. Cette méthode modifie l'attribut dateupdate.
 	 */
 	public function formatDateupdate() {
-		$this->Dateupdate = $this->Dateupdate->format('d/m/Y à H\hi');
+		$this->dateupdate = $this->dateupdate->format('d/m/Y à H\hi');
 	}
 	
 	/**
@@ -154,14 +163,14 @@ class News extends Entity {
 	/**
 	 * @return \DateTime
 	 */
-	public function Dateadd() {
-		return $this->Dateadd;
+	public function dateadd() {
+		return $this->dateadd;
 	}
 	
 	/**
 	 * @return \DateTime
 	 */
-	public function Dateupdate() {
-		return $this->Dateupdate;
+	public function dateupdate() {
+		return $this->dateupdate;
 	}
 }

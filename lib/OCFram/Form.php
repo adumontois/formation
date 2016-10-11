@@ -38,10 +38,8 @@ class Form {
 	/**
 	 * Ajoute un champ au formulaire passé en paramètre, en assignant la valeur du champ associé de l'netité du formulaire ($this -> entity -> $field_name()).
 	 * Retourne le nouveau formulaire.
-	 * Si la valeur du champ n'est pas donnée, elle est récupérée directement dans l'objet.
 	 *
 	 * @param Field $field
-	 * @param string $value
 	 *
 	 * @return Form
 	 */

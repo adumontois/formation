@@ -48,6 +48,7 @@ class HTTPResponse extends ApplicationComponent {
 	 * Crée une redirection vers une erreur
 	 *
 	 * @param $error_number int
+	 * @param $error \Exception L'erreur à retourner
 	 */
 	public function redirectError( $error_number, \Exception $error ) {
 		$this->page = new Page( $this->app() );

@@ -142,7 +142,7 @@ class User extends Entity {
 	 * @return string
 	 */
 	public function __toString() {
-		return $this->login().'('.$this->email().')';
+		return $this->login().' ('.$this->email().')';
 	}
 	
 	/**
@@ -154,7 +154,7 @@ class User extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !empty( $this->login ) AND $this->isCrypted() AND !empty( $this->email );
+		return !empty( $this->login ) AND !empty( $this->email );
 	}
 	
 	/**
@@ -234,7 +234,7 @@ class User extends Entity {
 		if ( !is_int( $fk_SUY ) OR $fk_SUY < 0 OR $fk_SUY > 255 ) {
 			throw new \InvalidArgumentException( 'Le type d\'un User doit être une entier entre 0 et 255' );
 		}
-		$this->type = $fk_SUY;
+		$this->fk_SUY = $fk_SUY;
 	}
 	
 	/**

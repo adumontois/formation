@@ -11,6 +11,7 @@ namespace App\Frontend\Modules\News;
 use App\Traits\AppController;
 use Entity\Comment;
 use Entity\News;
+use Entity\User;
 use FormBuilder\CommentFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
@@ -53,8 +54,6 @@ class NewsController extends BackController {
 		
 		// Récupérer la liste des news à afficher
 		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
-		
-		//
 		foreach ( $Liste_news_a as $News ) {
 			// Prendre le nombre de caractères nécessaires
 			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
@@ -80,7 +79,6 @@ class NewsController extends BackController {
 		 */
 		$News_manager = $this->managers->getManagerOf();
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
-		
 		$News->format();
 		
 		// Si la news n'existe pas on redirige vers une erreur 404
@@ -91,11 +89,23 @@ class NewsController extends BackController {
 		// Afficher les commentaires
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
 		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
-		foreach ($Liste_comments_a as $comment) {
-			$comment->formatDate();
+		
+		$action_a = null;
+		foreach ($Liste_comments_a as $Comment) {
+			$Comment->formatDate();
+			// Générer les actions dans tous les cas
+			$action_a[$Comment->id()] = '- <a href="admin/comment-update-'.$Comment->id().'html">Modifier</a>
+				| <a href="admin/comment-delete-'.$Comment->id().'.html">Supprimer</a>';
 		}
 		
-		$this->page->addVar( 'title', $News->titre() );
+		if ($this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN) {
+			$this->page->addVar( 'action_a', $action_a);
+		}
+		else {
+			// Ne pas intégrer les actions si l'utilisateur n'a pas les droits
+			$this->page->addVar( 'action_a', null);
+		}
+		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', $this->app->user() );

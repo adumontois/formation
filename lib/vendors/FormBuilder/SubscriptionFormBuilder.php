@@ -13,7 +13,6 @@ use Model\UserManager;
 use OCFram\EmailField;
 use OCFram\EmailValidator;
 use OCFram\Entity;
-use OCFram\ExistsValidator;
 use OCFram\FormBuilder;
 use OCFram\MinLengthValidator;
 use OCFram\NotExistsValidator;

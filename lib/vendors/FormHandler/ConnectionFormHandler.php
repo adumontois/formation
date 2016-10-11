@@ -9,7 +9,7 @@
 namespace FormHandler;
 
 
-use App\Frontend\Modules\Connexion\ConnectionController;
+use App\Frontend\Modules\Connection\ConnectionController;
 use Entity\User;
 use Model\UserManager;
 use OCFram\FormHandler;

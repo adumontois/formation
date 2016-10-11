@@ -10,10 +10,7 @@
  * @var $News              \Entity\News
  * @var $Comment_list_a    \Entity\Comment[]
  * @var $User              OCFram\User
- *
- * @var $News              ['DateAjout'] DateTime (OK)
- * @var $News              ['DateModif'] DateTime (OK)
- * @var $Comment           ['Date'] DateTime (OK)
+ * @var $action_a string[]
  */
 
 ?>
@@ -44,11 +41,7 @@
 	<fieldset>
 		<legend>
 			Posté par <strong><?= htmlspecialchars( $Comment[ 'User' ] ) ?></strong> le <?= $Comment[ 'date' ] ?>
-			<!-- A modifier, à mettre dans le contrôleur -->
-			<?php if ( $User->authenticationLevel() == \Entity\User::USERY_SUPERADMIN ): ?>
-				- <a href="admin/comment-update-<?= $Comment[ 'id' ] ?>.html">Modifier</a> |
-				<a href="admin/comment-delete-<?= $Comment[ 'id' ] ?>.html">Supprimer</a>
-			<?php endif; ?>
+			<?= $action_a[$Comment['id']] ?>
 		</legend>
 		<p>
 			<?= nl2br( htmlspecialchars( $Comment[ 'content' ] ) ) ?>

@@ -9,7 +9,6 @@
 namespace App\Backend;
 
 
-use Entity\User;
 use OCFram\Application;
 use OCFram\HTTPResponse;
 

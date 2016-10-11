@@ -3,7 +3,7 @@
 	<route url="/" module="News" action="buildIndex" />
 	<route url="/news-([0-9]+)\.html" module="News" action="buildNews" vars="id" />
 	<route url="/commenter-([0-9]+)\.html" module="News" action="putInsertComment" vars="id" />
-	<route url="/create-account.html" module="Connexion" action="putUser" />
-	<route url="/logout.html" module="Connexion" action="clearConnection" />
-	<route url="/connect.html" module="Connexion" action="getConnection" />
+	<route url="/create-account.html" module="Connection" action="putUser" />
+	<route url="/logout.html" module="Connection" action="clearConnection" />
+	<route url="/connect.html" module="Connection" action="getConnection" />
 </routes>

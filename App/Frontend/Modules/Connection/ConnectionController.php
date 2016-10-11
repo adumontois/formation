@@ -6,14 +6,14 @@
  * Time: 09:44
  */
 
-namespace App\Frontend\Modules\Connexion;
+namespace App\Frontend\Modules\Connection;
 
 
 use App\Traits\AppController;
 use Entity\User;
-use FormBuilder\ConnexionFormBuilder;
+use FormBuilder\ConnectionFormBuilder;
 use FormBuilder\SubscriptionFormBuilder;
-use FormHandler\ConnexionFormHandler;
+use FormHandler\ConnectionFormHandler;
 use Model\UserManager;
 use OCFram\Application;
 use OCFram\BackController;
@@ -59,12 +59,12 @@ class ConnectionController extends BackController {
 		}
 		
 		// Construction du formulaire
-		$Form_builder = new ConnexionFormBuilder( $User, $User_manager );
+		$Form_builder = new ConnectionFormBuilder( $User, $User_manager );
 		$Form_builder->build();
 		$Form = $Form_builder->form();
 		
 		// Sauvegarder avec le FormHandler
-		$Form_handler = new ConnexionFormHandler( $Form, $User_manager, $Request );
+		$Form_handler = new ConnectionFormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->httpResponse()->redirect( '.' );
 		}

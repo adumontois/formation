@@ -60,6 +60,7 @@ abstract class CommentsManager extends Manager {
 	 *
 	 * @param Entity $Comment
 	 *
+	 *
 	 */
 	final public function save( Entity $Comment ) {
 		if (!$Comment instanceof Comment) {

@@ -30,7 +30,9 @@ abstract class Manager {
 	}
 	
 	/**
-	 * Sauvegarde (insert ou update) l'entité passée en paramètre
+	 * Sauvegarde (insert ou update) l'entité passée en paramètre.
+	 *
+	 * @param Entity $object L'objet à sauvegarder
 	 */
 	abstract public function save(Entity $object);
 }
