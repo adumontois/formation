@@ -50,7 +50,7 @@ class News extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return $this->User->isValid() AND !empty( $this->title ) AND !empty( $this->content );
+		return !empty( $this->title ) AND !empty( $this->content ) AND !empty($this->fk_SUC) AND is_int($this->fk_SUC);
 	}
 	
 	/**

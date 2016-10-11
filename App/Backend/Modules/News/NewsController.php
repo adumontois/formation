@@ -69,7 +69,7 @@ class NewsController extends BackController {
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
 				if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id()) {
 					$action_a[$News->id()] = '<a href="news-update-'.$News->id().'.html"><img src="../images/update.png" alt="Modifier" /></a>
-						<a href="news-delete-'.$News->id().'html"><img src="../images/delete.png" alt="Supprimer" /></a>';
+						<a href="news-delete-'.$News->id().'.html"><img src="../images/delete.png" alt="Supprimer" /></a>';
 				}
 				else {
 					$action_a[$News->id()] = '';

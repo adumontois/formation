@@ -13,7 +13,10 @@
 
 <h2>Inscription sur Monsupersite</h2>
 
+<p>
+	Rejoignez la communauté Monsupersite ! Déjà <?= $user_count ?> utilisateurs inscrits !
+</p>
 <form action="" method="post">
 	<?= $form ?>
-	<input type="submit" value="Inscrire" />
+	<input type="submit" value="M'inscrire !" />
 </form>

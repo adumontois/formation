@@ -116,9 +116,12 @@ class ConnectionController extends BackController {
 			$this->app->user()->setFlash( 'Vous avez été correctement inscrit.' );
 			$this->app->httpResponse()->redirect( '.' );
 		}
+		else {
+			$this->page->addVar( 'user_count', $User_manager->countUsercUsingUsercId());
+			$this->page->addVar( 'header', 'Formulaire d\'inscription' );
+			$this->page->addVar( 'form', $Form->createView() );
+		}
 		
-		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
-		$this->page->addVar( 'form', $Form->createView() );
 		$this->run();
 	}
 	
