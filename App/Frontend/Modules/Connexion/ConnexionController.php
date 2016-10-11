@@ -9,6 +9,7 @@
 namespace App\Frontend\Modules\Connexion;
 
 
+use App\Traits\AppController;
 use Entity\User;
 use FormBuilder\SubscriptionFormBuilder;
 use Model\UserManager;
@@ -18,6 +19,8 @@ use OCFram\FormHandler;
 use OCFram\HTTPRequest;
 
 class ConnexionController extends BackController {
+	use AppController;
+	
 	/**
 	 * ConnexionController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
@@ -60,6 +63,7 @@ class ConnexionController extends BackController {
 				$this->app->user()->setFlash( self::REFUSED_CONNECTION );
 			}
 		}
+		$this->run();
 	}
 	
 	/**
@@ -99,6 +103,8 @@ class ConnexionController extends BackController {
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 		$this->page->addVar( 'form', $Form->createView() );
+		
+		$this->run();
 	}
 	
 	/**
@@ -109,5 +115,6 @@ class ConnexionController extends BackController {
 		$this->app->user()->setFlash( self::DISCONNECTION_SUCCESSFUL );
 		// On redirige vers la racine
 		$this->app->httpResponse()->redirect( '../' );
+		$this->run();
 	}
 }

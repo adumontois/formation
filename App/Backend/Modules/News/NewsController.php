@@ -8,6 +8,7 @@
 
 namespace App\Backend\Modules\News;
 
+use App\Traits\AppController;
 use Entity\Comment;
 use Entity\News;
 use Entity\User;
@@ -29,6 +30,11 @@ use OCFram\HTTPResponse;
  * @package App\Backend\Modules\News
  */
 class NewsController extends BackController {
+	/**
+	 * Utiliser la génération du menu.
+	 */
+	use AppController;
+	
 	/**
 	 * NewsController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
@@ -65,6 +71,7 @@ class NewsController extends BackController {
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
 		}
+		$this->run();
 	}
 	
 	/**
@@ -135,6 +142,8 @@ class NewsController extends BackController {
 		}
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'News', $News );
+		
+		$this->run();
 	}
 	
 	/**
@@ -185,6 +194,7 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
 		$this->app->httpResponse()->redirect( '.' );
+		$this->run();
 	}
 	
 	/**
@@ -232,6 +242,7 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'Comment', $Comment );
+		$this->run();
 	}
 	
 	/**
@@ -252,5 +263,6 @@ class NewsController extends BackController {
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
 		$this->app->httpResponse()->redirect( '.' );
+		$this->run();
 	}
 }

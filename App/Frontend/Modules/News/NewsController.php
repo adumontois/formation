@@ -8,6 +8,7 @@
 
 namespace App\Frontend\Modules\News;
 
+use App\Traits\AppController;
 use Entity\Comment;
 use Entity\News;
 use FormBuilder\CommentFormBuilder;
@@ -20,6 +21,8 @@ use \OCFram\HTTPRequest;
 use OCFram\HTTPResponse;
 
 class NewsController extends BackController {
+	use AppController;
+	
 	/**
 	 * NewsController constructor.
 	 * Construit un backcontroller en spécifiant la DB news.
@@ -61,6 +64,8 @@ class NewsController extends BackController {
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
+		
+		$this->run();
 	}
 	
 	/**
@@ -94,6 +99,8 @@ class NewsController extends BackController {
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', $this->app->user() );
+		
+		$this->run();
 	}
 	
 	/**
@@ -127,5 +134,7 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
 		$this->page->addVar( 'form', $Form_builder->form()->createView() );
+		
+		$this->run();
 	}
 }

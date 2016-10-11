@@ -7,6 +7,7 @@
 /**
  * @var $User    \OCFram\User Session utilisateur
  * @var $content string Contenu de la page générée
+ * @var $menu string Panneau menu personnalisé en fonction de l'authentification
  */
 
 ?>
@@ -32,23 +33,14 @@
 			
 			<nav>
 				<ul>
-					<li><a href="/">Accueil</a></li>
-					<li><a href="/admin/">Admin<?= $User->isAuthenticated() ? ' (connecté)' : ' (non connecté)'?></a></li>
-					<?php if ( $User->isAuthenticated() ): ?>
-						<li><a href="/logout.html">Déconnexion</a></li>
-						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
-					<?php else: ?>
-						<li><a href="/create-account.html">Inscription</a></li>
-						<li><a href="/connect.html">Connexion</a></li>
-					<?php endif;?>
-				
+					<?= $menu ?>
 				</ul>
 			</nav>
 			
 			<div id="content-wrap">
 				<section id="main">
 					<?php if ( $User->hasFlash() ): ?>
-						<p style="text-align: center;"> <?=$User->getFlash()?> </p>
+						<p style="text-align: center;"> <?= $User->getFlash() ?> </p>
 					<?php endif; ?>
 					<?= $content ?>
 				</section>
