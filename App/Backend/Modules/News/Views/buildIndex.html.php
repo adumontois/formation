@@ -10,6 +10,7 @@
  * @var $news_count  integer
  * @var $News_list_a \Entity\News[]
  * @var $User \OCFram\User
+ * @var string[] $action_a
  */
 ?>
 
@@ -42,10 +43,7 @@
 				<?php endif; ?>
 			</td>
 			<td>
-				<?php if ($News['auteur'] == $User->userId() OR $User->authenticationLevel() === \Entity\User::USERY_SUPERADMIN): ?>
-					<a href="news-update-<?= $News[ 'id' ] ?>.html"><img src="../images/update.png" alt="Modifier" /></a>
-					<a href="news-delete-<?= $News[ 'id' ] ?>.html"><img src="../images/delete.png" alt="Supprimer" /></a>
-				<?php endif; ?>
+				<?= $action_a[$News['id']] ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>

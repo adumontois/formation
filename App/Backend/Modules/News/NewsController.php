@@ -57,16 +57,27 @@ class NewsController extends BackController {
 		/**
 		 * @var $News_manager NewsManager
 		 * @var News[] $News_list_a
+		 * @var string[] $modify_a Liens permettant de modifier les news
 		 */
 		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
 			$News_list_a = $News_manager->getNewscAndUsercLoginSortByIdDesc();
+			$action_a = array();
 			foreach ($News_list_a as $News) {
 				$News->format();
+				// On génère le lien si l'utilisateur a les droits de modification et de suppression
+				if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->auteur()) {
+					$action_a[$News->id()] = '<a href="news-update-'.$News->id().'.html"><img src="../images/update.png" alt="Modifier" /></a>
+						<a href="news-delete-'.$News->id().'html"><img src="../images/delete.png" alt="Supprimer" /></a>';
+				}
+				else {
+					$action_a[$News->id()] = '';
+				}
 			}
 			$this->page->addVar( 'News_list_a', $News_list_a);
 			$this->page->addVar( 'news_count', $News_manager->countNewscUsingNewscId() );
+			$this->page->addVar( 'action_a', $action_a);
 		}
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
