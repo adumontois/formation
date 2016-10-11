@@ -7,6 +7,8 @@
  */
 
 namespace App\Traits;
+
+use Entity\User;
 use OCFram\BackController;
 
 /**
@@ -26,15 +28,14 @@ trait AppController {
 		 */
 		$menu = '<li><a href="/">Accueil</a></li>';
 		if ( $this->app()->user()->isAuthenticated() ) {
-			$menu .= '<li><a href="/admin/">Admin (connecté)</a></li>
+			$menu .= '<li><a href="/admin/">' . ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ' (connecté)</a></li>
 				<li><a href="/logout.html">Déconnexion</a></li>
 				<li><a href="/admin/news-insert.html">Ajouter une news</a></li>';
 		}
 		else {
-			$menu .= '<li>(non connecté)</li>
-				<li><a href="/create-account.html">Inscription</a></li>
+			$menu .= '<li><a href="/create-account.html">Inscription</a></li>
 				<li><a href="/connect.html">Connexion</a></li>';
 		}
-		$this->page()->addVar('menu', $menu);
+		$this->page()->addVar( 'menu', $menu );
 	}
 }

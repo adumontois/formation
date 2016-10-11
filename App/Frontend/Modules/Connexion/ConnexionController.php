@@ -11,7 +11,9 @@ namespace App\Frontend\Modules\Connexion;
 
 use App\Traits\AppController;
 use Entity\User;
+use FormBuilder\ConnexionFormBuilder;
 use FormBuilder\SubscriptionFormBuilder;
+use FormHandler\ConnexionFormHandler;
 use Model\UserManager;
 use OCFram\Application;
 use OCFram\BackController;
@@ -20,7 +22,6 @@ use OCFram\HTTPRequest;
 
 class ConnexionController extends BackController {
 	use AppController;
-	
 	/**
 	 * ConnexionController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
@@ -31,7 +32,7 @@ class ConnexionController extends BackController {
 	 */
 	
 	const DATABASE                 = 'news';
-	const DISCONNECTION_SUCCESSFUL = 'Vous avez été déconnecté de l\'interface administrateur de Mon super site.';
+	const DISCONNECTION_SUCCESSFUL = 'Vous avez été déconnecté de l\'interface de Mon super site.';
 	const REFUSED_CONNECTION       = 'La combinaison login-password entrée est incorrecte.';
 	
 	public function __construct( Application $App, $module, $action ) {
@@ -47,22 +48,30 @@ class ConnexionController extends BackController {
 		/**
 		 * @var $User_manager UserManager
 		 */
-		if ( $Request->postExists( 'login' ) ) {
-			$given_login  = $Request->postData( 'login' );
-			$User_manager = $this->managers->getManagerOf( 'User' );
-			$User_stored  = $User_manager->getUsercUsingUsercLogin( $given_login );
-			// On vérifie si le password passé à la requête crypté avec la même clé que le password en DB correspond au password de l'objet récupéré
-			if ( $User_stored != NULL AND User::cryptWithKey( $Request->postData( 'password' ), $User_stored->cryptKey() ) === $User_stored->password() ) {
-				// Connexion du client avec son id en variable de session
-				$this->app->user()->setAuthenticationLevel((int) $User_stored->type());
-				$this->app->user()->setUserId($User_stored->id());
-				$this->app->user()->setFlash('Vous êtes connecté.');
-				$this->app->httpResponse()->redirect( '.' );
-			}
-			else {
-				$this->app->user()->setFlash( self::REFUSED_CONNECTION );
-			}
+		$User_manager = $this->managers->getManagerOf( 'User' );
+		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			$User = new User ( array( 'login'    => $Request->postData( 'login' ),
+									  'password' => $Request->postData( 'password' ),
+			) );
 		}
+		else {
+			$User = new User;
+		}
+		
+		// Construction du formulaire
+		$Form_builder = new ConnexionFormBuilder( $User, $User_manager );
+		$Form_builder->build();
+		$Form = $Form_builder->form();
+		
+		// Sauvegarder avec le FormHandler
+		$Form_handler = new ConnexionFormHandler( $Form, $User_manager, $Request );
+		if ( $Form_handler->process() ) {
+			$this->app->httpResponse()->redirect( '.' );
+		}
+		
+		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
+		$this->page->addVar( 'form', $Form->createView() );
+		
 		$this->run();
 	}
 	
@@ -78,9 +87,9 @@ class ConnexionController extends BackController {
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$User = new User( array(
-				'login'    => $Request->postData( 'login' ),
-				'password' => $Request->postData( 'password' ),
-				'email'    => $Request->postData( 'email' ),
+				'login'            => $Request->postData( 'login' ),
+				'password'         => $Request->postData( 'password' ),
+				'email'            => $Request->postData( 'email' ),
 				'password_confirm' => $Request->postData( 'password_confirm' ),
 				'email_confirm'    => $Request->postData( 'email_confirm' ),
 			) );

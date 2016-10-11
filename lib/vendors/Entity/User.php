@@ -104,6 +104,32 @@ class User extends Entity {
 		}
 	}
 	
+	/**
+	 * Récupère le texte descriptif d'un type de User.
+	 *
+	 * @param $type int Type du User en chiffre ($this->type())
+	 *
+	 * @return string
+	 */
+	static public function getTextualStatus($type) {
+		if (!is_int($type)) {
+			throw new \InvalidArgumentException('Le type d\'un User doit être un entier !');
+		}
+		switch ($type) {
+			case 1 :
+				return 'simple écrivain';
+			case 2 :
+				return 'superadmin';
+			default :
+				throw new \InvalidArgumentException('Le type de User '.$type.' n\'existe pas !');
+		}
+	}
+	
+	/**
+	 * Construit le user en l'hydratant. Si les valeurs password_confirm et email_confirm sont passées, elles sont settées manuellement.
+	 *
+	 * @param array $values Tableau paramètre-valeur du User à instancier.
+	 */
 	public function __construct( array $values = array() ) {
 		parent::__construct( $values );
 		if ( isset( $values[ 'password_confirm' ] ) ) {

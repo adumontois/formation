@@ -5,18 +5,13 @@
  * Date: 03/10/2016
  * Time: 18:27
  */
+/**
+ * @var string $form Formulaire de connexion
+ */
 ?>
 <h2>Connexion</h2>
 
 <form action="" method="post">
-	<label for="login">Pseudo</label>
-	<input id="login" type="text" name="login" />
-	<br />
-	
-	<label for="password">Mot de passe</label>
-	<input id="password" type="password" name="password" />
-	<br />
-	<br />
-	
+	<?= $form ?>
 	<input type="submit" value="Connexion" />
 </form>

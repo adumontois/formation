@@ -35,6 +35,9 @@ $entityLoader->register();
 $formBuilderLoader = new SplClassLoader( 'FormBuilder', __DIR__ . '\..\lib\vendors' );
 $formBuilderLoader->register();
 
+$formBuilderLoader = new SplClassLoader( 'FormHandler', __DIR__ . '\..\lib\vendors' );
+$formBuilderLoader->register();
+
 
 $appClass = 'App\\' . $_GET[ 'app' ] . '\\' . $_GET[ 'app' ] . 'Application';
 $app      = new $appClass;
