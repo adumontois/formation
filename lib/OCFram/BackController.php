@@ -88,6 +88,20 @@ abstract class BackController extends ApplicationComponent {
 	}
 	
 	/**
+	 * @return string
+	 */
+	public function module() {
+		return $this->module;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function action() {
+		return $this->action;
+	}
+	
+	/**
 	 * Setter pour l'attribut module.
 	 *
 	 * @param $module string

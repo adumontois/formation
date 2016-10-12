@@ -123,11 +123,8 @@ class CommentsManagerPDO extends CommentsManager {
 	
 	/**
 	 * Supprime le commentaire d'id fourni en paramètre.
-	 * Renvoie true si le commentaire existait, false sinon.
 	 *
 	 * @param $commentc_id int ID du commentaire
-	 *
-	 * @return bool
 	 */
 	public function deleteCommentcUsingCommentcId( $commentc_id ) {
 		/**
@@ -138,8 +135,6 @@ class CommentsManagerPDO extends CommentsManager {
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
 		$stmt->execute();
-		
-		return (bool)$stmt->rowCount();
 	}
 	
 	/**

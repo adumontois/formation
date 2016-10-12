@@ -9,6 +9,7 @@
  * @var $content string Contenu de la page générée
  * @var $menu_a array[] Panneau menu personnalisé en fonction de l'authentification
  * @var $flash string Affichage du flash (message à l'utilisateur)
+ * @var $layout_link_a string[] Liste des liens à afficher
  */
 
 ?>
@@ -22,13 +23,13 @@
 		
 		<meta charset="utf-8" />
 		
-		<link rel="stylesheet" href="../css/Envision.css" type="text/css" />
+		<link rel="stylesheet" href="/css/Envision.css" type="text/css" />
 	</head>
 	
 	<body>
 		<div id="wrap">
 			<header>
-				<h1><a href="/">Mon super site</a></h1>
+				<h1><a href="<?= $layout_link_a['Frontend-buildIndex']?>">Mon super site</a></h1>
 				<p>Comment ça, il n'y a presque rien ?</p>
 			</header>
 			

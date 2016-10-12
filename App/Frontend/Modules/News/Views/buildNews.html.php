@@ -7,10 +7,9 @@
  */
 
 /**
- * @var $News              \Entity\News
- * @var $Comment_list_a    \Entity\Comment[]
- * @var $User              OCFram\User
- * @var $action_a string[]
+ * @var $News              \Entity\News News à afficher
+ * @var $Comment_list_a    \Entity\Comment[] Liste des commentaires à afficher
+ * @var $link_a string[] Liste des liens à afficher
  */
 
 ?>
@@ -28,7 +27,7 @@
 <?php endif; ?>
 
 <p>
-	<a href="commenter-<?= $News[ 'id' ] ?>.html">Ajouter un commentaire</a>
+	<a href="<?= $link_a['putInsertComment'] ?>">Ajouter un commentaire</a>
 </p>
 
 <?php if ( empty( $Comment_list_a ) ): ?>
@@ -55,5 +54,5 @@
 <?php endforeach; ?>
 
 <p>
-	<a href="commenter-<?= $News[ 'id' ] ?>.html">Ajouter un commentaire</a>
+	<a href="<?= $link_a['putInsertComment'] ?>">Ajouter un commentaire</a>
 </p>

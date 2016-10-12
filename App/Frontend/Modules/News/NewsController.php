@@ -89,24 +89,28 @@ class NewsController extends BackController {
 		// Afficher les commentaires
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
 		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
-		foreach ($Liste_comments_a as $Comment) {
+		foreach ( $Liste_comments_a as $Comment ) {
 			$Comment->formatDate();
 			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				$Comment->setAction_a( [
-					'link'  => 'admin/comment-update-' . $Comment->id() . '.html',
-					'label' => 'Modifier'
+					'link'  => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
+					'label' => 'Modifier',
 				] );
 				$Comment->setAction_a( [
-					'link'  => 'admin/comment-delete-' . $Comment->id() . '.html',
-					'label' => 'Supprimer'
+					'link'  => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
+					'label' => 'Supprimer',
 				] );
 			}
 		}
+		// Générer les liens affichés dans la page web
+		$link_a = array();
+		$link_a['putInsertComment'] = $this->app->getUrlFromModuleAndAction($this->app->name(), $this->module, 'putInsertComment', array('id' => (int)$News->id()));
+		
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', $this->app->user() );
-		
+		$this->page->addVar( 'link_a', $link_a);
 		$this->run();
 	}
 	
@@ -116,18 +120,19 @@ class NewsController extends BackController {
 	 */
 	public function executePutInsertComment( HTTPRequest $Request ) {
 		/**
-		 * @var NewsManager $News_manager
+		 * @var NewsManager    $News_manager
 		 * @var UserManagerPDO $User_manager
-		 * @var User $User
+		 * @var User           $User
 		 */
-
+		
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
-			$News_manager= $this->managers->getManagerOf();
-			if (!$News_manager->existsNewscUsingNewscId($Request->getData( 'id' ))) {
-				$this->app->httpResponse()->redirectError(HTTPResponse::NOT_FOUND, new \Exception('Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !'));
+			$News_manager = $this->managers->getManagerOf();
+			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+				$this->app->httpResponse()
+						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
 			}
 			$Commentaire = new Comment( array(
-				'fk_SNC'    => $Request->getData( 'id' ),
+				'fk_SNC'  => $Request->getData( 'id' ),
 				'author'  => $Request->postData( 'author' ),
 				'content' => $Request->postData( 'content' ),
 			) );
@@ -135,11 +140,11 @@ class NewsController extends BackController {
 		else {
 			$Commentaire = new Comment();
 			// Préremplir le champ auteur si l'utilisateur est connecté
-			if ($this->app->user()->isAuthenticated()) {
-				$User_manager = $this->managers->getManagerOf('User');
-				$User = $User_manager->getUsercUsingUsercId($this->app->user()->userId());
-				if (null != $User) {
-					$Commentaire->setAuthor($User->login());
+			if ( $this->app->user()->isAuthenticated() ) {
+				$User_manager = $this->managers->getManagerOf( 'User' );
+				$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
+				if ( null != $User ) {
+					$Commentaire->setAuthor( $User->login() );
 				}
 			}
 		}
@@ -155,7 +160,7 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
+			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

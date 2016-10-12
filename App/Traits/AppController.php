@@ -9,6 +9,7 @@
 namespace App\Traits;
 
 use Entity\User;
+use OCFram\Application;
 use OCFram\BackController;
 
 /**
@@ -29,21 +30,35 @@ trait AppController {
 		// Générer les labels et liens de la vue
 		//<li><a href="/">Accueil</a></li>
 		
-		$menu_a = [['label' => 'Accueil',
-						  'link' => '/']];
+		$menu_a = [
+			[
+				'label' => 'Accueil',
+				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'News', 'buildIndex'),
+			],
+		];
 		if ( $this->app()->user()->isAuthenticated() ) {
-			$menu_a[] = ['label' => ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ). ' (connecté)',
-					   'link' => '/admin/'];
-			$menu_a[] = ['label' => 'Déconnexion',
-						'link' => '/logout.html'];
-			$menu_a[] = ['label' => 'Ajouter une news',
-						 'link' => '/admin/news-insert.html'];
+			$menu_a[] = [
+				'label' => ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ' (connecté)',
+				'link'  => $this->app()->getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
+			];
+			$menu_a[] = [
+				'label' => 'Déconnexion',
+				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'Connection', 'clearConnection'),
+			];
+			$menu_a[] = [
+				'label' => 'Ajouter une news',
+				'link'  => $this->app()->getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews'),
+			];
 		}
 		else {
-			$menu_a[] = ['label' => 'Inscription',
-						 'link' => '/create-account.html'];
-			$menu_a[] = ['label' => 'Connexion',
-						'link' => '/connect.html'];
+			$menu_a[] = [
+				'label' => 'Inscription',
+				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'Connection', 'putUser'),
+			];
+			$menu_a[] = [
+				'label' => 'Connexion',
+				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'Connection', 'getConnection'),
+			];
 		}
 		$this->page()->addVar( 'menu_a', $menu_a );
 		
@@ -52,5 +67,11 @@ trait AppController {
 			$flash = $this->app()->user()->getFlash();
 			$this->page()->addVar( 'flash', $flash );
 		}
+		
+		// Générer les liens
+		$layout_link_a                          = [];
+		$layout_link_a[ 'Frontend-buildIndex' ] = $this->app()->getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' );
+		
+		$this->page()->addVar( 'layout_link_a', $layout_link_a );
 	}
 }

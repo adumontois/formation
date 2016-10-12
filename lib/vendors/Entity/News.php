@@ -50,7 +50,7 @@ class News extends Entity {
 	 */
 	protected $action_a;
 	
-	public function __construct( array $values ) {
+	public function __construct( array $values = array() ) {
 		parent::__construct( $values );
 		if (!isset($this->action_a)) {
 			$this->action_a = [];

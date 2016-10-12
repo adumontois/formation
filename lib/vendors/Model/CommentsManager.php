@@ -40,11 +40,8 @@ abstract class CommentsManager extends Manager {
 	
 	/**
 	 * Supprime le commentaire d'id fourni en paramètre.
-	 * Renvoie true si le commentaire existait, false sinon.
 	 *
 	 * @param $commentc_id int ID du commentaire
-	 *
-	 * @return bool
 	 */
 	abstract public function deleteCommentcUsingCommentcId( $commentc_id );
 	

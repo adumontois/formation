@@ -50,13 +50,14 @@ class ConnectionController extends BackController {
 		 * @var $User_manager UserManager
 		 */
 		// Si l'utilisateur est connecté, on le déconnecte
-		if ($this->app->user()->isAuthenticated()) {
+		if ( $this->app->user()->isAuthenticated() ) {
 			$this->app->user()->unsetAuthentication();
 		}
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
-			$User = new User ( array( 'login'    => $Request->postData( 'login' ),
-									  'password' => $Request->postData( 'password' ),
+			$User = new User ( array(
+				'login'    => $Request->postData( 'login' ),
+				'password' => $Request->postData( 'password' ),
 			) );
 		}
 		else {
@@ -71,7 +72,7 @@ class ConnectionController extends BackController {
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new ConnectionFormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
-			$this->app->httpResponse()->redirect( '.' );
+			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		}
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
@@ -88,8 +89,8 @@ class ConnectionController extends BackController {
 		/**
 		 * @var $User_manager UserManager
 		 */
-		if ($this->app->user()->isAuthenticated()) {
-			$this->app->httpResponse()->redirectError(HTTPResponse::FORBIDDEN, new \Exception('Vous devez vous déconnecter avant de pouvoir inscrire un compte.'));
+		if ( $this->app->user()->isAuthenticated() ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::FORBIDDEN, new \Exception( 'Vous devez vous déconnecter avant de pouvoir inscrire un compte.' ) );
 		}
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
@@ -114,10 +115,10 @@ class ConnectionController extends BackController {
 		$Form_handler = new FormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Vous avez été correctement inscrit.' );
-			$this->app->httpResponse()->redirect( '.' );
+			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		}
 		else {
-			$this->page->addVar( 'user_count', $User_manager->countUsercUsingUsercId());
+			$this->page->addVar( 'user_count', $User_manager->countUsercUsingUsercId() );
 			$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 			$this->page->addVar( 'form', $Form->createView() );
 		}
@@ -130,9 +131,9 @@ class ConnectionController extends BackController {
 	 */
 	public function executeClearConnection() {
 		$this->app->user()->unsetAuthentication();
-		$this->app->user()->setFlash( htmlspecialchars(self::DISCONNECTION_SUCCESSFUL) );
+		$this->app->user()->setFlash( htmlspecialchars( self::DISCONNECTION_SUCCESSFUL ) );
 		// On redirige vers la racine
-		$this->app->httpResponse()->redirect( '../' );
+		$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		$this->run();
 	}
 }

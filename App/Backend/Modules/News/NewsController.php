@@ -16,7 +16,6 @@ use FormBuilder\CommentFormBuilder;
 use FormBuilder\NewsFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
-use MongoDB\Driver\Exception\ExecutionTimeoutException;
 use OCFram\Application;
 use OCFram\BackController;
 use OCFram\FormHandler;
@@ -43,8 +42,7 @@ class NewsController extends BackController {
 	 * @param string      $module
 	 * @param string      $action
 	 */
-	const DATABASE            = 'news';
-	const BUILDINDEX_LOCATION = '/admin/';
+	const DATABASE = 'news';
 	
 	public function __construct( Application $App, $module, $action ) {
 		parent::__construct( $App, $module, $action, self::DATABASE );
@@ -67,12 +65,16 @@ class NewsController extends BackController {
 				$News->format();
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
 				if ( $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id() ) {
-					$News->setAction_a(['action_link' => Application::getUrlFromModuleAndAction('Backend', 'News', 'putUpdateNews', array('id' => $News->id())),
-						'image_source' => '/images/update.png',
-						'alternative_text' => 'Modifier']);
-					$News->setAction_a(['action_link' => Application::getUrlFromModuleAndAction('Backend', 'News', 'clearNews', array('id' => $News->id())),
-						'image_source' => '/images/delete.png',
-						'alternative_text' => 'Supprimer']);
+					$News->setAction_a( [
+						'action_link'      => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+						'image_source'     => '/images/update.png',
+						'alternative_text' => 'Modifier',
+					] );
+					$News->setAction_a( [
+						'action_link'      => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+						'image_source'     => '/images/delete.png',
+						'alternative_text' => 'Supprimer',
+					] );
 				}
 			}
 			$this->page->addVar( 'News_list_a', $News_list_a );
@@ -105,8 +107,8 @@ class NewsController extends BackController {
 			// S'il s'agit d'un update, il faut connaître l'id de la news qui est donné dans l'url
 			if ( $Request->getExists( 'id' ) ) {
 				// On vérifie si la news correspondante existe
-				if (!$News_manager->existsNewscUsingNewscId($Request->getData('id'))) {
-					$this->app->httpResponse()->redirectError(HTTPResponse::NOT_FOUND, new \Exception('La news à modifier n\'existe plus !'));
+				if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+					$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news à modifier n\'existe plus !' ) );
 				}
 				$News->setId( $Request->getData( 'id' ) );
 			}
@@ -138,7 +140,7 @@ class NewsController extends BackController {
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée.' );
 			};
-			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
+			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		}
 		
 		
@@ -191,22 +193,22 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		
 		$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
-		if (null == $News) {
+		if ( null == $News ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
 		}
 		if ( $News->fk_SUC() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas supprimer la news de quelqu\'un d\'autre !' ) );
 		}
-
+		
 		// Suppression des commentaires associés à la news
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		$Comments_manager->deleteCommentcUsingNewscId( $Request->getData( 'id' ) );
 		// Suppression de la news
 		$News_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) );
-			
+		
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
-		$this->app->httpResponse()->redirect( '.' );
+		$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		$this->run();
 	}
 	
@@ -220,22 +222,23 @@ class NewsController extends BackController {
 	public function executePutUpdateComment( HTTPRequest $Request ) {
 		/**
 		 * @var $Comments_manager CommentsManager
-		 * @var $News_manager NewsManager
+		 * @var $News_manager     NewsManager
 		 */
 		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour éditer les commentaires.' ) );
+			$this->app->httpResponse()
+					  ->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour éditer les commentaires.' ) );
 		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		$News_manager = $this->managers->getManagerOf();
+		$News_manager     = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
-			if (!ctype_digit($Request->postData('news'))) {
-				$this->app->httpResponse()->redirectError(HTTPResponse::BAD_REQUEST, new \Exception('Le champ de news caché a été modifié par l\'utilisateur. Bien essayé !'));
+			if ( !ctype_digit( $Request->postData( 'news' ) ) ) {
+				$this->app->httpResponse()->redirectError( HTTPResponse::BAD_REQUEST, new \Exception( 'Le champ de news caché a été modifié par l\'utilisateur. Bien essayé !' ) );
 			}
-			if (!$News_manager->existsNewscUsingNewscId($Request->postData('id'))) {
-				$this->app->httpResponse()->redirectError(HTTPResponse::NOT_FOUND, new \Exception('Le commentaire en cours d\'édition n\'existe plus !'));
+			if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Le commentaire en cours d\'édition n\'existe plus !' ) );
 			}
-			if (!$Comments_manager->existsCommentcUsingCommentcId($Request->getData('news'))) {
-				$this->app->httpResponse()->redirectError(HTTPResponse::NOT_FOUND, new \Exception('La news associée au commentaire en cours d\'édition n\'existe pas !'));
+			if ( !$News_manager->existsNewscUsingNewscId( $Request->postData( 'news' ) ) ) {
+				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news associée au commentaire en cours d\'édition n\'existe pas !' ) );
 			}
 			$Comment = new Comment( array(
 				'id'      => $Request->getData( 'id' ),
@@ -264,7 +267,7 @@ class NewsController extends BackController {
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
 			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( self::BUILDINDEX_LOCATION );
+			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		}
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		$this->page->addVar( 'form', $Form->createView() );
@@ -288,12 +291,13 @@ class NewsController extends BackController {
 					  ->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' ) );
 		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		if ( !$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+		if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
 		}
+		$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
-		$this->app->httpResponse()->redirect( '.' );
+		$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		$this->run();
 	}
 }
