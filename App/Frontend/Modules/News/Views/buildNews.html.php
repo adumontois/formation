@@ -26,9 +26,11 @@
 	</p>
 <?php endif; ?>
 
-<p>
+<!-- Début de formulaire Ajax -->
+<p id="test">
 	<a href="<?= $link_a['putInsertComment'] ?>">Ajouter un commentaire</a>
 </p>
+<!-- Fin de formulaire Ajax -->
 
 <?php if ( empty( $Comment_list_a ) ): ?>
 	<p>
@@ -53,6 +55,8 @@
 	</fieldset>
 <?php endforeach; ?>
 
+<!-- Début de formulaire Ajax -->
 <p>
 	<a href="<?= $link_a['putInsertComment'] ?>">Ajouter un commentaire</a>
 </p>
+<!-- Fin de formulaire Ajax -->

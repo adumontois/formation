@@ -54,9 +54,9 @@ class NewsController extends BackController {
 	 */
 	public function executeBuildIndex() {
 		/**
-		 * @var          $News_manager NewsManager
-		 * @var News[]   $News_list_a
-		 * @var string[] $modify_a     Liens permettant de modifier les news
+		 * @var NewsManager $News_manager
+		 * @var News[]      $News_list_a
+		 * @var string[]    $modify_a Liens permettant de modifier les news
 		 */
 		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
@@ -84,6 +84,7 @@ class NewsController extends BackController {
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
 		}
+		
 		$this->run();
 	}
 	

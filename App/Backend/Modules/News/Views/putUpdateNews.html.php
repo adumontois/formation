@@ -9,7 +9,6 @@
 /**
  * @var $header string En-tête du formulaire
  * @var $form string Code HTML du formulaire de création de news
- * @var $News \Entity\News News à modifier
  */
 ?>
 

@@ -63,6 +63,7 @@ class Page extends ApplicationComponent {
 		$User = $this->app->user();
 		extract( $this->vars );
 		
+		
 		// Créer la page en bufferisation
 		ob_start();
 		require $this->contentFile; // Existence du fichier vérifiée

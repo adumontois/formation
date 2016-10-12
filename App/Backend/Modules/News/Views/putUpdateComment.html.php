@@ -9,8 +9,6 @@
 /** @var $form string
  * Formulaire d'ajout de commentaire
  * @var $Comment \Entity\Comment
- * @var $Comment ['news'] integer
- * foreign key to news table
  */
 ?>
 <form action="" method="post">

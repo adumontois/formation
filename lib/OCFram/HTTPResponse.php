@@ -86,7 +86,11 @@ class HTTPResponse extends ApplicationComponent {
 	 * Envoie la page calculée au client
 	 */
 	public function send() {
-		exit( $this->page->getGeneratedPage() );
+		$html = $this->page->getGeneratedPage();
+		$json = new \DOMDocument();
+		var_dump($html);
+		//exit($this->page->getGeneratedPageJson());
+		//exit( $this->page->getGeneratedPage() );
 	}
 	
 	/**

@@ -42,31 +42,32 @@ class NewsController extends BackController {
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml.
 	 */
 	public function executeBuildIndex() {
-		/**
-		 * @var $News_manager NewsManager
-		 * @var $Liste_news_a News[]
-		 */
-		// Récupérer la config
-		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
-		$longueur_news = $this->app()->config()->get( 'longueur_news' );
-		
-		// Récupérer le manager des news
-		
-		$News_manager = $this->managers->getManagerOf();
-		
-		// Récupérer la liste des news à afficher
-		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
-		foreach ( $Liste_news_a as $News ) {
-			// Prendre le nombre de caractères nécessaires
-			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
-			if ( strlen( $News->content() ) == $longueur_news ) {
-				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
-			}
-		}
-		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
-		$this->page->addVar( 'News_list_a', $Liste_news_a );
-		
 		$this->run();
+//		/**
+//		 * @var $News_manager NewsManager
+//		 * @var $Liste_news_a News[]
+//		 */
+//		// Récupérer la config
+//		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
+//		$longueur_news = $this->app()->config()->get( 'longueur_news' );
+//
+//		// Récupérer le manager des news
+//
+//		$News_manager = $this->managers->getManagerOf();
+//
+//		// Récupérer la liste des news à afficher
+//		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
+//		foreach ( $Liste_news_a as $News ) {
+//			// Prendre le nombre de caractères nécessaires
+//			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
+//			if ( strlen( $News->content() ) == $longueur_news ) {
+//				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
+//			}
+//		}
+//		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
+//		$this->page->addVar( 'News_list_a', $Liste_news_a );
+//
+//		$this->run();
 	}
 	
 	/**
@@ -104,14 +105,14 @@ class NewsController extends BackController {
 			}
 		}
 		// Générer les liens affichés dans la page web
-		$link_a = array();
-		$link_a['putInsertComment'] = Router::getUrlFromModuleAndAction($this->app->name(), $this->module, 'putInsertComment', array('id' => (int)$News->id()));
+		$link_a                       = array();
+		$link_a[ 'putInsertComment' ] = Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'putInsertComment', array( 'id' => (int)$News->id() ) );
 		
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', $this->app->user() );
-		$this->page->addVar( 'link_a', $link_a);
+		$this->page->addVar( 'link_a', $link_a );
 		$this->run();
 	}
 	
@@ -161,7 +162,8 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			$this->app->httpResponse()
+					  ->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
