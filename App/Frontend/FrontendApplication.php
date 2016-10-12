@@ -13,7 +13,7 @@ use OCFram\Application;
 /**
  * Class FrontendApplication
  *
- * Représente l'application de Frontent
+ * Représente l'application de Frontend
  *
  * @package App\Frontend
  */

@@ -21,6 +21,7 @@ use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
 use OCFram\HTTPResponse;
+use OCFram\Router;
 
 /**
  * Class NewsController
@@ -66,12 +67,12 @@ class NewsController extends BackController {
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
 				if ( $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id() ) {
 					$News->setAction_a( [
-						'action_link'      => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
 						'image_source'     => '/images/update.png',
 						'alternative_text' => 'Modifier',
 					] );
 					$News->setAction_a( [
-						'action_link'      => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
 						'image_source'     => '/images/delete.png',
 						'alternative_text' => 'Supprimer',
 					] );
@@ -140,7 +141,7 @@ class NewsController extends BackController {
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée.' );
 			};
-			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		}
 		
 		
@@ -208,7 +209,7 @@ class NewsController extends BackController {
 		
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
-		$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		$this->run();
 	}
 	
@@ -267,7 +268,7 @@ class NewsController extends BackController {
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
 			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		}
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		$this->page->addVar( 'form', $Form->createView() );
@@ -297,7 +298,7 @@ class NewsController extends BackController {
 		$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
-		$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
 		$this->run();
 	}
 }

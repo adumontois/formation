@@ -9,8 +9,8 @@
 namespace App\Traits;
 
 use Entity\User;
-use OCFram\Application;
 use OCFram\BackController;
+use OCFram\Router;
 
 /**
  * trait AppController
@@ -33,31 +33,31 @@ trait AppController {
 		$menu_a = [
 			[
 				'label' => 'Accueil',
-				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'News', 'buildIndex'),
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'News', 'buildIndex'),
 			],
 		];
 		if ( $this->app()->user()->isAuthenticated() ) {
 			$menu_a[] = [
 				'label' => ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ' (connecté)',
-				'link'  => $this->app()->getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
+				'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
 			];
 			$menu_a[] = [
 				'label' => 'Déconnexion',
-				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'Connection', 'clearConnection'),
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'clearConnection'),
 			];
 			$menu_a[] = [
 				'label' => 'Ajouter une news',
-				'link'  => $this->app()->getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews'),
+				'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews'),
 			];
 		}
 		else {
 			$menu_a[] = [
 				'label' => 'Inscription',
-				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'Connection', 'putUser'),
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'putUser'),
 			];
 			$menu_a[] = [
 				'label' => 'Connexion',
-				'link'  => $this->app()->getUrlFromModuleAndAction('Frontend', 'Connection', 'getConnection'),
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'getConnection'),
 			];
 		}
 		$this->page()->addVar( 'menu_a', $menu_a );
@@ -70,7 +70,7 @@ trait AppController {
 		
 		// Générer les liens
 		$layout_link_a                          = [];
-		$layout_link_a[ 'Frontend-buildIndex' ] = $this->app()->getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' );
+		$layout_link_a[ 'Frontend-buildIndex' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' );
 		
 		$this->page()->addVar( 'layout_link_a', $layout_link_a );
 	}

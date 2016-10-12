@@ -21,6 +21,7 @@ use \OCFram\BackController;
 use OCFram\FormHandler;
 use \OCFram\HTTPRequest;
 use OCFram\HTTPResponse;
+use OCFram\Router;
 
 class NewsController extends BackController {
 	use AppController;
@@ -93,18 +94,18 @@ class NewsController extends BackController {
 			$Comment->formatDate();
 			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				$Comment->setAction_a( [
-					'link'  => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
+					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
 					'label' => 'Modifier',
 				] );
 				$Comment->setAction_a( [
-					'link'  => $this->app->getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
+					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
 					'label' => 'Supprimer',
 				] );
 			}
 		}
 		// Générer les liens affichés dans la page web
 		$link_a = array();
-		$link_a['putInsertComment'] = $this->app->getUrlFromModuleAndAction($this->app->name(), $this->module, 'putInsertComment', array('id' => (int)$News->id()));
+		$link_a['putInsertComment'] = Router::getUrlFromModuleAndAction($this->app->name(), $this->module, 'putInsertComment', array('id' => (int)$News->id()));
 		
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
@@ -160,7 +161,7 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

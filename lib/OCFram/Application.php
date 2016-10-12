@@ -37,9 +37,9 @@ abstract class Application {
 	 */
 	protected $config;
 	/**
-	 * @var $Routers_a Router[] Tableau bidimensionnel qui recense tous les routeurs existants
+	 * @var $Router Router Routeur qui contient toutes les routes déjà générées
 	 */
-	protected $Routers_a;
+	protected $Router;
 	
 	/**
 	 * Construit un objet application en initialisant httpRequest et httpResponse
@@ -50,7 +50,7 @@ abstract class Application {
 		$this->name         = '';
 		$this->user         = new User( $this );
 		$this->config       = new Config( $this );
-		$this->Routers_a    = [];
+		$this->Router    = new Router($this);
 	}
 	
 	/**
@@ -65,9 +65,8 @@ abstract class Application {
 	 */
 	public function getController() {
 		// Si le routeur appelé n'est pas créé, on le crée.
-		if ( !isset( $this->Routers_a[ $this->name ] ) ) {
-			$application_class_name = 'App\\'.$this->name.'\\'.$this->name.'Application';
-			$this->addRouter($Router = new Router(new $application_class_name()));
+		if ( !isset( Router::routes()[$this->name] ) ) {
+			Router::generateRoutes($this->name);
 		}
 		
 		// 2) Une fois toutes les routes créées, essayer de router l'URL reçue
@@ -75,7 +74,7 @@ abstract class Application {
 			/**
 			 * @var $route \OCFram\Route
 			 */
-			$route = $Router->getRoute( $this->httpRequest()->requestURI() );
+			$route = $this->Router->getRoute( $this->httpRequest()->requestURI() );
 			
 			// 3) Ajouter les variables lues dans l'url au tableau _GET
 			// En effet ce sont des variables récupérées par l'url
@@ -97,33 +96,6 @@ abstract class Application {
 		return null;
 	}
 	
-	/**
-	 * Récupère une URL à partir du nom du module et de l'action souhaitée.
-	 * Si l'URL à récupérer nécessite des paramètres, ils sont indiqués dans given_values_a.
-	 *
-	 * @param string $app            Le nom de l'application où chercher la route.
-	 * @param string $module         Le module souhaité
-	 * @param string $action         L'action souhaitée
-	 * @param array  $given_values_a Les variables nécessaires dans l'Url
-	 *
-	 * @return string L'URL calculée
-	 */
-	public function getUrlFromModuleAndAction( $app, $module, $action, $given_values_a = array() ) {
-		// Sélection du routeur
-		if ( !isset( $this->Routers_a[ $app ] ) ) {
-			// Si le routeur n'existe pas, on le crée et on l'ajoute.
-			$application_class_name = 'App\\'.$app.'\\'.$app.'Application';
-			$this->addRouter(new Router(new $application_class_name()));
-		}
-		// Appeler la méthode du routeur correspondant à l'application
-		return $this->Routers_a[ $app ]->getUrlFromModuleAndAction( $module, $action, $given_values_a );
-	}
-	
-	public function addRouter(Router $Router) {
-		if (!in_array($Router, $this->Routers_a)) {
-			$this->Routers_a[$Router->app()->name()] = $Router;
-		}
-	}
 	
 	/**
 	 * @return HTTPRequest

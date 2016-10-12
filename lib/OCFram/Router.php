@@ -16,27 +16,22 @@ namespace OCFram;
  */
 class Router extends ApplicationComponent {
 	/**
-	 * @var $routes Route[]
+	 * @var $routes Route[][]
 	 */
-	protected $routes;
+	static protected $routes = array();
 	const ROUTE_NOT_FOUND = 18;
 	
 	/**
-	 * Construit le routeur comme un composant d'application
-	 * Les routes sont créées à la construction.
+	 * Génère les routes associées à une application de nom passé en paramètre
 	 *
-	 * @param Application $App L'application dont le routeur gère les routes
+	 * @param $app_name string Nom de l'application dont les routes doivent être générées
 	 */
-	public function __construct(Application $App) {
-		parent::__construct($App);
-		$this->routes = array();
+	static public function generateRoutes( $app_name ) {
 		// 1) Aller chercher dans la liste des routes toutes les routes existantes
 		$xml = new \DOMDocument();
-		$xml->load( __DIR__ . '/../../App/' . $this->app()->name() . '/Config/routes.xml' );
+		$xml->load( __DIR__ . '/../../App/' . $app_name . '/Config/routes.xml' );
 		$route_list = $xml->getElementsByTagName( 'route' );
-		
-		foreach ( $route_list as $route ) // Construire le routeur à partir de toutes les routes existantes
-		{
+		foreach ( $route_list as $route ) {
 			/**
 			 * @var $route \DOMElement
 			 */
@@ -46,7 +41,7 @@ class Router extends ApplicationComponent {
 				$vars = explode( ',', $route->getAttribute( 'vars' ) );
 			}
 			// Ajouter la route au routeur les arguments passés
-			$this->addRoute( new Route( array(
+			self::addRoute( $app_name, new Route( array(
 				'action'    => $route->getAttribute( 'action' ),
 				'module'    => $route->getAttribute( 'module' ),
 				'url'       => $route->getAttribute( 'url' ),
@@ -58,12 +53,79 @@ class Router extends ApplicationComponent {
 	/**
 	 * Ajoute la route au catalogue du routeur, si elle n'existe pas déjà.
 	 *
-	 * @param Route $route
+	 * @param string $app_name Nom de l'application à laquelle sont associées les routes
+	 * @param Route  $route
 	 */
-	public function addRoute( Route $route ) {
-		if ( !in_array( $route, $this->routes ) ) {
-			$this->routes[] = $route;
+	static public function addRoute( $app_name, Route $route ) {
+		if ( !isset(self::$routes[$app_name]) OR !in_array( $route, self::$routes[ $app_name ] ) ) {
+			self::$routes[ $app_name ][] = $route;
 		}
+	}
+	
+	/**
+	 * Récupère une URL à partir du nom du module et de l'action souhaitée.
+	 * Si l'URL à récupérer nécessite des paramètres, ils sont indiqués dans given_values_a.
+	 *
+	 * @param string $app			 Nom de l'application (Frontend, Backend...)
+	 * @param string $module         Le module souhaité
+	 * @param string $action         L'action souhaitée
+	 * @param array  $given_values_a Les variables nécessaires dans l'Url
+	 *
+	 * @return string L'URL calculée
+	 */
+	static public function getUrlFromModuleAndAction($app, $module, $action, $given_values_a = array() ) {
+		if ( !isset( self::$routes[ $app ] ) ) {
+			// Si les routes d' l'application n'existent pas, on les crée et on les rajoute.
+			self::generateRoutes($app);
+		}
+		
+		// 1) Aller chercher dans la liste des routes toutes les routes existantes
+		foreach ( self::$routes[$app] as $Route ) {
+			/**
+			 * @var $Route Route
+			 */
+			if ( $Route->module() === $module AND $Route->action() === $action ) {
+				// On a trouvé un module et une action qui correspondent : on vérifie si on a le bon nombre de paramètres
+				$route_attribute_count = count( $Route->varsNames() );
+				if ( count( $given_values_a ) === $route_attribute_count ) {
+					// En plus elle a le bon nombre d'attributs
+					// Prendre l'url
+					$url = $Route->url();
+					if ( 0 != $route_attribute_count ) {
+						// Rechercher les parties variables : elles sont indiquées par des parenthèses dans l'URL
+						preg_match( '/\(.+\)/', $url, $pattern_a );
+						// Associer les clés des noms de variables aux parties variables
+						$replacement_a = array_combine( $Route->varsNames(), $pattern_a );
+						foreach ( $replacement_a as $var_name => $pattern ) {
+							// Si le pattern est respecté, alors on remplace l'élément correspondant dans l'URL
+							// On vérifie d'abord s'il est bien set.
+							if ( !isset( $given_values_a[ $var_name ] ) ) {
+								throw new \InvalidArgumentException( 'Le paramètre ' . $var_name . ' n\'est pas renseigné et est nécessaire au fonctionnement de la route.' );
+							}
+							if ( preg_match( '/^' . $pattern . '$/', $given_values_a[ $var_name ] ) ) {
+								$url = preg_replace( '/\(.+\)/', $given_values_a[ $var_name ], $url, 1 );
+							}
+							else {
+								throw new \InvalidArgumentException( 'Les paramètres de la route ne correspondent pas aux paramètres indiqués dans la configuration.' );
+							}
+						}
+					}
+					
+					// Remplacer les points échappées par des points et renvoyer l'URL calculée.
+					return preg_replace( '/\\\./', '.', $url );
+				}
+			}
+		}
+		// Si on n'a pas trouvé, c'est que la route est incorrecte
+		throw new \InvalidArgumentException( 'Impossible de trouver l\'action ' . $action . ' dans le module ' . $module . ' de l\'application ' . $app );
+	}
+		
+	
+	/**
+	 * @return Route[][]
+	 */
+	static public function routes() {
+		return self::$routes;
 	}
 	
 	/**
@@ -76,7 +138,7 @@ class Router extends ApplicationComponent {
 	 */
 	public function getRoute( $url ) {
 		// Trouver la route qui matche l'url fournie
-		foreach ( $this->routes as $route ) {
+		foreach ( self::$routes[$this->app->name()] as $route ) {
 			$varsValues = $route->match( $url );
 			if ( $varsValues !== false AND $route->hasVars() ) // Si on a des variables, on doit les récupérer pour les faire transiter dans l'URL
 			{
@@ -101,56 +163,8 @@ class Router extends ApplicationComponent {
 		throw new \RuntimeException( 'Couldn\'t find route ' . $url . ', no such route exists !', Router::ROUTE_NOT_FOUND );
 	}
 	
-	/**
-	 * Récupère une URL à partir du nom du module et de l'action souhaitée.
-	 * Si l'URL à récupérer nécessite des paramètres, ils sont indiqués dans given_values_a.
-	 *
-	 * @param string $module Le module souhaité
-	 * @param string $action L'action souhaitée
-	 * @param array  $given_values_a Les variables nécessaires dans l'Url
-	 *
-	 * @return string L'URL calculée
-	 */
-	public function getUrlFromModuleAndAction($module, $action, $given_values_a = array() ) {
-		// 1) Aller chercher dans la liste des routes toutes les routes existantes
-		foreach ( $this->routes as $Route )
-		{
-			/**
-			 * @var $Route Route
-			 */
-			if ($Route->module() === $module AND $Route->action() === $action) {
-				// On a trouvé un module et une action qui correspondent : on vérifie si on a le bon nombre de paramètres
-				$route_attribute_count = count($Route->varsNames());
-				if (count($given_values_a) === $route_attribute_count) {
-					// En plus elle a le bon nombre d'attributs
-					// Prendre l'url
-					$url = $Route->url();
-					if (0 != $route_attribute_count) {
-						// Rechercher les parties variables : elles sont indiquées par des parenthèses dans l'URL
-						preg_match('/\(.+\)/', $url, $pattern_a);
-						// Associer les clés des noms de variables aux parties variables
-						$replacement_a = array_combine($Route->varsNames(), $pattern_a);
-						foreach ($replacement_a as $var_name => $pattern) {
-							// Si le pattern est respecté, alors on remplace l'élément correspondant dans l'URL
-							// On vérifie d'abord s'il est bien set.
-							if (!isset($given_values_a[$var_name])) {
-								throw new \InvalidArgumentException('Le paramètre '.$var_name.' n\'est pas renseigné et est nécessaire au fonctionnement de la route.');
-							}
-							if (preg_match('/^'.$pattern.'$/', $given_values_a[$var_name])) {
-								$url = preg_replace('/\(.+\)/', $given_values_a[$var_name], $url, 1);
-							}
-							else {
-								throw new \InvalidArgumentException('Les paramètres de la route ne correspondent pas aux paramètres indiqués dans la configuration.');
-							}
-						}
-					}
-					// Remplacer les points échappées par des points et renvoyer l'URL calculée.
-					return preg_replace('/\\\./', '.', $url);
-				}
-			}
-		}
-		// Si on n'a pas trouvé, c'est que la route est incorrecte
-		throw new \InvalidArgumentException('Impossible de trouver l\'action '.$action.' dans le module '.$module.' de l\'application '.$this->app->name());
+	public function resetRouter() {
+		self::$routes = array();
+		self::generateRoutes($this->app->name());
 	}
-	
 }

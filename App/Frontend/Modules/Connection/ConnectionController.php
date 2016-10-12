@@ -20,6 +20,7 @@ use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
 use OCFram\HTTPResponse;
+use OCFram\Router;
 
 class ConnectionController extends BackController {
 	use AppController;
@@ -72,7 +73,7 @@ class ConnectionController extends BackController {
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new ConnectionFormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
-			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		}
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
@@ -115,7 +116,7 @@ class ConnectionController extends BackController {
 		$Form_handler = new FormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Vous avez été correctement inscrit.' );
-			$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		}
 		else {
 			$this->page->addVar( 'user_count', $User_manager->countUsercUsingUsercId() );
@@ -133,7 +134,7 @@ class ConnectionController extends BackController {
 		$this->app->user()->unsetAuthentication();
 		$this->app->user()->setFlash( htmlspecialchars( self::DISCONNECTION_SUCCESSFUL ) );
 		// On redirige vers la racine
-		$this->app->httpResponse()->redirect( $this->app->getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
+		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		$this->run();
 	}
 }
