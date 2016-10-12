@@ -67,11 +67,11 @@ class NewsController extends BackController {
 				$News->format();
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
 				if ( $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id() ) {
-					$News->setAction_a(['action_link' => 'news-update-'. $News->id().'.html',
-						'image_source' => '../images/update.png',
+					$News->setAction_a(['action_link' => Application::getUrlFromModuleAndAction('Backend', 'News', 'putUpdateNews', array('id' => $News->id())),
+						'image_source' => '/images/update.png',
 						'alternative_text' => 'Modifier']);
-					$News->setAction_a(['action_link' => 'news-delete-'. $News->id().'.html',
-						'image_source' => '../images/delete.png',
+					$News->setAction_a(['action_link' => Application::getUrlFromModuleAndAction('Backend', 'News', 'clearNews', array('id' => $News->id())),
+						'image_source' => '/images/delete.png',
 						'alternative_text' => 'Supprimer']);
 				}
 			}
