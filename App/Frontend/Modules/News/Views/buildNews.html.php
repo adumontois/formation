@@ -41,7 +41,12 @@
 	<fieldset>
 		<legend>
 			Posté par <strong><?= htmlspecialchars( $Comment[ 'author' ] ) ?></strong> le <?= $Comment[ 'date' ] ?>
-			<?= $action_a[$Comment['id']] ?>
+			<?php if (!empty($Comment['action_a'])): ?>
+				-
+				<?php foreach ($Comment['action_a'] as $action_a): ?>
+					<a href=<?= $action_a['link'] ?>><?= $action_a['label'] ?></a>
+				<?php endforeach; ?>
+			<?php endif; ?>
 		</legend>
 		<p>
 			<?= nl2br( htmlspecialchars( $Comment[ 'content' ] ) ) ?>

@@ -35,6 +35,19 @@ class Comment extends Entity {
 	 * @var $date \DateTime
 	 */
 	protected $date;
+	/**
+	 * Liste des liens donnant les actions possibles sur l'entité
+	 *
+	 * @var $action_a array[]
+	 */
+	protected $action_a;
+	
+	public function __construct( array $values = array() ) {
+		parent::__construct( $values );
+		if (!isset($this->action_a)) {
+			$this->action_a = [];
+		}
+	}
 	
 	/**
 	 * Vérifie si le commentaire est valide.
@@ -71,6 +84,13 @@ class Comment extends Entity {
 	 */
 	public function date() {
 		return $this->date;
+	}
+	
+	/**
+	 * @return array[]|array array si vide.
+	 */
+	public function action_a() {
+		return $this->action_a;
 	}
 	
 	/**
@@ -120,5 +140,16 @@ class Comment extends Entity {
 	 */
 	public function formatDate() {
 		$this->date = $this->date->format('d/m/Y à H\hi');
+	}
+	
+	/**
+	 * Ajoute une UNIQUE action à afficher au commentaire.
+	 *
+	 * @param array $action
+	 */
+	public function setAction_a(array $action) {
+		if (!in_array($action, $this->action_a)) {
+			$this->action_a[] = $action;
+		}
 	}
 }

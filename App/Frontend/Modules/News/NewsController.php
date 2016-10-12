@@ -89,21 +89,18 @@ class NewsController extends BackController {
 		// Afficher les commentaires
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
 		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
-		
-		$action_a = null;
 		foreach ($Liste_comments_a as $Comment) {
 			$Comment->formatDate();
-			// Générer les actions dans tous les cas
-			$action_a[$Comment->id()] = '- <a href="admin/comment-update-'.$Comment->id().'.html">Modifier</a>
-				| <a href="admin/comment-delete-'.$Comment->id().'.html">Supprimer</a>';
-		}
-		
-		if ($this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN) {
-			$this->page->addVar( 'action_a', $action_a);
-		}
-		else {
-			// Ne pas intégrer les actions si l'utilisateur n'a pas les droits
-			$this->page->addVar( 'action_a', null);
+			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+				$Comment->setAction_a( [
+					'link'  => 'admin/comment-update-' . $Comment->id() . '.html',
+					'label' => 'Modifier'
+				] );
+				$Comment->setAction_a( [
+					'link'  => 'admin/comment-delete-' . $Comment->id() . '.html',
+					'label' => 'Supprimer'
+				] );
+			}
 		}
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
@@ -158,7 +155,7 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			//$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
+			$this->app->httpResponse()->redirect( 'news-' . $Request->getData( 'id' ) . '.html' );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue

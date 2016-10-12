@@ -74,9 +74,6 @@ class NewsController extends BackController {
 						'image_source' => '../images/delete.png',
 						'alternative_text' => 'Supprimer']);
 				}
-				else {
-					$action_a[ $News->id() ] = '';
-				}
 			}
 			$this->page->addVar( 'News_list_a', $News_list_a );
 			$this->page->addVar( 'news_count', $News_manager->countNewsc() );

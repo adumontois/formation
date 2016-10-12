@@ -43,7 +43,11 @@ class News extends Entity {
 	 * @var $dateupdate \DateTime
 	 */
 	protected $dateupdate;
-	
+	/**
+	 * Liste des liens donnant les actions possibles sur l'entité
+	 *
+	 * @var $action_a array[]
+	 */
 	protected $action_a;
 	
 	public function __construct( array $values ) {
@@ -145,6 +149,17 @@ class News extends Entity {
 	}
 	
 	/**
+	 * Ajoute une UNIQUE action à afficher à la news.
+	 *
+	 * @param array $action
+	 */
+	public function setAction_a(array $action = array()) {
+		if (!in_array($action, $this->action_a)) {
+			$this->action_a[] = $action;
+		}
+	}
+	
+	/**
 	 * @return User
 	 */
 	public function User() {
@@ -184,14 +199,8 @@ class News extends Entity {
 	}
 	
 	/**
-	 * Ajoute une action à afficher à la news.
-	 *
-	 * @param array $action
+	 * @return array[]|array array si vide.
 	 */
-	public function setAction_a(array $action) {
-		$this->action_a[] = $action;
-	}
-	
 	public function action_a() {
 		return $this->action_a;
 	}
