@@ -7,7 +7,7 @@
 /**
  * @var $User    \OCFram\User Session utilisateur
  * @var $content string Contenu de la page générée
- * @var $menu string Panneau menu personnalisé en fonction de l'authentification
+ * @var $menu_a array[] Panneau menu personnalisé en fonction de l'authentification
  * @var $flash string Affichage du flash (message à l'utilisateur)
  */
 
@@ -34,13 +34,17 @@
 			
 			<nav>
 				<ul>
-					<?= isset($menu) ? $menu : '' ?>
+					<?php foreach ($menu_a as $element_a): ?>
+						<li><a href="<?= $element_a['link'] ?>"><?= $element_a['label']?></a></li>
+					<?php endforeach; ?>
 				</ul>
 			</nav>
 			
 			<div id="content-wrap">
 				<section id="main">
-					<?= isset($flash) ? $flash : '' ?>
+					<?php if(isset($flash)): ?>
+						<p style="text-align: center;"><?= $flash ?></p>
+					<?php endif ?>
 					<?= $content ?>
 				</section>
 			</div>

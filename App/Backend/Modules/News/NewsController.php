@@ -63,13 +63,16 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
 			$News_list_a = $News_manager->getNewscSortByIdDesc();
-			$action_a    = array();
 			foreach ( $News_list_a as $News ) {
 				$News->format();
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
 				if ( $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id() ) {
-					$action_a[ $News->id() ] = '<a href="news-update-' . $News->id() . '.html"><img src="../images/update.png" alt="Modifier" /></a>
-						<a href="news-delete-' . $News->id() . '.html"><img src="../images/delete.png" alt="Supprimer" /></a>';
+					$News->setAction_a(['action_link' => 'news-update-'. $News->id().'.html',
+						'image_source' => '../images/update.png',
+						'alternative_text' => 'Modifier']);
+					$News->setAction_a(['action_link' => 'news-delete-'. $News->id().'.html',
+						'image_source' => '../images/delete.png',
+						'alternative_text' => 'Supprimer']);
 				}
 				else {
 					$action_a[ $News->id() ] = '';
@@ -77,7 +80,6 @@ class NewsController extends BackController {
 			}
 			$this->page->addVar( 'News_list_a', $News_list_a );
 			$this->page->addVar( 'news_count', $News_manager->countNewsc() );
-			$this->page->addVar( 'action_a', $action_a );
 		}
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );

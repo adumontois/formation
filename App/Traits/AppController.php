@@ -26,26 +26,31 @@ trait AppController {
 		/**
 		 * @var $this BackController
 		 */
-		// Générer le menu de boutons-liens
-		$menu = '<li><a href="/">Accueil</a></li>';
+		// Générer les labels et liens de la vue
+		//<li><a href="/">Accueil</a></li>
+		
+		$menu_a = [['label' => 'Accueil',
+						  'link' => '/']];
 		if ( $this->app()->user()->isAuthenticated() ) {
-			$menu .= '<li><a href="/admin/">' . ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ' (connecté)</a></li>
-				<li><a href="/logout.html">Déconnexion</a></li>
-				<li><a href="/admin/news-insert.html">Ajouter une news</a></li>';
+			$menu_a[] = ['label' => ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ). ' (connecté)',
+					   'link' => '/admin/'];
+			$menu_a[] = ['label' => 'Déconnexion',
+						'link' => '/logout.html'];
+			$menu_a[] = ['label' => 'Ajouter une news',
+						 'link' => '/admin/news-insert.html'];
 		}
 		else {
-			$menu .= '<li><a href="/create-account.html">Inscription</a></li>
-				<li><a href="/connect.html">Connexion</a></li>';
+			$menu_a[] = ['label' => 'Inscription',
+						 'link' => '/create-account.html'];
+			$menu_a[] = ['label' => 'Connexion',
+						'link' => '/connect.html'];
 		}
-		$this->page()->addVar( 'menu', $menu );
+		$this->page()->addVar( 'menu_a', $menu_a );
 		
 		// Générer le flash
 		if ( $this->app()->user()->hasFlash() ) {
-			$flash = '<p style="text-align: center;">' . $this->app()->user()->getFlash() . '</p>';
+			$flash = $this->app()->user()->getFlash();
+			$this->page()->addVar( 'flash', $flash );
 		}
-		else {
-			$flash = '';
-		}
-		$this->page()->addVar('flash', $flash);
 	}
 }

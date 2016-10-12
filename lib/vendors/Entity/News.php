@@ -44,6 +44,15 @@ class News extends Entity {
 	 */
 	protected $dateupdate;
 	
+	protected $action_a;
+	
+	public function __construct( array $values ) {
+		parent::__construct( $values );
+		if (!isset($this->action_a)) {
+			$this->action_a = [];
+		}
+	}
+	
 	/**
 	 * Vérifie si la news est valide.
 	 *
@@ -172,5 +181,18 @@ class News extends Entity {
 	 */
 	public function dateupdate() {
 		return $this->dateupdate;
+	}
+	
+	/**
+	 * Ajoute une action à afficher à la news.
+	 *
+	 * @param array $action
+	 */
+	public function setAction_a(array $action) {
+		$this->action_a[] = $action;
+	}
+	
+	public function action_a() {
+		return $this->action_a;
 	}
 }

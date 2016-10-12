@@ -70,6 +70,9 @@ class HTTPResponse extends ApplicationComponent {
 			case self::SERVICE_TEMPORARY_UNAVAILABLE:
 				$this->addHeader( 'HTTP/1.0 503 Service Temporarily Unavailable' );
 				break;
+			case self::NOT_FOUND:
+				$this->addHeader( 'HTTP/1.0 404 not found' );
+				break;
 			default:
 				$this->addHeader( 'HTTP/1.0 404 not found' );
 				$this->page->addVar( 'inexistant', 'Page associated to error ' . $error_number . ' doesn\'t exists' );

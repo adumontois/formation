@@ -43,7 +43,9 @@
 				<?php endif; ?>
 			</td>
 			<td class="action">
-				<?= $action_a[$News['id']] ?>
+				<?php foreach ($News['action_a'] as $action_a): ?>
+					<a href="<?= $action_a['action_link'] ?>"><img src="<?= $action_a['image_source'] ?>" alt="<?= $action_a['alternative_text'] ?>" /></a>
+				<?php endforeach; ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>
