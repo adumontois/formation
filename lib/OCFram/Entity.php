@@ -15,7 +15,7 @@ namespace OCFram;
  *
  * Classe abstraite représentant une classe objet (news, commentaire...)
  */
-abstract class Entity implements \ArrayAccess {
+abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	use Hydrator;
 	/**
 	 * @var $id int ID de l'entité en DB. Vaut NULL si l'entité n'est pas encore insérée.
@@ -126,5 +126,10 @@ abstract class Entity implements \ArrayAccess {
 		if ( (int)$id > 0 ) {
 			$this->id = (int)$id;
 		}
+	}
+	
+	// Implémentation de JsonSerialisable
+	public function jsonSerialize() {
+		return get_object_vars($this);
 	}
 }

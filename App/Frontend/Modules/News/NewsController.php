@@ -33,6 +33,7 @@ class NewsController extends BackController {
 	 * @param Application $App
 	 * @param string      $module
 	 * @param string      $action
+	 * @param string	  $format
 	 */
 	public function __construct( Application $App, $module, $action, $format ) {
 		parent::__construct( $App, $module, $action, $format, 'news' );
@@ -105,15 +106,30 @@ class NewsController extends BackController {
 				] );
 			}
 		}
-		// Générer les liens affichés dans la page web
-		$link_a                       = array();
-		$link_a[ 'putInsertComment' ] = Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'putInsertComment', array( 'id' => (int)$News->id() ) );
+
+		
+		// Construire le formulaire
+		$Commentaire = new Comment();
+		// Préremplir le champ auteur si l'utilisateur est connecté
+		if ( $this->app->user()->isAuthenticated() ) {
+			$User_manager = $this->managers->getManagerOf( 'User' );
+			$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
+			if ( null != $User ) {
+				$Commentaire->setAuthor( $User->login() );
+			}
+		}
+		
+		$Form_builder = new CommentFormBuilder( $Commentaire );
+		$Form_builder->build();
+		$Form = $Form_builder->form();
+		
 		
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', $this->app->user() );
-		$this->page->addVar( 'link_a', $link_a );
+		$this->page->addVar( 'form', $Form->createView());
+		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction('Frontend', 'News', 'putInsertComment', array('id' => (int)$News->id())));
 		$this->run();
 	}
 	
@@ -169,16 +185,49 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
 		$this->page->addVar( 'form', $Form_builder->form()->createView() );
-		
+		// Rajouter le lien d'action du formulaire
+		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction('Frontend', 'News', 'putInsertComment', array('id' => (int)$Request->getData('id'))));
 		$this->run();
 	}
 	
 	/**
-	 * Methode pour gerer l'insertion d'un commentaire depuis une requete ajax
+	 * Methode pour gerer l'insertion d'un commentaire depuis une requête Ajax
+	 *
 	 * @param HTTPRequest $Request
+	 *
+	 * @return string|false Retourne un commentaire JSON s'il a été inséré, false sinon.
 	 */
 	public function executePutInsertCommentFromAjax( HTTPRequest $Request  ) {
+		/**
+		 * @var NewsManager    $News_manager
+		 * @var UserManagerPDO $User_manager
+		 * @var User           $User
+		 */
 		
-		$this->run();
+		// Il est important de ne faire que les vérifs et l'insertion en DB - tout le reste doit être géré en JS.
+		// Format des données reçues ??? A voir si modif à faire
+		// Est-ce qu'on peut rediriger en cas d'erreur ??? A voir aussi
+		
+		$News_manager = $this->managers->getManagerOf();
+		if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+			$this->app->httpResponse()
+					  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
+		}
+		$Commentaire = new Comment( array(
+			'fk_SNC'  => $Request->getData( 'id' ),
+			'author'  => $Request->postData( 'author' ),
+			'content' => $Request->postData( 'content' ),
+		) );
+		
+		// Construction du formulaire
+		// 1) Données values
+		$Form_builder = new CommentFormBuilder( $Commentaire );
+		// 2) Construction et vérification des données
+		$Form_builder->build();
+		$Form = $Form_builder->form();
+		
+		// Sauvegarde avec le handler
+		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
+		return $Form_handler->process() ? json_decode($Commentaire) : false;
 	}
 }
