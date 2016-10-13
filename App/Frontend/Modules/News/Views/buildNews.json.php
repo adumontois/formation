@@ -26,10 +26,7 @@
 	</p>
 <?php endif; ?>
 
-<p class="no-comment">
-	<a href="<?= $link_a[ 'putInsertComment' ] ?>">Ajouter un commentaire</a>
-	<button class="insert-comment">Insérer</button>
-</p>
+<button class="insert-comment">Insérer le commentaire arbitraire</button>
 
 <?php if ( empty( $Comment_list_a ) ): ?>
 	<p id="no-comment">
@@ -54,14 +51,14 @@
 	</fieldset>
 <?php endforeach; ?>
 
-<p class="no-comment">
-	<a href="<?= $link_a[ 'putInsertComment' ] ?>">Ajouter un commentaire</a>
-	<button class="insert-comment">Insérer</button>
-</p>
+
+<button class="insert-comment">Insérer le commentaire arbitraire</button>
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript">
+	// Fonction pour insérer un commentaire arbitraire sur la page
+	// La connexion sur la DB n'est pas assurée pour l'instant
 	$( function() {
 		$( ".insert-comment" ).click( function() {
 			// Test
@@ -75,30 +72,19 @@
 			var string = JSON.stringify( comment );
 			var html   = jQuery.parseJSON( string );
 			
-			// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire
-			
+			// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire. On le formate en HTML
 			var new_comment = $( "<fieldset></fieldset>" )
 					.append( $( "<legend></legend>" ).append( "Posté par ", $( "<strong></strong>" ).text( html[ 'author' ] ), ' le ', html[ 'date' ] ) );
 			new_comment.prepend( $( "<p></p>" ).text( comment[ 'content' ] ) );
 			
-			/*
-			 node2 = document.createElement( 'legend' );
-			 node.appendChild( node2 );
-			 node2.innerHTML = 'Posté par <strong>' + html[ 'author' ] + '</strong> le ' + html[ 'date' ];
-			 node3           = document.createElement( 'p' );
-			 node.appendChild( node3 );
-			 node3.textContent = html[ 'content' ];
-			 */
-			
 			// Sélectionner l'endroit d'insertion
 			var insert_location = $( "#main fieldset" )[ 0 ];
 			if ( typeof insert_location === 'undefined' ) {
-				insert_location = $( "#main .no-comment" )[ 1 ];
-				// On supprime le message disant qu'il n'y a pas de commentaire
+				// S'il n'y a pas encore de commentaire, on se repère par rapport au bouton du bas, on insère au-dessus de celui-ci, et on retire le message disant qu'il n'y a pas de commentaire.
+				insert_location = $( ".insert-comment" )[ 1 ];
 				$( "#no-comment" ).remove();
 			}
-			
-			// Insérer le noeud
+			// Insérer le commentaire en top commentaire
 			$( new_comment ).insertBefore( insert_location );
 		} )
 	} )
