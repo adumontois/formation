@@ -100,6 +100,8 @@ abstract class NewsManager extends Manager {
 	 * Vérifie si la news d'id donné existe. Renvoie true si elle existe, false sinon.
 	 *
 	 * @param $newsc_id int
+	 *
+	 * @return bool
 	 */
 	abstract public function existsNewscUsingNewscId($newsc_id);
 }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <routes>
 	<route url="/" module="News" action="buildIndex" />
-	<route url="/news-([0-9]+)\.html" module="News" action="buildNews" vars="id" />
+	<route url="/news-([0-9]+)\.html" module="News" action="buildNews" vars="id"  />
 	<route url="/commenter-([0-9]+)\.html" module="News" action="putInsertComment" vars="id" />
 	<route url="/create-account.html" module="Connection" action="putUser" />
 	<route url="/logout.html" module="Connection" action="clearConnection" />
 	<route url="/connect.html" module="Connection" action="getConnection" />
+	<route url="/commenter-([0-9]+)\.json" module="News" action="putInsertCommentFromAjax" vars="id" format="json" />
 </routes>

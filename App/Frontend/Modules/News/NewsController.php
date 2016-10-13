@@ -34,8 +34,8 @@ class NewsController extends BackController {
 	 * @param string      $module
 	 * @param string      $action
 	 */
-	public function __construct( Application $App, $module, $action ) {
-		parent::__construct( $App, $module, $action, 'news' );
+	public function __construct( Application $App, $module, $action, $format ) {
+		parent::__construct( $App, $module, $action, $format, 'news' );
 	}
 	
 	/**
@@ -56,12 +56,14 @@ class NewsController extends BackController {
 
 		// Récupérer la liste des news à afficher
 		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
+
 		foreach ( $Liste_news_a as $News ) {
 			// Prendre le nombre de caractères nécessaires
 			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
 			if ( strlen( $News->content() ) == $longueur_news ) {
 				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
 			}
+			$News->setAction_a(array( 'build' => Router::getUrlFromModuleAndAction('Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id()))));
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
@@ -167,6 +169,15 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
 		$this->page->addVar( 'form', $Form_builder->form()->createView() );
+		
+		$this->run();
+	}
+	
+	/**
+	 * Methode pour gerer l'insertion d'un commentaire depuis une requete ajax
+	 * @param HTTPRequest $Request
+	 */
+	public function executePutInsertCommentFromAjax( HTTPRequest $Request  ) {
 		
 		$this->run();
 	}

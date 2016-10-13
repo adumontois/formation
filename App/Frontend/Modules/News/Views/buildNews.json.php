@@ -26,7 +26,17 @@
 	</p>
 <?php endif; ?>
 
-<button class="insert-comment">Insérer le commentaire arbitraire</button>
+
+<fieldset>
+	<form id="test" method="post" onsubmit="return false;">
+		<label>Pseudo</label>
+		<input type="text" name="author" />
+		<label>Votre message</label>
+		<textarea name="content"></textarea>
+		<button class="insert-comment">Insérer le commentaire arbitraire</button>
+	</form>
+</fieldset>
+
 
 <?php if ( empty( $Comment_list_a ) ): ?>
 	<p id="no-comment">
@@ -51,9 +61,15 @@
 	</fieldset>
 <?php endforeach; ?>
 
-
-<button class="insert-comment">Insérer le commentaire arbitraire</button>
-
+<fieldset>
+	<form id="test" method="post" onsubmit="return false;">
+		<label>Pseudo</label>
+		<input type="text" name="author" />
+		<label>Votre message</label>
+		<textarea name="content"></textarea>
+		<button class="insert-comment">Insérer le commentaire arbitraire</button>
+	</form>
+</fieldset>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript">
@@ -62,30 +78,31 @@
 	$( function() {
 		$( ".insert-comment" ).click( function() {
 			// Test
-			var comment = {
+			var html = {
 				author  : 'Mon_auteur',
 				content : 'Ceci est un contenu.',
-				date    : '13/10/2016 à 14h24'
+				date    : '13/10/2016 à 14h24',
 			};
 			
-			// Transformer la variable en string JSON
-			var string = JSON.stringify( comment );
-			var html   = jQuery.parseJSON( string );
 			
 			// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire. On le formate en HTML
 			var new_comment = $( "<fieldset></fieldset>" )
-					.append( $( "<legend></legend>" ).append( "Posté par ", $( "<strong></strong>" ).text( html[ 'author' ] ), ' le ', html[ 'date' ] ) );
-			new_comment.prepend( $( "<p></p>" ).text( comment[ 'content' ] ) );
+					.append( $( "<legend></legend>" )
+							.append( "Posté par ", $( "<strong></strong>" )
+									.text( html.author ), ' le ', html.date ) );
+			new_comment.prepend( $( "<p></p>" ).text( html.content ) );
 			
-			// Sélectionner l'endroit d'insertion
-			var insert_location = $( "#main fieldset" )[ 0 ];
-			if ( typeof insert_location === 'undefined' ) {
-				// S'il n'y a pas encore de commentaire, on se repère par rapport au bouton du bas, on insère au-dessus de celui-ci, et on retire le message disant qu'il n'y a pas de commentaire.
-				insert_location = $( ".insert-comment" )[ 1 ];
-				$( "#no-comment" ).remove();
+			// Supprimer le message "pas de commentaires"
+			var no_comment_message = $( "#no-comment" );
+			if ( no_comment_message ) {
+				// S'il n'y a pas encore de commentaire, on retire le message disant qu'il n'y a pas de commentaire.
+				no_comment_message.remove();
 			}
+			
 			// Insérer le commentaire en top commentaire
-			$( new_comment ).insertBefore( insert_location );
+			$( new_comment ).insertBefore( $( "#main fieldset" )[ 1 ] );
 		} )
-	} )
+	} );
+
+
 </script>

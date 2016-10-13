@@ -23,16 +23,22 @@ class Page extends ApplicationComponent {
 	 * @var $vars array Tableau associatif donnant à chaque variable de la vue sa valeur
 	 */
 	protected $vars;
+	/**
+	 * @var $format string Format de la page (html, json, etc.)
+	 */
+	protected $format;
 	
 	/**
 	 * Construit une page vierge à partir de l'application choisie
 	 *
 	 * @param Application $app
+	 * @param string $format Format de la page à afficher (html, json, etc.)
 	 */
-	public function __construct( Application $app ) {
+	public function __construct( Application $app, $format = 'html' ) {
 		parent::__construct( $app );
 		$this->contentFile = '';
 		$this->vars        = array();
+		$this->format	   = $format;
 	}
 	
 	/**
@@ -74,7 +80,7 @@ class Page extends ApplicationComponent {
 		
 		ob_start();
 		
-		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.json.php'; // Construction dynamique du chemin de layout OK
+		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.'.$this->format.'.php'; // Construction dynamique du chemin de layout OK
 		
 		return ob_get_clean();
 	}
@@ -89,5 +95,12 @@ class Page extends ApplicationComponent {
 			throw new \InvalidArgumentException( 'View file name must be a non NULL string' );
 		}
 		$this->contentFile = $contentFile;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function format() {
+		return $this->format;
 	}
 }

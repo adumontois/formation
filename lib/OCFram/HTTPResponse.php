@@ -54,7 +54,7 @@ class HTTPResponse extends ApplicationComponent {
 	 */
 	public function redirectError( $error_number, \Exception $error ) {
 		$this->page = new Page( $this->app() );
-		$this->page->setContentFile( __DIR__ . '\..\..\Errors\\' . $error_number . '.html' );
+		$this->page->setContentFile( __DIR__ . '\..\..\Errors\\' . $error_number . '.' . $this->page->format() );
 		$this->page->addVar( 'erreur', $error->getMessage() );
 		switch ( $error_number ) {
 			case self::BAD_REQUEST:

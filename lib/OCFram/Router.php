@@ -27,25 +27,37 @@ class Router extends ApplicationComponent {
 	 * @param $app_name string Nom de l'application dont les routes doivent être générées
 	 */
 	static public function generateRoutes( $app_name ) {
+		/**
+		 * @var $route \DOMElement
+		 */
 		// 1) Aller chercher dans la liste des routes toutes les routes existantes
 		$xml = new \DOMDocument();
 		$xml->load( __DIR__ . '/../../App/' . $app_name . '/Config/routes.xml' );
 		$route_list = $xml->getElementsByTagName( 'route' );
 		foreach ( $route_list as $route ) {
-			/**
-			 * @var $route \DOMElement
-			 */
-			$vars = array();
-			if ( $route->hasAttribute( 'vars' ) ) // Récupérer les arguments nécessaires à la route
-			{
+			
+			// Récupérer les arguments nécessaires à la route
+			if ( $route->hasAttribute( 'vars' ) ) {
 				$vars = explode( ',', $route->getAttribute( 'vars' ) );
 			}
+			else {
+				$vars = array();
+			}
+			if ( $route->hasAttribute( 'format' ) ) {
+				$format = $route->getAttribute( 'format' );
+			}
+			else {
+				// Le format par défaut d'une route est le format html
+				$format = 'html';
+			}
+			
 			// Ajouter la route au routeur les arguments passés
 			self::addRoute( $app_name, new Route( array(
 				'action'    => $route->getAttribute( 'action' ),
 				'module'    => $route->getAttribute( 'module' ),
 				'url'       => $route->getAttribute( 'url' ),
 				'varsNames' => $vars,
+				'format'	=> $format,
 			) ) );
 		}
 	}
@@ -57,7 +69,7 @@ class Router extends ApplicationComponent {
 	 * @param Route  $route
 	 */
 	static public function addRoute( $app_name, Route $route ) {
-		if ( !isset(self::$routes[$app_name]) OR !in_array( $route, self::$routes[ $app_name ] ) ) {
+		if ( !isset( self::$routes[ $app_name ] ) OR !in_array( $route, self::$routes[ $app_name ] ) ) {
 			self::$routes[ $app_name ][] = $route;
 		}
 	}
@@ -66,25 +78,25 @@ class Router extends ApplicationComponent {
 	 * Récupère une URL à partir du nom du module et de l'action souhaitée.
 	 * Si l'URL à récupérer nécessite des paramètres, ils sont indiqués dans given_values_a.
 	 *
-	 * @param string $app			 Nom de l'application (Frontend, Backend...)
+	 * @param string $app            Nom de l'application (Frontend, Backend...)
 	 * @param string $module         Le module souhaité
 	 * @param string $action         L'action souhaitée
 	 * @param array  $given_values_a Les variables nécessaires dans l'Url
 	 *
 	 * @return string L'URL calculée
 	 */
-	static public function getUrlFromModuleAndAction($app, $module, $action, $given_values_a = array() ) {
+	static public function getUrlFromModuleAndAction( $app, $module, $action, $given_values_a = array() ) {
 		if ( !isset( self::$routes[ $app ] ) ) {
 			// Si les routes d' l'application n'existent pas, on les crée et on les rajoute.
-			self::generateRoutes($app);
+			self::generateRoutes( $app );
 		}
 		
 		// 1) Aller chercher dans la liste des routes toutes les routes existantes
-		foreach ( self::$routes[$app] as $Route ) {
+		foreach ( self::$routes[ $app ] as $Route ) {
 			/**
 			 * @var $Route Route
 			 */
-			if ( $Route->module() === $module AND $Route->action() === $action ) {
+			if ( $Route->module() === $module && $Route->action() === $action ) {
 				// On a trouvé un module et une action qui correspondent : on vérifie si on a le bon nombre de paramètres
 				$route_attribute_count = count( $Route->varsNames() );
 				if ( count( $given_values_a ) === $route_attribute_count ) {
@@ -119,7 +131,6 @@ class Router extends ApplicationComponent {
 		// Si on n'a pas trouvé, c'est que la route est incorrecte
 		throw new \InvalidArgumentException( 'Impossible de trouver l\'action ' . $action . ' dans le module ' . $module . ' de l\'application ' . $app );
 	}
-		
 	
 	/**
 	 * @return Route[][]
@@ -138,7 +149,7 @@ class Router extends ApplicationComponent {
 	 */
 	public function getRoute( $url ) {
 		// Trouver la route qui matche l'url fournie
-		foreach ( self::$routes[$this->app->name()] as $route ) {
+		foreach ( self::$routes[ $this->app->name() ] as $route ) {
 			$varsValues = $route->match( $url );
 			if ( $varsValues !== false AND $route->hasVars() ) // Si on a des variables, on doit les récupérer pour les faire transiter dans l'URL
 			{
@@ -165,6 +176,6 @@ class Router extends ApplicationComponent {
 	
 	public function resetRouter() {
 		self::$routes = array();
-		self::generateRoutes($this->app->name());
+		self::generateRoutes( $this->app->name() );
 	}
 }

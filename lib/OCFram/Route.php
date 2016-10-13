@@ -36,6 +36,10 @@ class Route {
 	 * @var $vars array Valeurs des variables nécessaires à la route
 	 */
 	protected $vars;
+	/**
+	 * @var $format string Format d'affichage de la page (html, json, etc.)
+	 */
+	protected $format;
 	
 	/**
 	 * Construit une nouvelle route en l'hydratant.
@@ -126,6 +130,15 @@ class Route {
 	}
 	
 	/**
+	 * Setter pour l'attribut format
+	 *
+	 * @param string $format Format de la page (html, json, etc.)
+	 */
+	public function setFormat($format) {
+		$this->format = $format;
+	}
+	
+	/**
 	 * @return string
 	 */
 	public function action() {
@@ -158,5 +171,12 @@ class Route {
 	 */
 	public function vars() {
 		return $this->vars;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function format() {
+		return $this->format;
 	}
 }
