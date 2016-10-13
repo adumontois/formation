@@ -79,17 +79,71 @@
 									.text( html.author ), ' le ', html.date ) );
 			new_comment.prepend( $( "<p></p>" ).text( html.content ) );
 			
+
+			
 			// Supprimer le message "pas de commentaires"
 			var no_comment_message = $( "#no-comment" );
 			if ( no_comment_message ) {
 				// S'il n'y a pas encore de commentaire, on retire le message disant qu'il n'y a pas de commentaire.
 				no_comment_message.remove();
+
 			}
 			
+			// Endroit d'insertion
+			insert_location = $( "#main fieldset" )[ 0 ];
+			if (typeof insert_location === 'undefined') {
+				insert_location = $( "#putInsertComment" )[ 0 ];
+			}
+			
+			console.log(insert_location);
 			// Insérer le commentaire en top commentaire
-			$( new_comment ).insertBefore( $( "#main fieldset" )[ 1 ] );
+			$( new_comment ).insertBefore( insert_location );
 		} )
 	} );
-
+	
+	// Fonction pour traiter l'envoi du formulaire
+	$('#putInsertComment').submit(function( event ) {
+		// Empêcher l'envoi au contrôleur html
+		event.preventDefault();
+		
+		// Ecriture de la requête Ajax
+		$.ajax({
+			url: "/commenter-16.json", // à générer dynamiquement
+			type: "POST",
+			data: "author=" + $("#putInsertComment")[0].author.value + "&content=" + $("#putInsertComment")[0].content.value,
+			datatype: "json",
+			success: function(json, status) {
+				
+				console.log(json);
+				
+				// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire. On le formate en HTML
+				var new_comment = $( "<fieldset></fieldset>" )
+						.append( $( "<legend></legend>" )
+								.append( "Posté par ", $( "<strong></strong>" )
+										.text( json.author ), ' le ', json.date ) );
+				new_comment.prepend( $( "<p></p>" ).text( json.content ) );
+				
+				
+				
+				// Supprimer le message "pas de commentaires"
+				var no_comment_message = $( "#no-comment" );
+				if ( no_comment_message ) {
+					// S'il n'y a pas encore de commentaire, on retire le message disant qu'il n'y a pas de commentaire.
+					no_comment_message.remove();
+					
+				}
+				
+				// Endroit d'insertion
+				insert_location = $( "#main fieldset" )[ 0 ];
+				if (typeof insert_location === 'undefined') {
+					insert_location = $( "#putInsertComment" )[ 0 ];
+				}
+				
+				console.log(insert_location);
+				// Insérer le commentaire en top commentaire
+				$( new_comment ).insertBefore( insert_location );
+			}
+		})
+	});
 
 </script>

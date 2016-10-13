@@ -67,7 +67,17 @@ class Page extends ApplicationComponent {
 		 * @var User $User utilisée dans les vues
 		 */
 		$User = $this->app->user();
+		
+		if ($this->format == 'json') {
+			// On serialize toutes les Entity passées en paramètre
+			foreach ($this->vars as 	&$element) {
+				if ( $element instanceof Entity ) {
+					$element = json_encode($element);
+				}
+			}
+		}
 		extract( $this->vars );
+		
 		
 		
 		// Créer la page en bufferisation

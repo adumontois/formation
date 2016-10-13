@@ -14,7 +14,9 @@ use Entity\News;
 use Entity\User;
 use FormBuilder\CommentFormBuilder;
 use Model\CommentsManager;
+use Model\CommentsManagerPDO;
 use Model\NewsManager;
+use Model\UserManager;
 use Model\UserManagerPDO;
 use OCFram\Application;
 use \OCFram\BackController;
@@ -33,7 +35,7 @@ class NewsController extends BackController {
 	 * @param Application $App
 	 * @param string      $module
 	 * @param string      $action
-	 * @param string	  $format
+	 * @param string      $format
 	 */
 	public function __construct( Application $App, $module, $action, $format ) {
 		parent::__construct( $App, $module, $action, $format, 'news' );
@@ -50,25 +52,25 @@ class NewsController extends BackController {
 		// Récupérer la config
 		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
 		$longueur_news = $this->app()->config()->get( 'longueur_news' );
-
+		
 		// Récupérer le manager des news
-
+		
 		$News_manager = $this->managers->getManagerOf();
-
+		
 		// Récupérer la liste des news à afficher
 		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
-
+		
 		foreach ( $Liste_news_a as $News ) {
 			// Prendre le nombre de caractères nécessaires
 			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
 			if ( strlen( $News->content() ) == $longueur_news ) {
 				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
 			}
-			$News->setAction_a(array( 'build' => Router::getUrlFromModuleAndAction('Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id()))));
+			$News->setAction_a( array( 'build' => Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id() ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
-
+		
 		$this->run();
 	}
 	
@@ -80,6 +82,7 @@ class NewsController extends BackController {
 		/**
 		 * @var $News_manager    NewsManager
 		 * @var $News            News
+		 * @var $User_manager    UserManager
 		 * @var $Comment_manager CommentsManager
 		 */
 		$News_manager = $this->managers->getManagerOf();
@@ -106,7 +109,7 @@ class NewsController extends BackController {
 				] );
 			}
 		}
-
+		
 		
 		// Construire le formulaire
 		$Commentaire = new Comment();
@@ -128,8 +131,8 @@ class NewsController extends BackController {
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', $this->app->user() );
-		$this->page->addVar( 'form', $Form->createView());
-		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction('Frontend', 'News', 'putInsertComment', array('id' => (int)$News->id())));
+		$this->page->addVar( 'form', $Form->createView() );
+		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$News->id() ) ) );
 		$this->run();
 	}
 	
@@ -186,7 +189,7 @@ class NewsController extends BackController {
 		// Passer le formulaire à la vue
 		$this->page->addVar( 'form', $Form_builder->form()->createView() );
 		// Rajouter le lien d'action du formulaire
-		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction('Frontend', 'News', 'putInsertComment', array('id' => (int)$Request->getData('id'))));
+		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		$this->run();
 	}
 	
@@ -197,11 +200,12 @@ class NewsController extends BackController {
 	 *
 	 * @return string|false Retourne un commentaire JSON s'il a été inséré, false sinon.
 	 */
-	public function executePutInsertCommentFromAjax( HTTPRequest $Request  ) {
+	public function executePutInsertCommentFromAjax( HTTPRequest $Request ) {
 		/**
-		 * @var NewsManager    $News_manager
-		 * @var UserManagerPDO $User_manager
-		 * @var User           $User
+		 * @var NewsManager     $News_manager
+		 * @var UserManager     $User_manager
+		 * @var User            $User
+		 * @var CommentsManager $Comments_manager
 		 */
 		
 		// Il est important de ne faire que les vérifs et l'insertion en DB - tout le reste doit être géré en JS.
@@ -228,6 +232,18 @@ class NewsController extends BackController {
 		
 		// Sauvegarde avec le handler
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
-		return $Form_handler->process() ? json_decode($Commentaire) : false;
+		
+		// Ca c'est la data que je veux retourner.
+		// Pas bon la serialization ici, il faut la faire ailleurs
+		if ( $Form_handler->process() ) {
+			// On va récupérer l'heure qui a été insérée en base
+			$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+			$Commentaire      = $Comments_manager->getCommentcUsingCommentcId( $Commentaire->id() );
+			$Commentaire->formatDate();
+			$this->page->addVar( 'Comment', $Commentaire );
+		}
+		else {
+			$this->page->addVar( 'Comment', false );
+		}
 	}
 }

@@ -14,7 +14,7 @@
 <h2>
 	Ajouter un commentaire
 </h2>
-<form action="<?= $form_action ?>" method="post">
+<form id="putInsertComment" action="<?= $form_action ?>" method="post">
 	<p>
 		<?= $form ?>
 		<input type="submit" value="Commenter" />

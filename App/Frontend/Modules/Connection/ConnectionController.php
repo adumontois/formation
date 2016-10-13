@@ -24,6 +24,12 @@ use OCFram\Router;
 
 class ConnectionController extends BackController {
 	use AppController;
+
+	
+	const DATABASE                 = 'news';
+	const DISCONNECTION_SUCCESSFUL = 'Vous avez été déconnecté de l\'interface de Mon super site.';
+	const REFUSED_CONNECTION       = 'La combinaison login-password entrée est incorrecte.';
+	
 	/**
 	 * ConnectionController constructor.
 	 * Construit un backcontroller en spécifiant la DB news
@@ -31,14 +37,10 @@ class ConnectionController extends BackController {
 	 * @param Application $App
 	 * @param string      $module
 	 * @param string      $action
+	 * @param string	  $format
 	 */
-	
-	const DATABASE                 = 'news';
-	const DISCONNECTION_SUCCESSFUL = 'Vous avez été déconnecté de l\'interface de Mon super site.';
-	const REFUSED_CONNECTION       = 'La combinaison login-password entrée est incorrecte.';
-	
-	public function __construct( Application $App, $module, $action ) {
-		parent::__construct( $App, $module, $action, self::DATABASE );
+	public function __construct( Application $App, $module, $action, $format ) {
+		parent::__construct( $App, $module, $action, $format, self::DATABASE );
 	}
 	
 	/**

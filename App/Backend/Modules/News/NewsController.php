@@ -45,8 +45,8 @@ class NewsController extends BackController {
 	 */
 	const DATABASE = 'news';
 	
-	public function __construct( Application $App, $module, $action ) {
-		parent::__construct( $App, $module, $action, self::DATABASE );
+	public function __construct( Application $App, $module, $action, $format ) {
+		parent::__construct( $App, $module, $action, $format, self::DATABASE );
 	}
 	
 	/**
