@@ -42,32 +42,31 @@ class NewsController extends BackController {
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml.
 	 */
 	public function executeBuildIndex() {
+		/**
+		 * @var $News_manager NewsManager
+		 * @var $Liste_news_a News[]
+		 */
+		// Récupérer la config
+		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
+		$longueur_news = $this->app()->config()->get( 'longueur_news' );
+
+		// Récupérer le manager des news
+
+		$News_manager = $this->managers->getManagerOf();
+
+		// Récupérer la liste des news à afficher
+		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
+		foreach ( $Liste_news_a as $News ) {
+			// Prendre le nombre de caractères nécessaires
+			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
+			if ( strlen( $News->content() ) == $longueur_news ) {
+				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
+			}
+		}
+		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
+		$this->page->addVar( 'News_list_a', $Liste_news_a );
+
 		$this->run();
-//		/**
-//		 * @var $News_manager NewsManager
-//		 * @var $Liste_news_a News[]
-//		 */
-//		// Récupérer la config
-//		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
-//		$longueur_news = $this->app()->config()->get( 'longueur_news' );
-//
-//		// Récupérer le manager des news
-//
-//		$News_manager = $this->managers->getManagerOf();
-//
-//		// Récupérer la liste des news à afficher
-//		$Liste_news_a = $News_manager->getNewscSortByIdDesc( 0, $nombre_news );
-//		foreach ( $Liste_news_a as $News ) {
-//			// Prendre le nombre de caractères nécessaires
-//			$News->setContent( substr( $News->content(), 0, $longueur_news ) );
-//			if ( strlen( $News->content() ) == $longueur_news ) {
-//				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
-//			}
-//		}
-//		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
-//		$this->page->addVar( 'News_list_a', $Liste_news_a );
-//
-//		$this->run();
 	}
 	
 	/**

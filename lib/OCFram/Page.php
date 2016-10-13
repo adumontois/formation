@@ -74,7 +74,7 @@ class Page extends ApplicationComponent {
 		
 		ob_start();
 		
-		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.html.php'; // Construction dynamique du chemin de layout OK
+		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.json.php'; // Construction dynamique du chemin de layout OK
 		
 		return ob_get_clean();
 	}
