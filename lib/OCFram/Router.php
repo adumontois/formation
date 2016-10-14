@@ -41,7 +41,6 @@ class Router extends ApplicationComponent {
 			// Le format par défaut d'une route est le format html
 			$format = $route->hasAttribute( 'format' ) ? $route->getAttribute( 'format' ) : 'html';
 			// Par défaut la route génère le layout
-			$generateLayout = $route->hasAttribute( 'generateLayout' ) ? (bool)$route->getAttribute( 'generateLayout' ) : true;
 			
 			// Ajouter la route au routeur les arguments passés
 			self::addRoute( $app_name, new Route( array(
@@ -50,7 +49,6 @@ class Router extends ApplicationComponent {
 				'url'            => $route->getAttribute( 'url' ),
 				'varsNames'      => $vars,
 				'format'         => $format,
-				'generateLayout' => $generateLayout,
 			) ) );
 		}
 	}

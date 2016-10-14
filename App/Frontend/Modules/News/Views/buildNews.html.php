@@ -26,7 +26,8 @@
 	</p>
 <?php endif; ?>
 
-<?php require "putInsertComment.html.php" ?>
+<?php $form_id = 'insert_comment_1'; ?>
+<?php require "form/insert_comment.html.php" ?>
 
 <button class="insert-comment">Insérer le commentaire arbitraire</button>
 
@@ -54,55 +55,16 @@
 	</fieldset>
 <?php endforeach; ?>
 
-<?php require "putInsertComment.html.php" ?>
+<?php $form_id = 'insert_comment_2'; ?>
+<?php require "form/insert_comment.html.php" ?>
 	
 <button class="insert-comment">Insérer le commentaire arbitraire</button>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript">
-	// Fonction pour insérer un commentaire arbitraire sur la page
-	// La connexion sur la DB n'est pas assurée pour l'instant
-	$( function() {
-		$( ".insert-comment" ).click( function() {
-			// Test
-			var html = {
-				author  : 'Mon_auteur',
-				content : 'Ceci est un contenu.',
-				date    : '13/10/2016 à 14h24',
-			};
-			
-			
-			// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire. On le formate en HTML
-			var new_comment = $( "<fieldset></fieldset>" )
-					.append( $( "<legend></legend>" )
-							.append( "Posté par ", $( "<strong></strong>" )
-									.text( html.author ), ' le ', html.date ) );
-			new_comment.prepend( $( "<p></p>" ).text( html.content ) );
-			
-
-			
-			// Supprimer le message "pas de commentaires"
-			var no_comment_message = $( "#no-comment" );
-			if ( no_comment_message ) {
-				// S'il n'y a pas encore de commentaire, on retire le message disant qu'il n'y a pas de commentaire.
-				no_comment_message.remove();
-
-			}
-			
-			// Endroit d'insertion
-			insert_location = $( "#main fieldset" )[ 0 ];
-			if (typeof insert_location === 'undefined') {
-				insert_location = $( "#putInsertComment" )[ 0 ];
-			}
-			
-			console.log(insert_location);
-			// Insérer le commentaire en top commentaire
-			$( new_comment ).insertBefore( insert_location );
-		} )
-	} );
-	
 	// Fonction pour traiter l'envoi du formulaire
-	$('#putInsertComment').submit(function( event ) {
+	$('.js-form-insert-comment').submit(function( event ) {
+		var $this = $(this);
 		// Empêcher l'envoi au contrôleur html
 		event.preventDefault();
 		
@@ -110,28 +72,46 @@
 		$.ajax({
 			url: "/commenter-16.json", // à générer dynamiquement
 			type: "POST",
-			data: "author=" + $("#putInsertComment")[0].author.value + "&content=" + $("#putInsertComment")[0].content.value,
-			datatype: "json",
+			data: {
+				author :  $this.find('[name=author]').val(),
+				content : $this.find('[name=content]').val()
+			},
+			dataType: "json",
 			success: function(json, status) {
+				console.log(json);
+				if (json.master_code != 0) {
+					console.error('Aie aie aie je m\'arrete la car j\'ai rencontré une erreur');
+					return;
+				}
+				
+				var Comment = json.content.Comment;
 				
 				// Parser la string JSON obtenue
-				json = JSON.parse(json);
+//				json = JSON.parse(json);
 				
 				// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire. On le formate en HTML
+				var new_comment_header;
 				var new_comment = $( "<fieldset></fieldset>" )
-						.append( $( "<legend></legend>" )
+						.append( new_comment_header = $( "<legend></legend>" )
 								.append( "Posté par ", $( "<strong></strong>" )
-										.text( json.author ), ' le ', json.date ) );
-				new_comment.prepend( $( "<p></p>" ).text( json.content ) );
+										.text( Comment.author ), ' le ', Comment.date ) );
 				
+				console.log(Comment.action_a);
+				if ( 0 !== Comment.action_a.length ) {
+					new_comment_header.append(' - ');
+					for (action in Comment.action_a) {
+						console.log(Comment.action_a[action]);
+						new_comment_header.append( $( "<a></a>" ).attr( "href", Comment.action_a[action].link ).text( Comment.action_a[action].label + ' ' ) );
+					}
+				};
 				
+				new_comment.append( $( "<p></p>" ).text( Comment.content ) );
 				
 				// Supprimer le message "pas de commentaires"
 				var no_comment_message = $( "#no-comment" );
 				if ( no_comment_message ) {
 					// S'il n'y a pas encore de commentaire, on retire le message disant qu'il n'y a pas de commentaire.
 					no_comment_message.remove();
-					
 				}
 				
 				// Endroit d'insertion
@@ -144,7 +124,7 @@
 				// Insérer le commentaire en top commentaire
 				$( new_comment ).insertBefore( insert_location );
 			}
-		})
+		});
 	});
 
 </script>

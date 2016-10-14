@@ -35,19 +35,6 @@ class NewsController extends BackController {
 	 * Utiliser la génération du menu.
 	 */
 	use AppController;
-	/**
-	 * NewsController constructor.
-	 * Construit un backcontroller en spécifiant la DB news
-	 *
-	 * @param Application $App
-	 * @param string      $module
-	 * @param string      $action
-	 */
-	const DATABASE = 'news';
-	
-	public function __construct( Application $App, $module, $action, $format, $generateLayout ) {
-		parent::__construct( $App, $module, $action, $format, $generateLayout, self::DATABASE );
-	}
 	
 	/**
 	 * Récupère toutes les news disponibles en DB.

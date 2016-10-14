@@ -26,22 +26,9 @@ class ConnectionController extends BackController {
 	use AppController;
 
 	
-	const DATABASE                 = 'news';
 	const DISCONNECTION_SUCCESSFUL = 'Vous avez été déconnecté de l\'interface de Mon super site.';
 	const REFUSED_CONNECTION       = 'La combinaison login-password entrée est incorrecte.';
-	
-	/**
-	 * ConnectionController constructor.
-	 * Construit un backcontroller en spécifiant la DB news
-	 *
-	 * @param Application $App
-	 * @param string      $module
-	 * @param string      $action
-	 * @param string	  $format
-	 */
-	public function __construct( Application $App, $module, $action, $format, $generateLayout ) {
-		parent::__construct( $App, $module, $action, $format, $generateLayout, self::DATABASE );
-	}
+
 	
 	/**
 	 * Vérifie si les identifiants de connexion sont corrects, et redirige vers l'accueil du site si c'est le cas.

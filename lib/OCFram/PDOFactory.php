@@ -18,12 +18,10 @@ class PDOFactory {
 	/**
 	 * Récupère un DAO de connexion à la base $dbname pour le SGBD Mysql.
 	 *
-	 * @param $dbname string
-	 *
 	 * @return \PDO
 	 */
-	static public function getPDO( $dbname ) {
-		$db = new \PDO( 'mysql:host=localhost;dbname=' . $dbname, 'root', 'root' );
+	static public function getPDO( ) {
+		$db = new \PDO( 'mysql:host=localhost;dbname=news', 'root', 'root' );
 		$db->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
 		
 		return $db;

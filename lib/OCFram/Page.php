@@ -27,24 +27,19 @@ class Page extends ApplicationComponent {
 	 * @var $format string Format de la page (html, json, etc.)
 	 */
 	protected $format;
-	/**
-	 * @var $generateLayout bool Indique si la layout doit être généré
-	 */
-	protected $generateLayout;
+
 	
 	/**
 	 * Construit une page vierge à partir de l'application choisie
 	 *
 	 * @param Application $app
 	 * @param string      $format         Format de la page à afficher (html, json, etc.)
-	 * @param bool        $generateLayout Indique si le layout doit être généré
 	 */
-	public function __construct( Application $app, $format = 'html', $generateLayout = true ) {
+	public function __construct( Application $app, $format = 'html') {
 		parent::__construct( $app );
 		$this->contentFile    = '';
 		$this->vars           = array();
 		$this->format         = $format;
-		$this->generateLayout = $generateLayout;
 	}
 	
 	/**
@@ -69,19 +64,28 @@ class Page extends ApplicationComponent {
 		if ( !file_exists( $this->contentFile ) ) {
 			throw new \RuntimeException( 'Specified view "' . $this->contentFile . '" doesn\'t exists' );
 		}
+		
+		
+		
+		switch( $this->format() ) {
+			case 'json' :
+				return $this->getGeneratedPageJSON();
+			default :
+				return $this->getGeneratedPageHTML();
+		}
+		
+	
+	}
+	
+	/**
+	 * Fonction qui va gerer la rendu HTML d'une page
+	 */
+	private function getGeneratedPageHTML() {
 		/*
 		 * @var User $User utilisée dans les vues
 		 */
 		$User = $this->app->user();
 		
-		if ( $this->format == 'json' ) {
-			// On serialize toutes les Entity passées en paramètre
-			foreach ( $this->vars as &$element ) {
-				if ( $element instanceof Entity ) {
-					$element = json_encode( $element );
-				}
-			}
-		}
 		extract( $this->vars );
 		
 		
@@ -92,17 +96,44 @@ class Page extends ApplicationComponent {
 		 * @var $content string utilisée dans les vues
 		 */
 		
-		// Générer le layout si besoin
-		if ( $this->generateLayout ) {
-			$content = ob_get_clean(); // Injecter le contenu de la page interne dans le layout
-			
-			ob_start();
-			
-			require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php'; // Construction dynamique du chemin de layout OK
-		}
+		$content = ob_get_clean(); // Injecter le contenu de la page interne dans le layout
+		
+		ob_start();
+		
+		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php'; // Construction dynamique du chemin de layout OK
 		
 		return ob_get_clean();
 	}
+	
+	/**
+	 * Fonction qui va gerer la rendu JSON d'une page
+	 */
+	private function getGeneratedPageJSON() {
+		/*
+	 * @var User $User utilisée dans les vues
+	 */
+		$User = $this->app->user();
+		
+//		if ( $this->format == 'json' ) {
+//			// On serialize toutes les Entity passées en paramètre
+//			foreach ( $this->vars as &$element ) {
+//				if ( $element instanceof Entity ) {
+//					$element = json_encode( $element );
+//				}
+//			}
+//		}
+		extract( $this->vars );
+				
+		// Créer la page en bufferisation
+		$content = require $this->contentFile; // Existence du fichier vérifiée
+		
+		/**
+		 * @var $content string utilisée dans les vues
+		 */
+		
+		return json_encode(require(__DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php'));
+	}
+	
 	
 	/**
 	 * Setter pour l'attribut contentFile.

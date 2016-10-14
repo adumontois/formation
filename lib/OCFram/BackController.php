@@ -47,15 +47,13 @@ abstract class BackController extends ApplicationComponent {
 	 * @param string      $module
 	 * @param string      $action
 	 * @param string      $format         Format de la page à construire
-	 * @param bool        $generateLayout Indique si le layout doit être généré
-	 * @param string      $dbName         Nom de la base de données
 	 * @param string      $daoClass       Nom de la classe permettant de construire le DAO
 	 */
-	public function __construct( Application $app, $module, $action, $format, $generateLayout, $dbName, $daoClass = 'PDO' ) {
+	public function __construct( Application $app, $module, $action, $format, $daoClass = 'PDO' ) {
 		parent::__construct( $app );
 		$this->setAction( $action );
 		$this->setModule( $module );
-		$this->page = new Page( $app, $format, $generateLayout );
+		$this->page = new Page( $app, $format );
 		$this->setView( $action );
 		
 		
@@ -64,7 +62,7 @@ abstract class BackController extends ApplicationComponent {
 		// Calcul du nom de la méthode retournant le DAO
 		$daoMethod = 'get' . ucfirst( $daoClass );
 		
-		$this->managers = new Managers( $daoClass, $daoFactoryClass::$daoMethod( $dbName ) );
+		$this->managers = new Managers( $daoClass, $daoFactoryClass::$daoMethod( ) );
 	}
 	
 	/**

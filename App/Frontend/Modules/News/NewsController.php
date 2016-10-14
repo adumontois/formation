@@ -28,18 +28,6 @@ use OCFram\Router;
 class NewsController extends BackController {
 	use AppController;
 	
-	/**
-	 * NewsController constructor.
-	 * Construit un backcontroller en spécifiant la DB news.
-	 *
-	 * @param Application $App
-	 * @param string      $module
-	 * @param string      $action
-	 * @param string      $format
-	 */
-	public function __construct( Application $App, $module, $action, $format, $generateLayout ) {
-		parent::__construct( $App, $module, $action, $format, $generateLayout, 'news' );
-	}
 	
 	/**
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml.
@@ -112,17 +100,17 @@ class NewsController extends BackController {
 		
 		
 		// Construire le formulaire
-		$Commentaire = new Comment();
+		$Comment = new Comment();
 		// Préremplir le champ auteur si l'utilisateur est connecté
 		if ( $this->app->user()->isAuthenticated() ) {
 			$User_manager = $this->managers->getManagerOf( 'User' );
 			$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
 			if ( null != $User ) {
-				$Commentaire->setAuthor( $User->login() );
+				$Comment->setAuthor( $User->login() );
 			}
 		}
 		
-		$Form_builder = new CommentFormBuilder( $Commentaire );
+		$Form_builder = new CommentFormBuilder( $Comment );
 		$Form_builder->build();
 		$Form = $Form_builder->form();
 		
@@ -153,27 +141,27 @@ class NewsController extends BackController {
 				$this->app->httpResponse()
 						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
 			}
-			$Commentaire = new Comment( array(
+			$Comment = new Comment( array(
 				'fk_SNC'  => $Request->getData( 'id' ),
 				'author'  => $Request->postData( 'author' ),
 				'content' => $Request->postData( 'content' ),
 			) );
 		}
 		else {
-			$Commentaire = new Comment();
+			$Comment = new Comment();
 			// Préremplir le champ auteur si l'utilisateur est connecté
 			if ( $this->app->user()->isAuthenticated() ) {
 				$User_manager = $this->managers->getManagerOf( 'User' );
 				$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
 				if ( null != $User ) {
-					$Commentaire->setAuthor( $User->login() );
+					$Comment->setAuthor( $User->login() );
 				}
 			}
 		}
 		
 		// Construction du formulaire
 		// 1) Données values
-		$Form_builder = new CommentFormBuilder( $Commentaire );
+		$Form_builder = new CommentFormBuilder( $Comment );
 		// 2) Construction et vérification des données
 		$Form_builder->build();
 		$Form = $Form_builder->form();
@@ -217,7 +205,7 @@ class NewsController extends BackController {
 			$this->app->httpResponse()
 					  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
 		}
-		$Commentaire = new Comment( array(
+		$Comment = new Comment( array(
 			'fk_SNC'  => $Request->getData( 'id' ),
 			'author'  => $Request->postData( 'author' ),
 			'content' => $Request->postData( 'content' ),
@@ -225,7 +213,7 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire
 		// 1) Données values
-		$Form_builder = new CommentFormBuilder( $Commentaire );
+		$Form_builder = new CommentFormBuilder( $Comment );
 		// 2) Construction et vérification des données
 		$Form_builder->build();
 		$Form = $Form_builder->form();
@@ -233,14 +221,26 @@ class NewsController extends BackController {
 		// Sauvegarde avec le handler
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		
-		// Ca c'est la data que je veux retourner.
-		// Pas bon la serialization ici, il faut la faire ailleurs
 		if ( $Form_handler->process() ) {
+			
 			// On va récupérer l'heure qui a été insérée en base
 			$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-			$Commentaire      = $Comments_manager->getCommentcUsingCommentcId( $Commentaire->id() );
-			$Commentaire->formatDate();
-			$this->page->addVar( 'Comment', $Commentaire );
+			$Comment      = $Comments_manager->getCommentcUsingCommentcId( $Comment->id() );
+			$Comment->formatDate();
+			
+			// On ajoute les droits d'administrateur si besoin
+			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+				$Comment->setAction_a( [
+					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
+					'label' => 'Modifier',
+				] );
+				$Comment->setAction_a( [
+					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
+					'label' => 'Supprimer',
+				] );
+			}
+			
+			$this->page->addVar( 'Comment', $Comment );
 		}
 		else {
 			$this->page->addVar( 'Comment', false );

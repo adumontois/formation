@@ -11,12 +11,5 @@
  */
 ?>
 
-<h2>
-	Ajouter un commentaire
-</h2>
-<form id="putInsertComment" action="<?= $form_action ?>" method="post">
-	<p>
-		<?= $form ?>
-		<input type="submit" value="Commenter" />
-	</p>
-</form>
+<?php $form_id = 'putInsertComment'; ?>
+<?php require "form/insert_comment.html.php" ?>
