@@ -432,3 +432,13 @@ footer a {
 
 .middle { vertical-align: middle; }
 
+
+
+/* Div added dynamically in json forms for errors */
+.form_error {
+	color: #f55;
+	display: inline-block;
+	font-size: 12px;
+	border-style: double;
+	border-width: 2px;
+}
