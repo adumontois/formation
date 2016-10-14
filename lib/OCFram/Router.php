@@ -37,27 +37,20 @@ class Router extends ApplicationComponent {
 		foreach ( $route_list as $route ) {
 			
 			// Récupérer les arguments nécessaires à la route
-			if ( $route->hasAttribute( 'vars' ) ) {
-				$vars = explode( ',', $route->getAttribute( 'vars' ) );
-			}
-			else {
-				$vars = array();
-			}
-			if ( $route->hasAttribute( 'format' ) ) {
-				$format = $route->getAttribute( 'format' );
-			}
-			else {
-				// Le format par défaut d'une route est le format html
-				$format = 'html';
-			}
+			$vars = $route->hasAttribute( 'vars' ) ? explode( ',', $route->getAttribute( 'vars' ) ) : array();
+			// Le format par défaut d'une route est le format html
+			$format = $route->hasAttribute( 'format' ) ? $route->getAttribute( 'format' ) : 'html';
+			// Par défaut la route génère le layout
+			$generateLayout = $route->hasAttribute( 'generateLayout' ) ? (bool)$route->getAttribute( 'generateLayout' ) : true;
 			
 			// Ajouter la route au routeur les arguments passés
 			self::addRoute( $app_name, new Route( array(
-				'action'    => $route->getAttribute( 'action' ),
-				'module'    => $route->getAttribute( 'module' ),
-				'url'       => $route->getAttribute( 'url' ),
-				'varsNames' => $vars,
-				'format'	=> $format,
+				'action'         => $route->getAttribute( 'action' ),
+				'module'         => $route->getAttribute( 'module' ),
+				'url'            => $route->getAttribute( 'url' ),
+				'varsNames'      => $vars,
+				'format'         => $format,
+				'generateLayout' => $generateLayout,
 			) ) );
 		}
 	}

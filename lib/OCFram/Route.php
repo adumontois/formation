@@ -40,6 +40,10 @@ class Route {
 	 * @var $format string Format d'affichage de la page (html, json, etc.)
 	 */
 	protected $format;
+	/**
+	 * @var $generateLayout bool Indique s'il faut générer le layout.
+	 */
+	protected $generateLayout;
 	
 	/**
 	 * Construit une nouvelle route en l'hydratant.
@@ -139,6 +143,15 @@ class Route {
 	}
 	
 	/**
+	 * Setter pour l'attribut generateLayout
+	 *
+	 * @param bool generateLayout
+	 */
+	public function setGenerateLayout( $generateLayout) {
+	    $this->generateLayout = $generateLayout;
+	}
+	
+	/**
 	 * @return string
 	 */
 	public function action() {
@@ -179,4 +192,12 @@ class Route {
 	public function format() {
 		return $this->format;
 	}
+	
+	/**
+	 * @return bool
+	 */
+	public function generateLayout() {
+		return $this->generateLayout;
+	}
+	
 }

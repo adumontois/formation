@@ -37,8 +37,8 @@ class NewsController extends BackController {
 	 * @param string      $action
 	 * @param string      $format
 	 */
-	public function __construct( Application $App, $module, $action, $format ) {
-		parent::__construct( $App, $module, $action, $format, 'news' );
+	public function __construct( Application $App, $module, $action, $format, $generateLayout ) {
+		parent::__construct( $App, $module, $action, $format, $generateLayout, 'news' );
 	}
 	
 	/**

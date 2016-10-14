@@ -27,18 +27,24 @@ class Page extends ApplicationComponent {
 	 * @var $format string Format de la page (html, json, etc.)
 	 */
 	protected $format;
+	/**
+	 * @var $generateLayout bool Indique si la layout doit être généré
+	 */
+	protected $generateLayout;
 	
 	/**
 	 * Construit une page vierge à partir de l'application choisie
 	 *
 	 * @param Application $app
-	 * @param string $format Format de la page à afficher (html, json, etc.)
+	 * @param string      $format         Format de la page à afficher (html, json, etc.)
+	 * @param bool        $generateLayout Indique si le layout doit être généré
 	 */
-	public function __construct( Application $app, $format = 'html' ) {
+	public function __construct( Application $app, $format = 'html', $generateLayout = true ) {
 		parent::__construct( $app );
-		$this->contentFile = '';
-		$this->vars        = array();
-		$this->format	   = $format;
+		$this->contentFile    = '';
+		$this->vars           = array();
+		$this->format         = $format;
+		$this->generateLayout = $generateLayout;
 	}
 	
 	/**
@@ -68,16 +74,15 @@ class Page extends ApplicationComponent {
 		 */
 		$User = $this->app->user();
 		
-		if ($this->format == 'json') {
+		if ( $this->format == 'json' ) {
 			// On serialize toutes les Entity passées en paramètre
-			foreach ($this->vars as 	&$element) {
+			foreach ( $this->vars as &$element ) {
 				if ( $element instanceof Entity ) {
-					$element = json_encode($element);
+					$element = json_encode( $element );
 				}
 			}
 		}
 		extract( $this->vars );
-		
 		
 		
 		// Créer la page en bufferisation
@@ -86,11 +91,15 @@ class Page extends ApplicationComponent {
 		/**
 		 * @var $content string utilisée dans les vues
 		 */
-		$content = ob_get_clean(); // Vider le buffer dans la sortie
 		
-		ob_start();
-		
-		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.'.$this->format.'.php'; // Construction dynamique du chemin de layout OK
+		// Générer le layout si besoin
+		if ( $this->generateLayout ) {
+			$content = ob_get_clean(); // Injecter le contenu de la page interne dans le layout
+			
+			ob_start();
+			
+			require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php'; // Construction dynamique du chemin de layout OK
+		}
 		
 		return ob_get_clean();
 	}

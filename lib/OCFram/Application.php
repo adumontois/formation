@@ -83,7 +83,7 @@ abstract class Application {
 			// 4) Instanciation du contrôleur
 			$controllerClass = 'App\\' . $this->name . '\\Modules\\' . $route->module() . '\\' . $route->module() . 'Controller';
 			
-			return new $controllerClass( $this, $route->module(), $route->action(), $route->format());
+			return new $controllerClass( $this, $route->module(), $route->action(), $route->format(), $route->generateLayout());
 		}
 		catch ( \RuntimeException $e ) {
 			if ( $e->getCode() == Router::ROUTE_NOT_FOUND ) // Si on n'a pas trouvé la route, erreur 404

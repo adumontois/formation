@@ -46,15 +46,16 @@ abstract class BackController extends ApplicationComponent {
 	 * @param Application $app
 	 * @param string      $module
 	 * @param string      $action
-	 * @param string      $format   Format de la page à construire
-	 * @param string      $dbName   Nom de la base de données
-	 * @param string      $daoClass Nom de la classe permettant de construire le DAO
+	 * @param string      $format         Format de la page à construire
+	 * @param bool        $generateLayout Indique si le layout doit être généré
+	 * @param string      $dbName         Nom de la base de données
+	 * @param string      $daoClass       Nom de la classe permettant de construire le DAO
 	 */
-	public function __construct( Application $app, $module, $action, $format, $dbName, $daoClass = 'PDO' ) {
+	public function __construct( Application $app, $module, $action, $format, $generateLayout, $dbName, $daoClass = 'PDO' ) {
 		parent::__construct( $app );
 		$this->setAction( $action );
 		$this->setModule( $module );
-		$this->page = new Page( $app, $format );
+		$this->page = new Page( $app, $format, $generateLayout );
 		$this->setView( $action );
 		
 		
