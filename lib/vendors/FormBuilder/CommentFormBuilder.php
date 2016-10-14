@@ -34,7 +34,7 @@ class CommentFormBuilder extends FormBuilder {
 			'name'       => 'author',
 			'maxLength'  => self::AUTHOR_MAX_LENGTH,
 			'validators' => array(
-				new NotNullValidator( 'Le nom de l\'User doit être précisé.' ),
+				new NotNullValidator( 'Le nom de l\'auteur doit être précisé.' ),
 			),
 		) ) );
 		$this->form->add( new TextField( array(

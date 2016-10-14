@@ -441,4 +441,6 @@ footer a {
 	font-size: 12px;
 	border-style: double;
 	border-width: 2px;
+	padding: 10px;
+	margin-right: 10px;
 }
