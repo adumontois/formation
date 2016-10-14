@@ -147,10 +147,10 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	/**
 	 * Ajoute une erreur à l'entité
 	 *
-	 * @param $key clé
-	 * @param $error_message Valeur
+	 * @param $key string clé
+	 * @param $error_message string Erreur à afficher
 	 */
-	public function setError_a($key, $error_message) {
+	public function addError_a($key, $error_message) {
 		if (!is_string($key) OR empty($key) OR ctype_digit($key[0])) {
 			throw new \InvalidArgumentException('Key to add must be a non empty string, and must start with a letter.');
 		}

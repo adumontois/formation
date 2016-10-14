@@ -6,5 +6,5 @@
 	<route url="/create-account.html" module="Connection" action="putUser" />
 	<route url="/logout.html" module="Connection" action="clearConnection" />
 	<route url="/connect.html" module="Connection" action="getConnection" />
-	<route url="/commenter-([0-9]+)\.json" module="News" action="putInsertCommentFromAjax" vars="id" format="json" generateLayout="0" />
+	<route url="/commenter-([0-9]+)\.json" module="News" action="putInsertCommentFromAjax" vars="id" format="json" />
 </routes>

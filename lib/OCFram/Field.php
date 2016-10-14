@@ -112,6 +112,13 @@ abstract class Field {
 	}
 	
 	/**
+	 * @return string
+	 */
+	 public function errorMessage() {
+	    return $this->errorMessage;
+	 }
+	
+	/**
 	 * Setter pour le paramètre label
 	 *
 	 * @param $label string

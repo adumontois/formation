@@ -76,7 +76,7 @@ $js_data_action = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 			dataType : "json", // et non datatype
 			success  : function( json, status ) {
 				// Cette fonction se déclenche dès lors que l'URL est trouvée !
-				
+				console.log('test');
 				if ( json.master_code != 0 ) {
 					console.error( 'Aie aie aie je m\'arrete la car j\'ai rencontré une erreur' );
 					return;

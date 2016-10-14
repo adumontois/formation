@@ -33,6 +33,7 @@ class NewsController extends BackController {
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml.
 	 */
 	public function executeBuildIndex() {
+		$this->run();
 		/**
 		 * @var $News_manager NewsManager
 		 * @var $Liste_news_a News[]
@@ -59,7 +60,6 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
 		
-		$this->run();
 	}
 	
 	/**
@@ -67,6 +67,7 @@ class NewsController extends BackController {
 	 * Affiche une news et les commentaires associés
 	 */
 	public function executeBuildNews( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $News_manager    NewsManager
 		 * @var $News            News
@@ -122,7 +123,6 @@ class NewsController extends BackController {
 		$this->page->addVar( 'User', $this->app->user() );
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$News->id() ) ) );
-		$this->run();
 	}
 	
 	/**
@@ -130,6 +130,7 @@ class NewsController extends BackController {
 	 * Insère un commentaire
 	 */
 	public function executePutInsertComment( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var NewsManager    $News_manager
 		 * @var UserManagerPDO $User_manager
@@ -179,7 +180,6 @@ class NewsController extends BackController {
 		$this->page->addVar( 'form', $Form_builder->form()->createView() );
 		// Rajouter le lien d'action du formulaire
 		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
-		$this->run();
 	}
 	
 	/**
@@ -239,11 +239,16 @@ class NewsController extends BackController {
 					'label' => 'Supprimer',
 				] );
 			}
-			
-			$this->page->addVar( 'Comment', $Comment );
 		}
 		else {
-			$this->page->addVar( 'erreurs_a', $Comment-> );
+			// Sinon on envoie les erreurs
+			foreach ($Form->Field_a() as $Field) {
+				$error = $Field->errorMessage();
+				if (!empty($error)) {
+					$Comment->addError_a($Field->name(), $error);
+				}
+			}
 		}
+		$this->page->addVar( 'Comment', $Comment );
 	}
 }

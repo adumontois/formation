@@ -130,7 +130,6 @@ class Page extends ApplicationComponent {
 		/**
 		 * @var $content string utilisée dans les vues
 		 */
-		
 		return json_encode(require(__DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php'));
 	}
 	

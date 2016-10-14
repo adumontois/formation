@@ -21,9 +21,9 @@ class Form {
 	 */
 	protected $entity;
 	/**
-	 * @var $fields Field[]
+	 * @var $Field_a Field[]
 	 */
-	protected $fields;
+	protected $Field_a;
 	
 	/**
 	 * Form constructor.
@@ -32,7 +32,7 @@ class Form {
 	 */
 	public function __construct( Entity $entity ) {
 		$this->setEntity( $entity );
-		$this->fields = array();
+		$this->Field_a = array();
 	}
 	
 	/**
@@ -47,7 +47,7 @@ class Form {
 		$field_name = $field->name(); // Récupérer le nom du champ
 		$field->setValue( $this->entity->$field_name());
 		// La value du field est initialisée à la valeur détenue par l'entité
-		$this->fields[] = $field;
+		$this->Field_a[] = $field;
 		
 		return $this;
 	}
@@ -60,7 +60,7 @@ class Form {
 	public function createView() {
 		$view = '';
 		// Construire tous les fields
-		foreach ( $this->fields as $field ) {
+		foreach ( $this->Field_a as $field ) {
 			$view .= $field->buildWidget();
 			$view .= '<br />';
 		}
@@ -75,13 +75,13 @@ class Form {
 	 * @return bool
 	 */
 	public function isValid() {
-		foreach ( $this->fields as $field ) {
-			if ( !$field->isValid() ) {
-				return false;
+		$valid = true;
+		foreach ( $this->Field_a as $Field ) {
+			if ( !$Field->isValid() ) {
+				$valid = false;
 			}
 		}
-		
-		return true;
+		return $valid;
 	}
 	
 	/**
@@ -90,6 +90,13 @@ class Form {
 	public function entity() {
 		return $this->entity;
 	}
+	
+	/**
+	 * @return Field[]
+	 */
+	 public function Field_a() {
+	    return $this->Field_a;
+	 }
 	
 	/**
 	 * Setter de l'attribut $entity.

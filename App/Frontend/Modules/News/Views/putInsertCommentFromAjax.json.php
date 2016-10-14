@@ -11,6 +11,6 @@
  */
 ?>
 <?php
-$var =  ['Comment' => $Comment ];
+$var =  ['Comment' => $Comment];
 return $var;
 ?>
