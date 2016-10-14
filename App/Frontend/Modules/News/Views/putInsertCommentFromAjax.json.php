@@ -9,8 +9,6 @@
 /**
  * @var string $Comment Commentaire sous format JSON
  */
-?>
-<?php
-$var =  ['Comment' => $Comment];
-return $var;
+
+return ['Comment' => $Comment];
 ?>

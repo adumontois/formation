@@ -28,12 +28,12 @@ use OCFram\Router;
 class NewsController extends BackController {
 	use AppController;
 	
-	
 	/**
 	 * Affiche les $nombre_news dernières news, $nombre_news est une constante déclarée dans le fichier app.xml.
 	 */
 	public function executeBuildIndex() {
 		$this->run();
+		var_dump( new \DateTime() );
 		/**
 		 * @var $News_manager NewsManager
 		 * @var $Liste_news_a News[]
@@ -59,7 +59,6 @@ class NewsController extends BackController {
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
-		
 	}
 	
 	/**
@@ -77,7 +76,10 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		$News->format();
-		$News->setAction_a(['insert_comment_json' => Router::getUrlFromModuleAndAction('Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => $News->id()))]);
+		$News->setAction_a( [
+			'insert_comment_json'   => Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => $News->id() ) ),
+			'refresh_comments_json' => Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildRefreshCommentsFromAjax', array( 'id' => $News->id() ) ),
+		] );
 		// Si la news n'existe pas on redirige vers une erreur 404
 		if ( null == $News ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
@@ -123,6 +125,11 @@ class NewsController extends BackController {
 		$this->page->addVar( 'User', $this->app->user() );
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$News->id() ) ) );
+		
+		// Ajouter la date et heure
+		$dateupdate = new \DateTime();
+		$dateupdate = $dateupdate->format('Y-m-d H:i:s.u');
+		$this->page->addVar( 'dateupdate', $dateupdate );
 	}
 	
 	/**
@@ -225,7 +232,7 @@ class NewsController extends BackController {
 			
 			// On va récupérer l'heure qui a été insérée en base
 			$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-			$Comment      = $Comments_manager->getCommentcUsingCommentcId( $Comment->id() );
+			$Comment          = $Comments_manager->getCommentcUsingCommentcId( $Comment->id() );
 			$Comment->formatDate();
 			
 			// On ajoute les droits d'administrateur si besoin
@@ -242,13 +249,45 @@ class NewsController extends BackController {
 		}
 		else {
 			// Sinon on envoie les erreurs
-			foreach ($Form->Field_a() as $Field) {
+			foreach ( $Form->Field_a() as $Field ) {
 				$error = $Field->errorMessage();
-				if (!empty($error)) {
-					$Comment->addError_a($Field->name(), $error);
+				if ( !empty( $error ) ) {
+					$Comment->addError_a( $Field->name(), $error );
 				}
 			}
 		}
 		$this->page->addVar( 'Comment', $Comment );
+	}
+	
+	/**
+	 * Rafraîchit les commentaires d'une news depuis la dernière date donnée
+	 *
+	 * /!\ Heure !
+	 *
+	 * @param HTTPRequest $Request
+	 */
+	public function executebuildRefreshCommentsFromAjax( HTTPRequest $Request ) {
+		$this->run();
+		/**
+		 * @var CommentsManager $Comments_manager
+		 * @var NewsManager     $News_manager
+		 */
+		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+		if ( $Request->postExists( 'dateupdate' ) && $Request->getExists( 'id' ) ) {
+			// On vérifie l'existence de la news
+			$News_manager = $this->managers->getManagerOf();
+			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+				$this->app->httpResponse()
+						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'afficher les nouveaux commentaires : la news concernée n\'existe plus !' ) );
+			}
+			$Comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
+			$this->page->addVar( 'Comment_a', $Comment_a );
+			$dateupdate = new \DateTime();
+			$dateupdate->format( 'Y-m-d H:i:s.u' );
+			$this->page->addVar( 'dateupdate', $dateupdate );
+		}
+		else {
+			throw new \RuntimeException( 'Can\'t determine last update date !' );
+		}
 	}
 }

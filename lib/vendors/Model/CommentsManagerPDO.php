@@ -172,4 +172,34 @@ class CommentsManagerPDO extends CommentsManager {
 		$stmt->closeCursor();
 		return (bool)$return;
 	}
+	
+	/*
+	 * Récupère tous les commentaires d'une news ultérieurs à la date de mise à jour demandée.
+	 *
+	 * @param int $newsc_id
+	 * @param string $commentc_dateupdate
+	 */
+	public function getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc( $newsc_id, $commentc_dateupdate ) {
+		/**
+		 * @var $stmt \PDOStatement
+		 * @var $Comment_a Comment[]
+		 */
+		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_date date
+                FROM T_SIT_commentc
+                WHERE SCC_fk_SNC = :fk_SNC
+                	AND SCC_date > :date';
+		
+		$stmt = $this->dao->prepare($sql);
+		$stmt->bindValue(':id', (int)$newsc_id, \PDO::PARAM_INT);
+		$stmt->bindValue(':date', $commentc_dateupdate);
+		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
+		$stmt->execute();
+		$Comment_a = $stmt->fetchAll();
+		foreach ( $Comment_a as $Comment ) {
+			$Comment->setDate( new \DateTime( $Comment->date() ) );
+		}
+		$stmt->closeCursor();
+		
+		return $Comment_a;
+	}
 }

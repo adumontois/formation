@@ -98,4 +98,12 @@ abstract class CommentsManager extends Manager {
 	 * @return bool
 	 */
 	abstract public function existsCommentcUsingCommentcId($commentc_id);
+	
+	/*
+	 * Récupère tous les commentaires d'une news ultérieurs à la date de mise à jour demandée.
+	 *
+	 * @param int $newsc_id
+	 * @param string $commentc_dateupdate
+	 */
+	abstract public function getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc($newsc_id, $commentc_dateupdate);
 }
