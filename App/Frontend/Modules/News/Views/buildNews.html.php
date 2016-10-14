@@ -114,7 +114,8 @@
 			datatype: "json",
 			success: function(json, status) {
 				
-				console.log(json);
+				// Parser la string JSON obtenue
+				json = JSON.parse(json);
 				
 				// On a construit un objet JS à partir du JSON. Maintenant on veut afficher le nouveau commentaire. On le formate en HTML
 				var new_comment = $( "<fieldset></fieldset>" )
