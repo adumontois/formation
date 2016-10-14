@@ -76,6 +76,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		$News->format();
+		$News->setAction_a(['insert_comment_json' => Router::getUrlFromModuleAndAction('Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => $News->id()))]);
 		// Si la news n'existe pas on redirige vers une erreur 404
 		if ( null == $News ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
@@ -197,7 +198,6 @@ class NewsController extends BackController {
 		 */
 		
 		// Il est important de ne faire que les vérifs et l'insertion en DB - tout le reste doit être géré en JS.
-		// Format des données reçues ??? A voir si modif à faire
 		// Est-ce qu'on peut rediriger en cas d'erreur ??? A voir aussi
 		
 		$News_manager = $this->managers->getManagerOf();
@@ -243,7 +243,7 @@ class NewsController extends BackController {
 			$this->page->addVar( 'Comment', $Comment );
 		}
 		else {
-			$this->page->addVar( 'Comment', false );
+			$this->page->addVar( 'erreurs_a', $Comment-> );
 		}
 	}
 }

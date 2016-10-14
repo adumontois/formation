@@ -21,6 +21,10 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	 * @var $id int ID de l'entité en DB. Vaut NULL si l'entité n'est pas encore insérée.
 	 */
 	protected $id;
+	/**
+	 * @var string[] $error_a Erreurs générées dans l'objet
+	 */
+	protected $error_a;
 	
 	/**
 	 * Construit une entité en initialisant ses arguments.
@@ -131,5 +135,30 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	// Implémentation de JsonSerialisable
 	public function jsonSerialize() {
 		return get_object_vars($this);
+	}
+	
+	/**
+	 * return string[]
+	 */
+	public function error_a() {
+	    return $this->error_a;
+	}
+	
+	/**
+	 * Ajoute une erreur à l'entité
+	 *
+	 * @param $key clé
+	 * @param $error_message Valeur
+	 */
+	public function setError_a($key, $error_message) {
+		if (!is_string($key) OR empty($key) OR ctype_digit($key[0])) {
+			throw new \InvalidArgumentException('Key to add must be a non empty string, and must start with a letter.');
+		}
+		if (!is_string($error_message)) {
+			throw new \InvalidArgumentException('Error_message must be a string');
+		}
+		if (!isset($this->error_a[$key])) {
+			$this->error_a[$key] = $error_message;
+		}
 	}
 }
