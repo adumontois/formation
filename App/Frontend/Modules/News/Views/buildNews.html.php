@@ -15,9 +15,7 @@
 
 ?>
 	
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
-	<script src="/javascript-functions/insert-comment-to-news.js"></script>
-	<script src="/javascript-functions/refresh-comments-on-news.js"></script>
+
 
 <p>
 	Par <em><?= htmlspecialchars( $News[ 'User' ] ) ?></em>, le <?= $News[ 'dateadd' ] ?>
@@ -64,3 +62,7 @@ $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 <?php $form_id = 'insert_comment_2';
 $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 <?php require "form/insert_comment.html.php" ?>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script src="/javascript-functions/insert-comment-to-news.js"></script>
+<script src="/javascript-functions/refresh-comments-on-news.js"></script>

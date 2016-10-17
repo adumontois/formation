@@ -10,5 +10,5 @@
  * @var \Entity\Comment[] $Comment_a Liste des nouveaux commentaires
  */
 return ['Comment_a' => $Comment_a,
-		'dateupdate', $dateupdate];
+		'dateupdate' => $dateupdate];
 ?>

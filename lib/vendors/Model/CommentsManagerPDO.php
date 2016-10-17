@@ -190,7 +190,7 @@ class CommentsManagerPDO extends CommentsManager {
                 	AND SCC_date > :date';
 		
 		$stmt = $this->dao->prepare($sql);
-		$stmt->bindValue(':id', (int)$newsc_id, \PDO::PARAM_INT);
+		$stmt->bindValue(':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT);
 		$stmt->bindValue(':date', $commentc_dateupdate);
 		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
 		$stmt->execute();

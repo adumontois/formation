@@ -14,11 +14,9 @@ use Entity\News;
 use Entity\User;
 use FormBuilder\CommentFormBuilder;
 use Model\CommentsManager;
-use Model\CommentsManagerPDO;
 use Model\NewsManager;
 use Model\UserManager;
 use Model\UserManagerPDO;
-use OCFram\Application;
 use \OCFram\BackController;
 use OCFram\FormHandler;
 use \OCFram\HTTPRequest;
@@ -33,7 +31,6 @@ class NewsController extends BackController {
 	 */
 	public function executeBuildIndex() {
 		$this->run();
-		var_dump( new \DateTime() );
 		/**
 		 * @var $News_manager NewsManager
 		 * @var $Liste_news_a News[]
@@ -128,8 +125,9 @@ class NewsController extends BackController {
 		
 		// Ajouter la date et heure
 		$dateupdate = new \DateTime();
-		$dateupdate = $dateupdate->format('Y-m-d H:i:s.u');
-		$this->page->addVar( 'dateupdate', $dateupdate );
+		$dateupdate->setTimezone(new \DateTimeZone('Europe/Paris'));
+		$dateupdate->format( 'Y-m-d H:i:s.u' );
+		$this->page->addVar( 'dateupdate', $dateupdate->format( 'Y-m-d H:i:s.u' ) );
 	}
 	
 	/**
@@ -193,8 +191,6 @@ class NewsController extends BackController {
 	 * Methode pour gerer l'insertion d'un commentaire depuis une requête Ajax
 	 *
 	 * @param HTTPRequest $Request
-	 *
-	 * @return string|false Retourne un commentaire JSON s'il a été inséré, false sinon.
 	 */
 	public function executePutInsertCommentFromAjax( HTTPRequest $Request ) {
 		/**
@@ -267,10 +263,10 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executebuildRefreshCommentsFromAjax( HTTPRequest $Request ) {
-		$this->run();
 		/**
 		 * @var CommentsManager $Comments_manager
 		 * @var NewsManager     $News_manager
+		 * @var Comment[] $Comment_a
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( $Request->postExists( 'dateupdate' ) && $Request->getExists( 'id' ) ) {
@@ -281,8 +277,30 @@ class NewsController extends BackController {
 						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'afficher les nouveaux commentaires : la news concernée n\'existe plus !' ) );
 			}
 			$Comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
+			
+			foreach ($Comment_a as $Comment) {
+				$Comment->formatDate();
+			}
+			
+			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+				foreach ( $Comment_a as $Comment ) {
+					// On ajoute les droits d'administrateur si besoin
+					$Comment->setAction_a( [
+						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
+						'label' => 'Modifier',
+					] );
+					$Comment->setAction_a( [
+						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
+						'label' => 'Supprimer',
+					] );
+				}
+			}
+			
 			$this->page->addVar( 'Comment_a', $Comment_a );
+			
+			// Générer la date d'update des commentaires affichés : ne pas oublier de les mettre à la bonne timezone
 			$dateupdate = new \DateTime();
+			$dateupdate->setTimezone(new \DateTimeZone('Europe/Paris'));
 			$dateupdate->format( 'Y-m-d H:i:s.u' );
 			$this->page->addVar( 'dateupdate', $dateupdate );
 		}
