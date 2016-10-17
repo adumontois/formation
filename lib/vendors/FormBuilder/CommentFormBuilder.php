@@ -29,14 +29,6 @@ class CommentFormBuilder extends FormBuilder {
 	 * Construit le formulaire de commentaires.
 	 */
 	public function build() {
-		$this->form->add( new StringField( array(
-			'label'      => 'Auteur',
-			'name'       => 'author',
-			'maxLength'  => self::AUTHOR_MAX_LENGTH,
-			'validators' => array(
-				new NotNullValidator( 'Le nom de l\'auteur doit être précisé.' ),
-			),
-		) ) );
 		$this->form->add( new TextField( array(
 			'label'      => 'Contenu',
 			'name'       => 'content',

@@ -62,6 +62,7 @@ class ConnectionController extends BackController {
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new ConnectionFormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
+			$this->app->user()->setAttribute('user_name', $User->login());
 			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
 		}
 		

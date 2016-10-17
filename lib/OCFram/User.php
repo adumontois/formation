@@ -75,7 +75,18 @@ class User extends ApplicationComponent {
 	}
 	
 	/**
-	 * Setter pour l'authentification. Passer '-1' pour déconnecter.
+	 * Vérifie si l'attribut $attr est défini en session.
+	 *
+	 * @param string $attr
+	 *
+	 * @return bool
+	 */
+	public function hasAttribute($attr) {
+		return isset($_SESSION[$attr]);
+	}
+	
+	/**
+	 * Setter pour l'authentification.
 	 *
 	 * @param int $authenticated
 	 */
@@ -83,21 +94,16 @@ class User extends ApplicationComponent {
 		if ( !is_int( $authenticated ) ) {
 			throw new \InvalidArgumentException( 'Authentication value must be an integer' );
 		}
-		
-		if ($authenticated == -1) {
-			unset($_SESSION['auth']);
-		}
-		else {
-			$this->setAttribute( 'auth', $authenticated );
-		}
+		$this->setAttribute( 'auth', $authenticated );
 	}
 	
 	/**
-	 * Supprime l'authentification. Alias de setAuthenticationLevel(-1).
+	 * Supprime l'authentification.
 	 */
 	public function unsetAuthentication() {
 		unset($_SESSION['user_id']);
-		$this->setAuthenticationLevel(-1);
+		unset($_SESSION['user_name']);
+		unset($_SESSION['auth']);
 	}
 	
 	/**

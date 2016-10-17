@@ -21,15 +21,27 @@ use OCFram\Router;
  */
 trait AppController {
 	/**
-	 * Génère le menu de la page courante. Doit être appelée à la fin de chaque contrôleur.
+	 * Génère le menu de la page courante. Doit être appelée au début de chaque contrôleur.
 	 */
 	public function run() {
 		/**
 		 * @var $this BackController
 		 */
-		// Générer les labels et liens de la vue
-		//<li><a href="/">Accueil</a></li>
-		
+		switch ( $this->page()->format() ) {
+			case 'html':
+				return $this->runHTML();
+			case 'json':
+				return $this->runJSON();
+			default:
+				throw new \Exception( 'Format ' . $this->page()->format() . ' has no run method defined.' );
+		}
+	}
+	
+	/**
+	 * Génère le menu d'une page HTML.
+	 */
+	private function runHTML() {
+		//var_dump($_SESSION['user_name']);
 		$menu_a = [
 			[
 				'label' => 'Accueil',
@@ -73,5 +85,11 @@ trait AppController {
 		$layout_link_a[ 'Frontend-buildIndex' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' );
 		
 		$this->page()->addVar( 'layout_link_a', $layout_link_a );
+	}
+	
+	/**
+	 * Génère le menu d'une page JSON
+	 */
+	private function runJSON() {
 	}
 }

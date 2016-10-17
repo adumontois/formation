@@ -13,6 +13,7 @@ use Entity\Comment;
 use Entity\News;
 use Entity\User;
 use FormBuilder\CommentFormBuilder;
+use FormBuilder\CommentFormBuilderWithAuthor;
 use Model\CommentsManager;
 use Model\NewsManager;
 use Model\UserManager;
@@ -99,22 +100,21 @@ class NewsController extends BackController {
 			}
 		}
 		
-		
-		// Construire le formulaire
+		// Attention, la variable $Comment CHANGE DE SIGNIFICATION !
 		$Comment = new Comment();
-		// Préremplir le champ auteur si l'utilisateur est connecté
-		if ( $this->app->user()->isAuthenticated() ) {
-			$User_manager = $this->managers->getManagerOf( 'User' );
-			$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
-			if ( null != $User ) {
-				$Comment->setAuthor( $User->login() );
-			}
+		
+		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
+		// On rajoute les données dont la méthode d'obtention varie
+		if (!$this->app->user()->hasAttribute('user_name')) {
+			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
+		}
+		else {
+			$Comment->setAuthor( $this->app->user()->getAttribute('user_name') );
+			$Form_builder = new CommentFormBuilder($Comment);
 		}
 		
-		$Form_builder = new CommentFormBuilder( $Comment );
 		$Form_builder->build();
 		$Form = $Form_builder->form();
-		
 		
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
@@ -125,7 +125,7 @@ class NewsController extends BackController {
 		
 		// Ajouter la date et heure
 		$dateupdate = new \DateTime();
-		$dateupdate->setTimezone(new \DateTimeZone('Europe/Paris'));
+		$dateupdate->setTimezone( new \DateTimeZone( 'Europe/Paris' ) );
 		$dateupdate->format( 'Y-m-d H:i:s.u' );
 		$this->page->addVar( 'dateupdate', $dateupdate->format( 'Y-m-d H:i:s.u' ) );
 	}
@@ -143,46 +143,55 @@ class NewsController extends BackController {
 		 */
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		$News_manager = $this->managers->getManagerOf();
+		
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			// La news doit exister
 			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
 				$this->app->httpResponse()
 						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
 			}
+			
+			// Créer le commentaire avec les données TOUJOURS passées
 			$Comment = new Comment( array(
 				'fk_SNC'  => $Request->getData( 'id' ),
-				'author'  => $Request->postData( 'author' ),
 				'content' => $Request->postData( 'content' ),
 			) );
 		}
+		
 		else {
 			$Comment = new Comment();
-			// Préremplir le champ auteur si l'utilisateur est connecté
-			if ( $this->app->user()->isAuthenticated() ) {
-
-				$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
-				if ( null != $User ) {
-					$Comment->setAuthor( $User->login() );
-				}
-			}
 		}
 		
-		// Construction du formulaire
-		// 1) Données values
-		$Form_builder = new CommentFormBuilder( $Comment );
+		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
+		// On rajoute les données dont la méthode d'obtention varie
+		if (!$this->app->user()->hasAttribute('user_name')) {
+			$Comment->setAuthor($Request->postData( 'author' ));
+			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
+		}
+		else {
+			$Comment->setAuthor( $this->app->user()->getAttribute('user_name') );
+			$Form_builder = new CommentFormBuilder($Comment);
+		}
+
 		// 2) Construction et vérification des données
 		$Form_builder->build();
 		$Form = $Form_builder->form();
 		
 		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
-		if (!$this->app->user()->isAuthenticated() && $Request->method() == HTTPRequest::POST_METHOD && $User_manager->existsUsercUsingUsercLogin($Comment->author())) {
-			$Form->getFieldFromName('author')->setErrorMessage('Le nom d\'utilisateur '.$Comment->author().' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.');
+		if ( $Request->method() == HTTPRequest::POST_METHOD && !$this->app->user()->isAuthenticated() && $User_manager->existsUsercUsingUsercLogin( $Comment->author() ) ) {
+			$Form->getFieldFromName( 'author' )
+				 ->setErrorMessage( 'Le nom d\'utilisateur ' . $Comment->author() . ' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.' );
 		}
 		
 		// Sauvegarde avec le handler
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
+			// Setter le login de l'utilisateur pour la session s'il n'avait pas été entré.
+			if (!$this->app->user()->hasAttribute('user_name')) {
+				$this->app->user()->setAttribute('user_name', $Comment->author());
+			}
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			//$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
@@ -197,6 +206,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executePutInsertCommentFromAjax( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var NewsManager     $News_manager
 		 * @var UserManager     $User_manager
@@ -205,52 +215,46 @@ class NewsController extends BackController {
 		 */
 		
 		// Il est important de ne faire que les vérifs et l'insertion en DB - tout le reste doit être géré en JS.
-		// Est-ce qu'on peut rediriger en cas d'erreur ??? A voir aussi
-		
+		// gérer la redirection et le master_error
 		$News_manager = $this->managers->getManagerOf();
-		$User_manager = $this->managers->getManagerOf('User');
+		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()
 					  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
 		}
 		$Comment = new Comment( array(
 			'fk_SNC'  => $Request->getData( 'id' ),
-			'author'  => $Request->postData( 'author' ),
 			'content' => $Request->postData( 'content' ),
 		) );
 		
-		// Construction du formulaire
-		// 1) Données values
-		$Form_builder = new CommentFormBuilder( $Comment );
+		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
+		// On rajoute les données dont la méthode d'obtention varie
+		if (!$this->app->user()->hasAttribute('user_name')) {
+			$Comment->setAuthor($Request->postData( 'author' ));
+			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
+		}
+		else {
+			$Comment->setAuthor( $this->app->user()->getAttribute('user_name') );
+			$Form_builder = new CommentFormBuilder($Comment);
+		}
+		
 		// 2) Construction et vérification des données
 		$Form_builder->build();
 		$Form = $Form_builder->form();
 		
 		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
-		if (!$this->app->user()->isAuthenticated() && $Request->method() == HTTPRequest::POST_METHOD && $User_manager->existsUsercUsingUsercLogin($Comment->author())) {
-			$Form->getFieldFromName('author')->setErrorMessage('Le nom d\'utilisateur '.$Comment->author().' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.');
+		if ( !$this->app->user()->isAuthenticated() && $Request->method() == HTTPRequest::POST_METHOD && $User_manager->existsUsercUsingUsercLogin( $Comment->author() ) ) {
+			$Form->getFieldFromName( 'author' )
+				 ->setErrorMessage( 'Le nom d\'utilisateur ' . $Comment->author() . ' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.' );
 		}
 		
 		// Sauvegarde avec le handler
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		
 		if ( $Form_handler->process() ) {
-			
-			// On va récupérer l'heure qui a été insérée en base
-			$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-			$Comment          = $Comments_manager->getCommentcUsingCommentcId( $Comment->id() );
-			$Comment->formatDate();
-			
-			// On ajoute les droits d'administrateur si besoin
-			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
-				$Comment->setAction_a( [
-					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
-					'label' => 'Modifier',
-				] );
-				$Comment->setAction_a( [
-					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
-					'label' => 'Supprimer',
-				] );
+			// Setter le login de l'utilisateur pour la session s'il n'avait pas été entré.
+			if (!$this->app->user()->hasAttribute('user_name')) {
+				$this->app->user()->setAttribute('user_name', $Comment->author());
 			}
 		}
 		else {
@@ -262,8 +266,34 @@ class NewsController extends BackController {
 				}
 			}
 		}
-		$this->page->addVar( 'Comment', $Comment );
+		$this->page->addVar( 'error_a', $Comment->error_a() );
 	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Rafraîchit les commentaires d'une news depuis la dernière date donnée
@@ -276,7 +306,7 @@ class NewsController extends BackController {
 		/**
 		 * @var CommentsManager $Comments_manager
 		 * @var NewsManager     $News_manager
-		 * @var Comment[] $Comment_a
+		 * @var Comment[]       $Comment_a
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( $Request->postExists( 'dateupdate' ) && $Request->getExists( 'id' ) ) {
@@ -288,7 +318,7 @@ class NewsController extends BackController {
 			}
 			$Comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
 			
-			foreach ($Comment_a as $Comment) {
+			foreach ( $Comment_a as $Comment ) {
 				$Comment->formatDate();
 			}
 			
@@ -310,7 +340,7 @@ class NewsController extends BackController {
 			
 			// Générer la date d'update des commentaires affichés : ne pas oublier de les mettre à la bonne timezone
 			$dateupdate = new \DateTime();
-			$dateupdate->setTimezone(new \DateTimeZone('Europe/Paris'));
+			$dateupdate->setTimezone( new \DateTimeZone( 'Europe/Paris' ) );
 			$dateupdate->format( 'Y-m-d H:i:s.u' );
 			$this->page->addVar( 'dateupdate', $dateupdate );
 		}

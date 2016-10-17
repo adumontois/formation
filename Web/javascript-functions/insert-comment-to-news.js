@@ -30,17 +30,20 @@ $( '.js-form-insert-comment' ).submit( function( event ) {
 			// Suppression des anciens messages d'erreur
 			$( ".form_error" ).remove();
 			
-			var Comment = json.content.Comment;
-			
+			var error_a = json.content.error_a;
 			
 			// Il y a des erreurs : on n'affiche pas le commentaire.
 			// Par contre on affiche les erreurs de remplissage du formulaire
-			if ( null !== Comment.error_a ) {
+			if ( null !== error_a ) {
 				var bad_field;
-				for ( input in Comment.error_a ) {
-					bad_field = ($( "<div class = \"form_error\"></div>" ).text( Comment.error_a[ input ] ));
-					$( bad_field ).insertBefore( $this.find( '[name=' + input + ']' ) );
+				for ( error in error_a ) {
+					bad_field = ($( "<div class = \"form_error\"></div>" ).text( error_a[ error ] ));
+					$( bad_field ).insertBefore( $this.find( '[name=' + error + ']' ) );
 				}
+			}
+			
+			
+			else {
 			}
 			
 			// On rafraîchit les commentaires dans tous les cas : le nouveau commentaire s'affiche s'il est correct.

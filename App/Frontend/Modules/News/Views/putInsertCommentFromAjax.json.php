@@ -7,8 +7,8 @@
  */
 
 /**
- * @var string $Comment Commentaire sous format JSON
+ * @var string[] $error_a Liste des erreurs générées dans le formulaire
  */
 
-return ['Comment' => $Comment];
+return ['error_a' => $error_a];
 ?>
