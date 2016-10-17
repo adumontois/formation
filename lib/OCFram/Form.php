@@ -106,4 +106,20 @@ class Form {
 	public function setEntity( Entity $entity ) {
 		$this->entity = $entity;
 	}
+	
+	/**
+	 * Recherche un champ de formulaire par son nom
+	 *
+	 * @param string $field_name
+	 *
+	 * @return Field|null
+	 */
+	public function getFieldFromName($field_name) {
+		foreach ($this->Field_a as $Field) {
+			if ($Field->name() === $field_name) {
+				return $Field;
+			}
+		}
+		return null;
+	}
 }

@@ -47,7 +47,7 @@ $( '.js-form-insert-comment' ).submit( function( event ) {
 			refresh_comments();
 		},
 		error : function(resultat, statut, erreur) {
-			console.log(resultat);
+			console.log(resultat.response);
 		}
 	} );
 } );

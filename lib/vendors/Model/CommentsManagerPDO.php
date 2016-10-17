@@ -187,7 +187,8 @@ class CommentsManagerPDO extends CommentsManager {
 		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_date date
                 FROM T_SIT_commentc
                 WHERE SCC_fk_SNC = :fk_SNC
-                	AND SCC_date > :date';
+                	AND SCC_date > :date
+				ORDER BY id DESC';
 		
 		$stmt = $this->dao->prepare($sql);
 		$stmt->bindValue(':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT);

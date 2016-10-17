@@ -67,6 +67,9 @@ abstract class Field {
 	 * @return bool
 	 */
 	public function isValid() {
+		if (isset($this->errorMessage)) {
+			return false;
+		}
 		if (!$this->validators) {
 			return true;
 		}
@@ -171,4 +174,16 @@ abstract class Field {
 	public function eraseValidators() {
 		$this->validators = array();
 	}
+	
+	/**
+	 * Setter pour l'attribut errorMessage
+	 *
+	 * @param string $errorMessage
+	 */
+	public function setErrorMessage( $errorMessage) {
+	    if (!is_string($this->errorMessage) || empty($this->errorMessage)) {
+	    	$this->errorMessage = $errorMessage;
+		}
+	}
+	
 }

@@ -2,10 +2,11 @@
  * Created by adumontois on 14/10/2016.
  */
 
-
+// Délai de rafraîchissement des commentaires
+const refresh_delay = 20000;
 
 window.onload = function() {
-	setTimeout(refresh_comments, 5000);
+	setTimeout(refresh_comments, refresh_delay);
 }
 
 
@@ -13,7 +14,7 @@ $.getScript("/javascript-functions/write-comment.js");
 
 // Fonction pour rafraîchir les commentaires sur la page
 // Omet les ids de commentaires passés en paramètres
-function refresh_comments(omit_ids) {
+function refresh_comments() {
 	
 	// Sélection du panel de commentaires
 	var $this = $( "#js-comment-panel" );
@@ -44,11 +45,11 @@ function refresh_comments(omit_ids) {
 			$this.data('last-update', json.content.dateupdate.date);
 		},
 		
-		//error : function(resultat, statut, erreur) {
-		//	console.log(resultat);
-		//}
+		error : function(resultat, statut, erreur) {
+			console.log(resultat.response);
+		}
 	});
 	
 	// Relancer le décompte
-	setTimeout(refresh_comments, 5000);
+	setTimeout(refresh_comments, refresh_delay);
 }

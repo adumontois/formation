@@ -145,4 +145,19 @@ class UserManagerPDO extends UserManager {
 		
 		return $this->dao->query( $sql )->fetchColumn();
 	}
+	
+	/**
+	 * Vérifie si l'utilisateur de pseudo donné existe déjà.
+	 *
+	 * @return bool
+	 */
+	public function existsUsercUsingUsercLogin($userc_login) {
+		$sql = 'SELECT *
+				FROM T_SIT_userc
+				WHERE SUC_login = :login';
+		$stmt = $this->dao->prepare($sql);
+		$stmt->bindValue(':login', $userc_login);
+		$stmt->execute();
+		return (bool)$stmt->fetch();
+	}
 }

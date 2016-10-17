@@ -83,4 +83,11 @@ abstract class UserManager extends Manager {
 	 * @return int nombre d'utilisateurs enregistrés en base
 	 */
 	abstract public function countUsercUsingUsercId();
+	
+	/**
+	 * Vérifie si l'utilisateur de pseudo donné existe déjà.
+	 *
+	 * @return bool
+	 */
+	abstract public function existsUsercUsingUsercLogin($userc_login);
 }

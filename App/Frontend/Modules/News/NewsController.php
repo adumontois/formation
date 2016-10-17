@@ -141,9 +141,9 @@ class NewsController extends BackController {
 		 * @var UserManagerPDO $User_manager
 		 * @var User           $User
 		 */
-		
+		$User_manager = $this->managers->getManagerOf( 'User' );
+		$News_manager = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
-			$News_manager = $this->managers->getManagerOf();
 			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
 				$this->app->httpResponse()
 						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
@@ -158,7 +158,7 @@ class NewsController extends BackController {
 			$Comment = new Comment();
 			// Préremplir le champ auteur si l'utilisateur est connecté
 			if ( $this->app->user()->isAuthenticated() ) {
-				$User_manager = $this->managers->getManagerOf( 'User' );
+
 				$User         = $User_manager->getUsercUsingUsercId( $this->app->user()->userId() );
 				if ( null != $User ) {
 					$Comment->setAuthor( $User->login() );
@@ -173,12 +173,16 @@ class NewsController extends BackController {
 		$Form_builder->build();
 		$Form = $Form_builder->form();
 		
+		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
+		if (!$this->app->user()->isAuthenticated() && $Request->method() == HTTPRequest::POST_METHOD && $User_manager->existsUsercUsingUsercLogin($Comment->author())) {
+			$Form->getFieldFromName('author')->setErrorMessage('Le nom d\'utilisateur '.$Comment->author().' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.');
+		}
+		
 		// Sauvegarde avec le handler
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()
-					  ->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			//$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
@@ -204,6 +208,7 @@ class NewsController extends BackController {
 		// Est-ce qu'on peut rediriger en cas d'erreur ??? A voir aussi
 		
 		$News_manager = $this->managers->getManagerOf();
+		$User_manager = $this->managers->getManagerOf('User');
 		if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()
 					  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
@@ -220,6 +225,11 @@ class NewsController extends BackController {
 		// 2) Construction et vérification des données
 		$Form_builder->build();
 		$Form = $Form_builder->form();
+		
+		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
+		if (!$this->app->user()->isAuthenticated() && $Request->method() == HTTPRequest::POST_METHOD && $User_manager->existsUsercUsingUsercLogin($Comment->author())) {
+			$Form->getFieldFromName('author')->setErrorMessage('Le nom d\'utilisateur '.$Comment->author().' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.');
+		}
 		
 		// Sauvegarde avec le handler
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
