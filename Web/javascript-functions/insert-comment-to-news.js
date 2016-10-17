@@ -41,9 +41,14 @@ $( '.js-form-insert-comment' ).submit( function( event ) {
 					$( bad_field ).insertBefore( $this.find( '[name=' + error + ']' ) );
 				}
 			}
-			
-			
+				
 			else {
+				// Supprimer le champ auteur s'il existe
+				$(".js-form-insert-comment label[for='author']").remove();
+				$(".js-form-insert-comment input[name='author']").remove();
+				
+				// Supprimer le contenu du commentaire
+				$(".js-form-insert-comment textarea[name='content']").val("");
 			}
 			
 			// On rafraîchit les commentaires dans tous les cas : le nouveau commentaire s'affiche s'il est correct.

@@ -43,7 +43,7 @@ class StringField extends Field {
 		if ( !empty( $this->errorMessage ) ) {
 			$code = $this->errorMessage . '<br />';
 		}
-		$code .= '<label>' . $this->label . '</label>
+		$code .= '<label for="'.$this->name().'">' . $this->label . '</label>
             <input type = "text" name = "' . $this->name() . '" value = "' . htmlspecialchars( $this->value() ) . '" ';
 		if ( !empty( $this->maxLength ) ) {
 			$code .= 'maxlength = "' . $this->maxLength . '" ';

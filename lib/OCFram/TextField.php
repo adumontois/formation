@@ -35,7 +35,7 @@ class TextField extends Field {
 		if ( !empty( $this->errorMessage ) ) {
 			$code = $this->errorMessage . '<br />';
 		}
-		$code .= '<label>' . $this->label . '</label>
+		$code .= '<label for="' . $this->name() . '">' . $this->label . '</label>
             <textarea name = "' . $this->name() . '" ';
 		if ( !empty( $this->cols ) ) {
 			$code .= 'cols = "' . $this->cols . '" ';
