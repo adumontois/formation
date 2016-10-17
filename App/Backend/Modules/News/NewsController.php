@@ -16,7 +16,6 @@ use FormBuilder\CommentFormBuilder;
 use FormBuilder\NewsFormBuilder;
 use Model\CommentsManager;
 use Model\NewsManager;
-use OCFram\Application;
 use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
@@ -40,6 +39,7 @@ class NewsController extends BackController {
 	 * Récupère toutes les news disponibles en DB.
 	 */
 	public function executeBuildIndex() {
+		$this->run();
 		/**
 		 * @var NewsManager $News_manager
 		 * @var News[]      $News_list_a
@@ -71,8 +71,6 @@ class NewsController extends BackController {
 		catch ( \PDOException $Db_error ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
 		}
-		
-		$this->run();
 	}
 	
 	/**
@@ -83,6 +81,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	protected function executePutNews( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $News_manager NewsManager
 		 */
@@ -143,8 +142,6 @@ class NewsController extends BackController {
 		}
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'News', $News );
-		
-		$this->run();
 	}
 	
 	/**
@@ -175,6 +172,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executeClearNews( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $News_manager     NewsManager
 		 * @var $Comments_manager CommentsManager
@@ -198,7 +196,6 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
 		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
-		$this->run();
 	}
 	
 	/**
@@ -209,6 +206,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executePutUpdateComment( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 * @var $News_manager     NewsManager
@@ -261,7 +259,6 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'Comment', $Comment );
-		$this->run();
 	}
 	
 	/**

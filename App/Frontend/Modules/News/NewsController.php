@@ -105,12 +105,12 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
 		// On rajoute les données dont la méthode d'obtention varie
-		if (!$this->app->user()->hasAttribute('user_name')) {
+		if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
 			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
 		}
 		else {
-			$Comment->setAuthor( $this->app->user()->getAttribute('user_name') );
-			$Form_builder = new CommentFormBuilder($Comment);
+			$Comment->setAuthor( $this->app->user()->getAttribute( 'user_name' ) );
+			$Form_builder = new CommentFormBuilder( $Comment );
 		}
 		
 		$Form_builder->build();
@@ -164,15 +164,15 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
 		// On rajoute les données dont la méthode d'obtention varie
-		if (!$this->app->user()->hasAttribute('user_name')) {
-			$Comment->setAuthor($Request->postData( 'author' ));
+		if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+			$Comment->setAuthor( $Request->postData( 'author' ) );
 			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
 		}
 		else {
-			$Comment->setAuthor( $this->app->user()->getAttribute('user_name') );
-			$Form_builder = new CommentFormBuilder($Comment);
+			$Comment->setAuthor( $this->app->user()->getAttribute( 'user_name' ) );
+			$Form_builder = new CommentFormBuilder( $Comment );
 		}
-
+		
 		// 2) Construction et vérification des données
 		$Form_builder->build();
 		$Form = $Form_builder->form();
@@ -187,11 +187,12 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			// Setter le login de l'utilisateur pour la session s'il n'avait pas été entré.
-			if (!$this->app->user()->hasAttribute('user_name')) {
-				$this->app->user()->setAttribute('user_name', $Comment->author());
+			if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+				$this->app->user()->setAttribute( 'user_name', $Comment->author() );
 			}
 			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			$this->app->httpResponse()
+					  ->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
@@ -229,13 +230,13 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
 		// On rajoute les données dont la méthode d'obtention varie
-		if (!$this->app->user()->hasAttribute('user_name')) {
-			$Comment->setAuthor($Request->postData( 'author' ));
+		if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+			$Comment->setAuthor( $Request->postData( 'author' ) );
 			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
 		}
 		else {
-			$Comment->setAuthor( $this->app->user()->getAttribute('user_name') );
-			$Form_builder = new CommentFormBuilder($Comment);
+			$Comment->setAuthor( $this->app->user()->getAttribute( 'user_name' ) );
+			$Form_builder = new CommentFormBuilder( $Comment );
 		}
 		
 		// 2) Construction et vérification des données
@@ -253,8 +254,8 @@ class NewsController extends BackController {
 		
 		if ( $Form_handler->process() ) {
 			// Setter le login de l'utilisateur pour la session s'il n'avait pas été entré.
-			if (!$this->app->user()->hasAttribute('user_name')) {
-				$this->app->user()->setAttribute('user_name', $Comment->author());
+			if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+				$this->app->user()->setAttribute( 'user_name', $Comment->author() );
 			}
 		}
 		else {
@@ -268,37 +269,9 @@ class NewsController extends BackController {
 		}
 		$this->page->addVar( 'error_a', $Comment->error_a() );
 	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	/**
 	 * Rafraîchit les commentaires d'une news depuis la dernière date donnée
-	 *
-	 * /!\ Heure !
 	 *
 	 * @param HTTPRequest $Request
 	 */
@@ -306,7 +279,8 @@ class NewsController extends BackController {
 		/**
 		 * @var CommentsManager $Comments_manager
 		 * @var NewsManager     $News_manager
-		 * @var Comment[]       $Comment_a
+		 * @var Comment[]       $New_comment_a
+		 * @var Comment[]       $Update_comment_a
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( $Request->postExists( 'dateupdate' ) && $Request->getExists( 'id' ) ) {
@@ -316,14 +290,14 @@ class NewsController extends BackController {
 				$this->app->httpResponse()
 						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'afficher les nouveaux commentaires : la news concernée n\'existe plus !' ) );
 			}
-			$Comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
 			
-			foreach ( $Comment_a as $Comment ) {
+			// Sélection des nouveaux commentaires
+			$New_comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDatecreationSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
+			foreach ( $New_comment_a as $Comment ) {
 				$Comment->formatDate();
 			}
-			
 			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
-				foreach ( $Comment_a as $Comment ) {
+				foreach ( $New_comment_a as $Comment ) {
 					// On ajoute les droits d'administrateur si besoin
 					$Comment->setAction_a( [
 						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
@@ -335,14 +309,28 @@ class NewsController extends BackController {
 					] );
 				}
 			}
+			$this->page->addVar( 'New_comment_a', $New_comment_a );
 			
-			$this->page->addVar( 'Comment_a', $Comment_a );
+			// Sélection des commentaires édités
+			// Pas besoin de regénérer les droits, il n'y a pas de raison qu'ils changent
+			$Update_comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
 			
-			// Générer la date d'update des commentaires affichés : ne pas oublier de les mettre à la bonne timezone
-			$dateupdate = new \DateTime();
-			$dateupdate->setTimezone( new \DateTimeZone( 'Europe/Paris' ) );
-			$dateupdate->format( 'Y-m-d H:i:s.u' );
-			$this->page->addVar( 'dateupdate', $dateupdate );
+			foreach ( $Update_comment_a as $Comment ) {
+				$Comment->formatDate();
+			}
+			$this->page->addVar( 'Update_comment_a', $Update_comment_a );
+			
+			// Sélection des ids supprimés
+			if ($Request->postExists('displayed_comments_ids_a')) {
+				$delete_ids_a = $Comments_manager->filterCommentcUsingUnexistantCommentcId(explode(',', $Request->postData('displayed_comments_ids_a')));
+			}
+			else {
+				$delete_ids_a = [];
+			}
+			$this->page->addVar('delete_ids_a', $delete_ids_a);
+			
+			// Générer la date du refresh
+			$this->page->addVar( 'dateupdate', (new \DateTime())->format( 'Y-m-d H:i:s.u' ));
 		}
 		else {
 			throw new \RuntimeException( 'Can\'t determine last update date !' );

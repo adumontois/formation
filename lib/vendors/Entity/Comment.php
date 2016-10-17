@@ -32,21 +32,22 @@ class Comment extends Entity {
 	 */
 	protected $content;
 	/**
-	 * @var $date \DateTime
+	 * @var $datecreation \DateTime
 	 */
-	protected $date;
+	protected $datecreation;
+	/**
+	 * @var $dateupdate \DateTime
+	 */
+	protected $dateupdate;
 	/**
 	 * Liste des liens donnant les actions possibles sur l'entité
 	 *
 	 * @var $action_a array[]
 	 */
-	protected $action_a;
+	protected $action_a = [];
 	
 	public function __construct( array $values = array() ) {
 		parent::__construct( $values );
-		if (!isset($this->action_a)) {
-			$this->action_a = [];
-		}
 	}
 	
 	/**
@@ -82,8 +83,15 @@ class Comment extends Entity {
 	/**
 	 * @return \DateTime
 	 */
-	public function date() {
-		return $this->date;
+	public function datecreation() {
+		return $this->datecreation;
+	}
+	
+	/**
+	 * @return \DateTime
+	 */
+	public function dateupdate() {
+		return $this->dateupdate;
 	}
 	
 	/**
@@ -127,19 +135,29 @@ class Comment extends Entity {
 	}
 	
 	/**
-	 * Setter pour l'attribut date.
+	 * Setter pour l'attribut datecreation
 	 *
-	 * @param \DateTime $date
+	 * @param \DateTime $datecreation
 	 */
-	public function setDate( \DateTime $date ) {
-		$this->date = $date;
+	public function setDatecreation(\DateTime $datecreation) {
+	    $this->datecreation = $datecreation;
+	}   
+	
+	/**
+	 * Setter pour l'attribut dateupdate
+	 *
+	 * @param \DateTime $dateupdate 
+	 */
+	public function setDateupdate(\DateTime $dateupdate) {
+	    $this->dateupdate = $dateupdate;
 	}
 	
 	/**
-	 * Formate la date pour affichage dans une vue. Cette méthode modifie la valeur de l'attribut date.
+	 * Formate les dates pour affichage dans une vue. Cette méthode modifie la valeur des attributs datecreation et dateupdate.
 	 */
 	public function formatDate() {
-		$this->date = $this->date->format('d/m/Y à H\hi');
+		$this->datecreation = $this->datecreation->format('d/m/Y à H\hi');
+		$this->dateupdate = $this->dateupdate->format('d/m/Y à H\hi');
 	}
 	
 	/**

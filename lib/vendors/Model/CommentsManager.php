@@ -100,10 +100,27 @@ abstract class CommentsManager extends Manager {
 	abstract public function existsCommentcUsingCommentcId($commentc_id);
 	
 	/*
-	 * Récupère tous les commentaires d'une news ultérieurs à la date de mise à jour demandée.
+	 * Récupère tous les commentaires d'une news créés après la date demandée.
+	 *
+	 * @param int $newsc_id
+	 * @param string $commentc_datecreation
+	 */
+	abstract public function getCommentcUsingNewscIdFilterOverDatecreationSortByIdDesc( $newsc_id, $commentc_datecreation );
+	
+	/*
+	 * Récupère tous les commentaires d'une news modifiés après la date demandée.
 	 *
 	 * @param int $newsc_id
 	 * @param string $commentc_dateupdate
 	 */
-	abstract public function getCommentcUsingNewscIdFilterOverDateupdateSortByIdDesc($newsc_id, $commentc_dateupdate);
+	abstract public function getCommentcUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $newsc_id, $commentc_dateupdate );
+	
+	/**
+	 * Filtre tous les ids de commentaires qui n'existent pas.
+	 *
+	 * @param int[] $commentc_id_a
+	 *
+	 * @return int[]|[]
+	 */
+	abstract public function filterCommentcUsingUnexistantCommentcId(array $commentc_id_a);
 }

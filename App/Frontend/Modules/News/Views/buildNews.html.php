@@ -10,11 +10,10 @@
  * @var $News              \Entity\News News à afficher
  * @var $Comment_list_a    \Entity\Comment[] Liste des commentaires à afficher
  * @var $link_a            string[] Liste des liens à afficher
- * @var $dateupdate string Date de dernière mise à jour des commentaires
+ * @var $dateupdate        string Date de dernière mise à jour des commentaires
  */
 
 ?>
-	
 
 
 <p>
@@ -29,7 +28,7 @@
 	</p>
 <?php endif; ?>
 
-<?php $form_id  = 'insert_comment_1';
+<?php $form_id         = 'insert_comment_1';
 $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 <?php require "form/insert_comment.html.php" ?>
 
@@ -42,9 +41,12 @@ $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 <?php $js_data_action_refresh = $News[ 'action_a' ][ 0 ][ 'refresh_comments_json' ]; ?>
 <div id="js-comment-panel" data-action="<?= $js_data_action_refresh ?>" data-last-update="<?= $dateupdate ?>">
 	<?php foreach ( $Comment_list_a as $Comment ): ?>
-		<fieldset class = ".js-comment">
+		<fieldset class="js-comment" data-id=<?= $Comment['id']?>>
 			<legend>
-				Posté par <strong><?= htmlspecialchars( $Comment[ 'author' ] ) ?></strong> le <?= $Comment[ 'date' ] ?>
+				Posté par <strong><?= htmlspecialchars( $Comment[ 'author' ] ) ?></strong> le <?= $Comment[ 'datecreation' ] ?>
+				<?php if ( $Comment[ 'datecreation' ] != $Comment[ 'dateupdate' ] ): ?>
+					- <strong class="js-edit-comment">modifié le <?= $Comment[ 'dateupdate' ] ?></strong>
+				<?php endif; ?>
 				<?php if ( !empty( $Comment[ 'action_a' ] ) ): ?>
 					-
 					<?php foreach ( $Comment[ 'action_a' ] as $action_a ): ?>
@@ -52,17 +54,17 @@ $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</legend>
-			<p>
+			<p class = "js-comment-content">
 				<?= nl2br( htmlspecialchars( $Comment[ 'content' ] ) ) ?>
 			</p>
 		</fieldset>
 	<?php endforeach; ?>
 </div>
 
-<?php $form_id = 'insert_comment_2';
+<?php $form_id         = 'insert_comment_2';
 $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 <?php require "form/insert_comment.html.php" ?>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="/javascript-functions/insert-comment-to-news.js"></script>
 <script src="/javascript-functions/refresh-comments-on-news.js"></script>

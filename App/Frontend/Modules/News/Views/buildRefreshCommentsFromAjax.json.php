@@ -7,8 +7,12 @@
  */
 
 /**
- * @var \Entity\Comment[] $Comment_a Liste des nouveaux commentaires
+ * @var \Entity\Comment[] $New_comment_a Liste des nouveaux commentaires
+ * @var \Entity\Comment[] $Update_comment_a Liste des nouveaux commentaires
+ * @var string $dateupdate Date de dernière mise à jour des commentaires (= NOW())
  */
-return ['Comment_a' => $Comment_a,
+return ['New_comment_a' => $New_comment_a,
+		'Update_comment_a' => $Update_comment_a,
+		'delete_ids_a' => $delete_ids_a,
 		'dateupdate' => $dateupdate];
 ?>
