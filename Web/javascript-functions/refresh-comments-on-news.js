@@ -12,7 +12,8 @@ window.onload = function() {
 $.getScript("/javascript-functions/write-comment.js");
 
 // Fonction pour rafraîchir les commentaires sur la page
-function refresh_comments() {
+// Omet les ids de commentaires passés en paramètres
+function refresh_comments(omit_ids) {
 	
 	// Sélection du panel de commentaires
 	var $this = $( "#js-comment-panel" );

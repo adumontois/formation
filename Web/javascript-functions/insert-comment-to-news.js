@@ -42,10 +42,9 @@ $( '.js-form-insert-comment' ).submit( function( event ) {
 					$( bad_field ).insertBefore( $this.find( '[name=' + input + ']' ) );
 				}
 			}
-			else {
-				// Pas d'erreur = afficher le nouveau commentaire. On le formate en HTML.
-				write_comment(Comment);
-			}
+			
+			// On rafraîchit les commentaires dans tous les cas : le nouveau commentaire s'affiche s'il est correct.
+			refresh_comments();
 		},
 		error : function(resultat, statut, erreur) {
 			console.log(resultat);
