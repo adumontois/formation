@@ -292,22 +292,24 @@ class NewsController extends BackController {
 	 *
 	 * @param HTTPRequest $Request
 	 */
-	public function executeClearCommentFromAjax(HTTPRequest $Request) {
+	public function executeClearCommentFromAjax( HTTPRequest $Request ) {
 		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->page->addVar('master_code', 1);
-			$this->page->addVar('master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
-		}
-		else if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
-			$this->page->addVar('master_code', 2);
-			$this->page->addVar('master_error', 'Le commentaire à supprimer n\'existe pas !');
+			$this->page->addVar( 'master_code', 1 );
+			$this->page->addVar( 'master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
 		}
 		else {
-			$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
+			if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+				$this->page->addVar( 'master_code', 2 );
+				$this->page->addVar( 'master_error', 'Le commentaire à supprimer n\'existe pas !' );
+			}
+			else {
+				$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
+			}
 		}
 	}
 	
@@ -324,53 +326,57 @@ class NewsController extends BackController {
 		 * @var $Comments_manager CommentsManager
 		 * @var $News_manager     NewsManager
 		 */
-		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->app->httpResponse()
-					  ->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour éditer les commentaires.' ) );
-		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		$News_manager     = $this->managers->getManagerOf();
-		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
-			if ( !ctype_digit( $Request->postData( 'news' ) ) ) {
-				$this->app->httpResponse()->redirectError( HTTPResponse::BAD_REQUEST, new \Exception( 'Le champ de news caché a été modifié par l\'utilisateur. Bien essayé !' ) );
-			}
-			if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
-				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Le commentaire en cours d\'édition n\'existe plus !' ) );
-			}
-			if ( !$News_manager->existsNewscUsingNewscId( $Request->postData( 'news' ) ) ) {
-				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news associée au commentaire en cours d\'édition n\'existe pas !' ) );
-			}
-			$Comment = new Comment( array(
-				'id'      => $Request->getData( 'id' ),
-				'fk_SNC'  => $Request->postData( 'news' ),
-				'author'  => $Request->postData( 'author' ),
-				'content' => $Request->postData( 'content' ),
-			) );
+		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
+			$this->page->addVar( 'master_code', 1 );
+			$this->page->addVar( 'master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
 		}
 		else {
-			// Récupérer le commentaire en DB
-			$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
+			if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+				if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+					$this->page->addVar( 'master_code', 2 );
+					$this->page->addVar( 'master_error', 'Le commentaire en cours d\'édition n\'existe plus !' );
+				}
+				if ( !$News_manager->existsNewscUsingNewscId( $Request->postData( 'news' ) ) ) {
+					$this->page->addVar( 'master_code', 3 );
+					$this->page->addVar( 'master_error', 'La news associée au commentaire en cours d\'édition n\'existe plus !' );
+				}
+				$Comment = new Comment( array(
+					'id'      => $Request->getData( 'id' ),
+					'content' => $Request->postData( 'content' ),
+				) );
+			}
+			else {
+				// Récupérer le commentaire en DB
+				$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
+			}
+			
+			if (null === $Comment) {
+				$this->page->addVar( 'master_code', 4 );
+				$this->page->addVar( 'master_error', 'Le commentaire à éditer n\'existe pas !' );
+			}
+			else {
+				// Construire le formulaire
+				$Form_builder = new CommentFormBuilder( $Comment );
+				$Form_builder->build();
+				$Form = $Form_builder->form();
+				
+				// Sauvegarder avec le FormHandler
+				$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
+				if ( !$Form_handler->process() ) {
+					// On envoie les erreurs si besoin
+					foreach ( $Form->Field_a() as $Field ) {
+						$error = $Field->errorMessage();
+						if ( !empty( $error ) ) {
+							$Comment->addError_a( $Field->name(), $error );
+						}
+					}
+				}
+				// Envoyer les erreurs
+				$this->page->addVar( 'Comment', $Comment );
+				$this->page->addVar( '')
+			}
 		}
-		
-		// News qui n'existe pas : on redirige vers une erreur 404
-		if ( null === $Comment ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à éditer n\'existe pas !' ) );
-		}
-		
-		// Construire le formulaire
-		$Form_builder = new CommentFormBuilder( $Comment );
-		$Form_builder->build();
-		$Form = $Form_builder->form();
-		
-		// Sauvegarder avec le FormHandler
-		$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
-		if ( $Form_handler->process() ) {
-			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
-			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
-		}
-		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
-		$this->page->addVar( 'form', $Form->createView() );
-		$this->page->addVar( 'Comment', $Comment );
 	}
 }
