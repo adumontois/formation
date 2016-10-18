@@ -3,10 +3,14 @@
 	<route url="/" module="News" action="buildIndex" />
 	<route url="/news-([0-9]+)\.html" module="News" action="buildNews" vars="id"  />
 	<route url="/commenter-([0-9]+)\.html" module="News" action="putInsertComment" vars="id" />
+	<route url="/commenter-([0-9]+)\.json" module="News" action="putInsertCommentFromAjax" vars="id" format="json" />
+	<route url="/refresh-comments-([0-9]+)\.json" module="News" action="buildRefreshCommentsFromAjax" vars="id" format="json" />
+	
 	<route url="/create-account.html" module="Connection" action="putUser" />
 	<route url="/logout.html" module="Connection" action="clearConnection" />
 	<route url="/connect.html" module="Connection" action="getConnection" />
-	<route url="/commenter-([0-9]+)\.json" module="News" action="putInsertCommentFromAjax" vars="id" format="json" />
-	<route url="/refresh-comments-([0-9]+)\.json" module="News" action="buildRefreshCommentsFromAjax" vars="id" format="json" />
+	
 	<route url="/device.html" module="Device" action="buildDevice" />
+	
+	<route url="/member-([0-9]+)\.html" module="Member" action="buildMember" vars="id" />
 </routes>

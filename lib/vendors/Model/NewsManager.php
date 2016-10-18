@@ -31,7 +31,7 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return News[]
 	 */
-	abstract public function getNewscSortByIdDesc($start = 0, $count = self::MAX_LIST_SIZE );
+	abstract public function getNewscAndUserSortByIdDesc($start = 0, $count = self::MAX_LIST_SIZE );
 	
 	/**
 	 * Récupère la news d'id donné.
@@ -104,4 +104,22 @@ abstract class NewsManager extends Manager {
 	 * @return bool
 	 */
 	abstract public function existsNewscUsingNewscId($newsc_id);
+	
+	/**
+	 * Récupère les News dont l'auteur est l'utilisateur d'id donné.
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return News[]|[]
+	 */
+	abstract public function getNewscUsingUsercIdSortByIdDesc( $userc_id);
+	
+	/**
+	 * Sélectionne toutes les news dans lesquelles l'utilisateur d'id donné a laissé un commentaire sans être l'auteur de la News
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return News[]|[]
+	 */
+	abstract public function getNewscAndUserUsingUsercIdFilterNotAuthorButCommenterSortByIdDesc( $userc_id);
 }

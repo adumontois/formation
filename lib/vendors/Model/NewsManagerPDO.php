@@ -28,7 +28,7 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @return News[] Renvoie un tableau de news
 	 */
-	public function getNewscSortByIdDesc( $start = 0, $count = parent::MAX_LIST_SIZE ) {
+	public function getNewscAndUserSortByIdDesc( $start = 0, $count = parent::MAX_LIST_SIZE ) {
 		if ( (int)$start < 0 OR (int)$count <= 0 ) {
 			throw new \InvalidArgumentException( 'Offset and limit values must be positive integers' );
 		}
@@ -208,6 +208,102 @@ class NewsManagerPDO extends NewsManager {
 		$stmt->execute();
 		$return = (bool)$stmt->fetch();
 		$stmt->closeCursor();
+		
 		return (bool)$return;
+	}
+	
+	/**
+	 * Récupère les News dont l'auteur est l'utilisateur d'id donné.
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return News[]|[]
+	 */
+	public function getNewscUsingUsercIdSortByIdDesc( $userc_id ) {
+		/**
+		 * @var News $News
+		 */
+		$sql = "SELECT SNC_id, SNC_content, SNC_dateadd, SNC_dateupdate, SNC_fk_SUC, SNC_title,
+					SUC_id, SUC_fk_SUY, SUC_login, SUC_fk_SUE_valid, SUC_fk_SUE_banned, SUC_datesubscription, SUC_email
+				FROM t_sit_newsc
+				INNER JOIN t_sit_userc ON SNC_fk_SUC = SUC_id
+					 AND SNC_fk_SUC = :fk_SUC
+				ORDER BY SNC_id DESC ";
+		
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SUC', (int)$userc_id, \PDO::PARAM_INT );
+		$stmt->setFetchMode( \PDO::FETCH_ASSOC );
+		$stmt->execute();
+		$News_a = [];
+		while ( $News = $stmt->fetch() ) {
+			$News_a[] = new News( [
+				'id'         => (int)$News[ 'SNC_id' ],
+				'fk_SUC'     => (int)$News[ 'SNC_fk_SUC' ],
+				'title'      => $News[ 'SNC_title' ],
+				'content'    => $News[ 'SNC_content' ],
+				'dateadd'    => new \DateTime( $News[ 'SNC_dateadd' ] ),
+				'dateupdate' => new \DateTime( $News[ 'SNC_dateupdate' ] ),
+				'User'       => new User( [
+					'id'               => (int)$News[ 'SUC_id' ],
+					'login'            => $News[ 'SUC_login' ],
+					'email'            => $News[ 'SUC_email' ],
+					'datesubscription' => new \DateTime( $News[ 'SUC_datesubscription' ] ),
+					'fk_SUE_banned'    => (int)$News[ 'SUC_fk_SUE_banned' ],
+					'fk_SUE_valid'     => (int)$News[ 'SUC_fk_SUE_valid' ],
+					'fk_SUY'           => (int)$News[ 'SUC_fk_SUY' ],
+				] ),
+			] );
+		}
+		
+		return $News_a;
+	}
+	
+	/**
+	 * Sélectionne toutes les news dans lesquelles l'utilisateur d'id donné a laissé un commentaire sans être l'auteur de la News,
+	 * et construit l'auteur de la news
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return News[]|[]
+	 */
+	public function getNewscAndUserUsingUsercIdFilterNotAuthorButCommenterSortByIdDesc( $userc_id ) {
+		/**
+		 * @var News $News
+		 */
+		$sql = "SELECT SNC_id, SNC_content, SNC_dateadd, SNC_dateupdate, SNC_fk_SUC, SNC_title,
+					B.SUC_id SUC_id, B.SUC_fk_SUY SUC_fk_SUY, B.SUC_login SUC_login, B.SUC_fk_SUE_valid SUC_fk_SUE_valid, B.SUC_fk_SUE_banned SUC_fk_SUE_banned, B.SUC_datesubscription SUC_datesubscription, B.SUC_email SUC_email
+				FROM t_sit_newsc
+				INNER JOIN t_sit_commentc ON SCC_fk_SNC = SNC_id
+					AND SNC_fk_SUC <> :userc_id
+				INNER JOIN t_sit_userc A ON A.SUC_id = :userc_id
+					AND A.SUC_login = SCC_author
+				INNER JOIN t_sit_userc B ON B.SUC_id = SNC_fk_SUC
+				ORDER BY SNC_id DESC ";
+		
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':userc_id', (int)$userc_id, \PDO::PARAM_INT );
+		$stmt->setFetchMode( \PDO::FETCH_ASSOC );
+		$stmt->execute();
+		$News_a = [];
+		while ( $News = $stmt->fetch() ) {
+			$News_a[] = new News( [
+				'id'         => (int)$News[ 'SNC_id' ],
+				'fk_SUC'     => (int)$News[ 'SNC_fk_SUC' ],
+				'title'      => $News[ 'SNC_title' ],
+				'content'    => $News[ 'SNC_content' ],
+				'dateadd'    => new \DateTime( $News[ 'SNC_dateadd' ] ),
+				'dateupdate' => new \DateTime( $News[ 'SNC_dateupdate' ] ),
+				'User'       => new User( [
+					'id'               => (int)$News[ 'SUC_id' ],
+					'login'            => $News[ 'SUC_login' ],
+					'email'            => $News[ 'SUC_email' ],
+					'datesubscription' => new \DateTime( $News[ 'SUC_datesubscription' ] ),
+					'fk_SUE_banned'    => (int)$News[ 'SUC_fk_SUE_banned' ],
+					'fk_SUE_valid'     => (int)$News[ 'SUC_fk_SUE_valid' ],
+					'fk_SUY'           => (int)$News[ 'SUC_fk_SUY' ],
+				] ),
+			] );
+		}
+		return $News_a;
 	}
 }

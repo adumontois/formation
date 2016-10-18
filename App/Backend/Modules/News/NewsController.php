@@ -48,9 +48,10 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		$this->page->addVar( 'title', 'Liste des news' );
 		try {
-			$News_list_a = $News_manager->getNewscSortByIdDesc();
+			$News_list_a = $News_manager->getNewscAndUserSortByIdDesc();
 			foreach ( $News_list_a as $News ) {
 				$News->format();
+				$News->User()['link'] = Router::getUrlFromModuleAndAction('Frontend', 'Member', 'buildMember', array('id' => (int)$News->User()->id()));
 				// On génère le lien si l'utilisateur a les droits de modification et de suppression
 				if ( $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id() ) {
 					$News->setAction_a( [

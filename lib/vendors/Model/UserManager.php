@@ -90,4 +90,13 @@ abstract class UserManager extends Manager {
 	 * @return bool
 	 */
 	abstract public function existsUsercUsingUsercLogin($userc_login);
+	
+	/**
+	 * Vérifie si l'utilisateur d'id donné existe.
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return bool
+	 */
+	abstract public function existsUsercUsingUsercId($userc_id);
 }

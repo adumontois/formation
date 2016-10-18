@@ -29,7 +29,7 @@
 	<?php foreach ( $News_list_a as $News ): ?>
 		<tr>
 			<td>
-				<?= htmlspecialchars( $News[ 'User' ] ) ?>
+				<a href="<?= $News['User']['link'] ?>"><?= htmlspecialchars( $News[ 'User' ] ) ?></a>
 			</td>
 			<td>
 				<?= htmlspecialchars( $News[ 'title' ] ) ?>

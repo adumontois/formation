@@ -125,4 +125,13 @@ abstract class CommentsManager extends Manager {
 	 * @return int[]|[]
 	 */
 	abstract public function filterCommentcUsingUnexistantCommentcId(array $commentc_id_a);
+	
+	/**
+	 * Récupère toues les commentaires d'un User donné par son login
+	 *
+	 * @param string $userc_login
+	 *
+	 * @return Comment[]|[]
+	 */
+	abstract public function getCommentcUsingUsercLoginSortByFk_SNCDesc( $userc_login);
 }

@@ -266,4 +266,33 @@ class CommentsManagerPDO extends CommentsManager {
 		$stmt->closeCursor();
 		return array_diff($commentc_id_a, $existant_ids_a);
 	}
+	
+	/**
+	 * Récupère toues les commentaires d'un User donné par son login
+	 *
+	 * @param string $userc_login
+	 *
+	 * @return Comment[]|[]
+	 */
+	public function getCommentcUsingUsercLoginSortByFk_SNCDesc( $userc_login) {
+		/**
+		 * @var Comment $Comment
+		 */
+		$sql = 'SELECT SCC_id id, SCC_author author, SCC_dateupdate dateupdate, SCC_datecreation datecreation, SCC_content content, SCC_fk_SNC fk_SNC
+				FROM t_sit_commentc
+				WHERE SCC_author = :login
+				ORDER BY SCC_id DESC';
+		
+		$stmt = $this->dao->prepare($sql);
+		$stmt->bindValue('login', $userc_login);
+		$stmt->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment');
+		$stmt->execute();
+		$Comment_a = [];
+		while ($Comment = $stmt->fetch()) {
+			$Comment->setDatecreation(new \DateTime($Comment->datecreation()));
+			$Comment->setDateupdate(new \DateTime($Comment->dateupdate()));
+			$Comment_a[] = $Comment;
+		}
+		return $Comment_a;
+	}
 }

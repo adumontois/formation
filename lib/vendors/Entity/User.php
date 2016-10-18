@@ -21,8 +21,8 @@ class User extends Entity {
 	/**
 	 * Type constants
 	 */
-	const USERY_STANDARD   = 1;
-	const USERY_SUPERADMIN = 2;
+	const USERY_STANDARD         = 1;
+	const USERY_SUPERADMIN       = 2;
 	const CRYPTED_PASSWORD_MATCH = '%^(\$6\$rounds=([0-9]){1,9}\$(.){1,16}\$)(.){1,}$%';
 	const CRYPT_KEY_MATCH        = '%^(\$6\$rounds=([0-9]){1,9}\$(.){1,16}\$)%';
 	/**
@@ -55,7 +55,6 @@ class User extends Entity {
 	 * @var $valid int Indique si l'utilisateur a été validé
 	 */
 	protected $fk_SUE_valid;
-	
 	// Variables de stockage pour la confirmation lors de la création d'un User
 	protected $password_confirm;
 	protected $email_confirm;
@@ -108,17 +107,48 @@ class User extends Entity {
 	 *
 	 * @return string
 	 */
-	static public function getTextualStatus($fk_SUY) {
-		if (!is_int($fk_SUY)) {
-			throw new \InvalidArgumentException('Le type d\'un User doit être un entier !');
-		}
-		switch ($fk_SUY) {
+	static public function getTextualStatus( $fk_SUY ) {
+		switch ( (int) $fk_SUY ) {
 			case 1 :
 				return 'simple écrivain';
 			case 2 :
 				return 'superadmin';
 			default :
-				throw new \InvalidArgumentException('Le type de User '.$fk_SUY.' n\'existe pas !');
+				throw new \InvalidArgumentException( 'Le type de User ' . $fk_SUY . ' n\'existe pas !' );
+		}
+	}
+	
+	/**
+	 * Retourne un état de validité formaté à partir de l'état passé en paramètre.
+	 *
+	 * @param int $fk_SUE_valid
+	 *
+	 * @return string Etat de validité formaté
+	 */
+	static public function getTextualValid( $fk_SUE_valid ) {
+		switch ( (int)$fk_SUE_valid ) {
+			case ( User::USERE_VALID_VALIDATED_BY_FORM ):
+				return "validé par le formulaire";
+			default:
+				throw new \InvalidArgumentException( 'L\'état ' . $fk_SUE_valid . 'n\'a pas de signification pour l\'attribut de validité.' );
+		}
+	}
+	
+	/**
+	 * Retourne un état de bannissement formaté à partir de l'état passé en paramètre.
+	 *
+	 * @param int $fk_SUE_banned
+	 *
+	 * @return string Etat de bannissement formaté
+	 */
+	static public function getTextualBanned( $fk_SUE_banned ) {
+		switch ( (int)$fk_SUE_banned ) {
+			case ( User::USERE_BANNED_NOT_BANNED):
+				return "en activité";
+			case (User::USERE_BANNED_BANNED_FOR_FLOOD):
+				return "banni pour flood";
+			default:
+				throw new \InvalidArgumentException( 'L\'état ' . $fk_SUE_banned . 'n\'a pas de signification pour l\'attribut de bannissement.' );
 		}
 	}
 	
@@ -139,10 +169,11 @@ class User extends Entity {
 	
 	/**
 	 * Conversion en string d'un User
+	 *
 	 * @return string
 	 */
 	public function __toString() {
-		return $this->login().' ('.$this->email().')';
+		return $this->login() . ' (' . $this->email() . ')';
 	}
 	
 	/**
@@ -337,5 +368,12 @@ class User extends Entity {
 	 */
 	public function fk_SUE_valid() {
 		return $this->fk_SUE_valid;
+	}
+	
+	/**
+	 * Formate les dates pour affichage dans une vue. Cette méthode modifie la valeur de l'attribut datesubscription
+	 */
+	public function formatDate() {
+		$this->datesubscription = $this->datesubscription->format('d/m/Y');
 	}
 }

@@ -62,10 +62,10 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	 * @return bool
 	 */
 	public function offsetExists( $offset ) {
-		return isset( $this->$offset ) AND is_callable( array(
+		return isset( $this->$offset ) /*AND is_callable( array(
 			$this,
 			$offset,
-		) );
+		) )*/;
 	}
 	
 	/**
@@ -78,7 +78,7 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	 */
 	public function offsetGet( $offset ) {
 		if ( $this->offsetExists( $offset ) ) {
-			return $this->$offset();
+			return $this->$offset;
 		}
 		
 		return null;
@@ -91,16 +91,16 @@ abstract class Entity implements \ArrayAccess, \JsonSerializable  {
 	 * @param mixed  $value  valeur
 	 */
 	public function offsetSet( $offset, $value ) {
-		$method = 'set' . ucfirst( $offset );
+		/*$method = 'set' . ucfirst( $offset );
 		if ( isset( $this->$offset ) AND is_callable( array(
 				[
 					$this,
 					$method,
 				],
 			) )
-		) {
-			$this->$method( $value );
-		}
+		) {*/
+			$this->$offset = $value;
+		//}
 	}
 	
 	/**
