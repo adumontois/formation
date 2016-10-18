@@ -310,4 +310,67 @@ class NewsController extends BackController {
 			$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
 		}
 	}
+	
+	/**
+	 * Met à jour un commentaire.
+	 *
+	 * Si le commentaire n'existe pas, redirige vers une erreur 404.
+	 *
+	 * @param HTTPRequest $Request
+	 */
+	public function executePutUpdateCommentFromAjax( HTTPRequest $Request ) {
+		$this->run();
+		/**
+		 * @var $Comments_manager CommentsManager
+		 * @var $News_manager     NewsManager
+		 */
+		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
+			$this->app->httpResponse()
+					  ->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour éditer les commentaires.' ) );
+		}
+		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+		$News_manager     = $this->managers->getManagerOf();
+		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			if ( !ctype_digit( $Request->postData( 'news' ) ) ) {
+				$this->app->httpResponse()->redirectError( HTTPResponse::BAD_REQUEST, new \Exception( 'Le champ de news caché a été modifié par l\'utilisateur. Bien essayé !' ) );
+			}
+			if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Le commentaire en cours d\'édition n\'existe plus !' ) );
+			}
+			if ( !$News_manager->existsNewscUsingNewscId( $Request->postData( 'news' ) ) ) {
+				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news associée au commentaire en cours d\'édition n\'existe pas !' ) );
+			}
+			$Comment = new Comment( array(
+				'id'      => $Request->getData( 'id' ),
+				'fk_SNC'  => $Request->postData( 'news' ),
+				'author'  => $Request->postData( 'author' ),
+				'content' => $Request->postData( 'content' ),
+			) );
+		}
+		else {
+			// Récupérer le commentaire en DB
+			$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
+		}
+		
+		// News qui n'existe pas : on redirige vers une erreur 404
+		if ( null === $Comment ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à éditer n\'existe pas !' ) );
+		}
+		
+		// Construire le formulaire
+		$Form_builder = new CommentFormBuilder( $Comment );
+		$Form_builder->build();
+		$Form = $Form_builder->form();
+		
+		// Sauvegarder avec le FormHandler
+		$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
+		if ( $Form_handler->process() ) {
+			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
+			// Redirection vers l'accueil d'administration
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+		}
+		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
+		$this->page->addVar( 'form', $Form->createView() );
+		$this->page->addVar( 'Comment', $Comment );
+	}
 }

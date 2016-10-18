@@ -3,10 +3,10 @@
  */
 
 /**
- * Supprime le commentaire en appuyant sur le bouton de suppression
+ * Ouvre un champ pour éditer le commentaire entré.
  */
-$(".js-comment button[data-function=\"delete_comment_on_click\"]").click( delete_comment_on_click = function( event ) {
-	var $this = $(this);
+$(".js-comment button[data-function=\"update_comment_on_click\"]").click( update_comment_on_click = function( event ) {
+	/*var $this = $(this);
 	
 	event.preventDefault();
 	console.log($this);
@@ -27,5 +27,5 @@ $(".js-comment button[data-function=\"delete_comment_on_click\"]").click( delete
 		error : function(resultat, statut, erreur) {
 			console.log(resultat);
 		}
-	});
+	});*/
 });

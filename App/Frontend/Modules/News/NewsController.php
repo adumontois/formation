@@ -90,12 +90,14 @@ class NewsController extends BackController {
 			$Comment->formatDate();
 			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				$Comment->setAction_a( [
-					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
+					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
 					'label' => 'Modifier',
+					'js_function' => 'update_comment_on_click'
 				] );
 				$Comment->setAction_a( [
 					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
 					'label' => 'Supprimer',
+					'js_function' => 'delete_comment_on_click'
 				] );
 			}
 		}
@@ -302,10 +304,12 @@ class NewsController extends BackController {
 					$Comment->setAction_a( [
 						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
 						'label' => 'Modifier',
+						'js_function' => 'update_comment_on_click'
 					] );
 					$Comment->setAction_a( [
 						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
 						'label' => 'Supprimer',
+						'js_function' => 'delete_comment_on_click'
 					] );
 				}
 			}
