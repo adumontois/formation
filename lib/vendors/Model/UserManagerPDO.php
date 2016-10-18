@@ -142,8 +142,7 @@ class UserManagerPDO extends UserManager {
 	public function countUsercUsingUsercId() {
 		$sql = 'SELECT COUNT(*)
 				FROM T_SIT_userc';
-		
-		return $this->dao->query( $sql )->fetchColumn();
+		return 	$this->dao->query( $sql )->fetchColumn();
 	}
 	
 	/**

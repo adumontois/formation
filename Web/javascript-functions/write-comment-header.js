@@ -8,13 +8,14 @@
  * @param Comment Commentaire à écrire (format JSON)
  */
 function write_comment_header( Comment ) {
+	console.log(Comment);
 	new_comment_header = $( "<legend></legend>" )
 		.append( "Posté par ", $( "<strong></strong>" )
 			.text( Comment.author ), ' le ', Comment.datecreation );
 
 	if ( Comment.datecreation != Comment.dateupdate ) {
-		new_comment.append( "- " )
-				   .append( $( "<strong class='\"js-edit-comment\"'></strong>" ).text( "modifié le ".Comment.dateupdate ) );
+		new_comment_header.append( " - " )
+				   .append( $( "<strong class='\"js-edit-comment\"'></strong>" ).text( "modifié le "+Comment.dateupdate ) );
 	}
 
 	// Ajout des actions au header

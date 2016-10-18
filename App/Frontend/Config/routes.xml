@@ -8,4 +8,5 @@
 	<route url="/connect.html" module="Connection" action="getConnection" />
 	<route url="/commenter-([0-9]+)\.json" module="News" action="putInsertCommentFromAjax" vars="id" format="json" />
 	<route url="/refresh-comments-([0-9]+)\.json" module="News" action="buildRefreshCommentsFromAjax" vars="id" format="json" />
+	<route url="/device.html" module="Device" action="buildDevice" />
 </routes>

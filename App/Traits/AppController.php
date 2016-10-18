@@ -8,6 +8,7 @@
 
 namespace App\Traits;
 
+use Detection\MobileDetect;
 use Entity\User;
 use OCFram\BackController;
 use OCFram\Router;
@@ -41,11 +42,14 @@ trait AppController {
 	 * Génère le menu d'une page HTML.
 	 */
 	private function runHTML() {
-		//var_dump($_SESSION['user_name']);
 		$menu_a = [
 			[
 				'label' => 'Accueil',
 				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'News', 'buildIndex'),
+			],
+			[
+				'label' => 'Votre appareil',
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Device', 'buildDevice'),
 			],
 		];
 		if ( $this->app()->user()->isAuthenticated() ) {

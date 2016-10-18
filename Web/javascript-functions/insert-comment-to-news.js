@@ -45,7 +45,9 @@ $( '.js-form-insert-comment' ).submit( function( event ) {
 			else {
 				// Supprimer le champ auteur s'il existe
 				$(".js-form-insert-comment label[for='author']").remove();
+				$(".js-form-insert-comment input[name='author']").next().remove();
 				$(".js-form-insert-comment input[name='author']").remove();
+				
 				
 				// Supprimer le contenu du commentaire
 				$(".js-form-insert-comment textarea[name='content']").val("");
