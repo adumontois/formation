@@ -269,6 +269,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executeClearComment( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 */
@@ -284,6 +285,29 @@ class NewsController extends BackController {
 		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
 		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+	}
+	
+	/**
+	 * Supprime un commentaire en Ajax.
+	 *
+	 * @param HTTPRequest $Request
+	 */
+	public function executeClearCommentFromAjax(HTTPRequest $Request) {
 		$this->run();
+		/**
+		 * @var $Comments_manager CommentsManager
+		 */
+		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
+		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
+			$this->page->addVar('master_code', 1);
+			$this->page->addVar('master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
+		}
+		else if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+			$this->page->addVar('master_code', 2);
+			$this->page->addVar('master_error', 'Le commentaire à supprimer n\'existe pas !');
+		}
+		else {
+			$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
+		}
 	}
 }

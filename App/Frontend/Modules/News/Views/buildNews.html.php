@@ -50,7 +50,7 @@ $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 				<?php if ( !empty( $Comment[ 'action_a' ] ) ): ?>
 					-
 					<?php foreach ( $Comment[ 'action_a' ] as $action_a ): ?>
-						<a href=<?= $action_a[ 'link' ] ?>><?= $action_a[ 'label' ] ?></a>
+						<button data-action="<?= $action_a[ 'link' ] ?>"><?= $action_a[ 'label' ]  ?></button>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</legend>
@@ -68,3 +68,4 @@ $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="/javascript-functions/insert-comment-to-news.js"></script>
 <script src="/javascript-functions/refresh-comments-on-news.js"></script>
+<script src="/javascript-functions/delete-comment-on-click.js"></script>

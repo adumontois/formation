@@ -36,7 +36,7 @@ function refresh_comments() {
 		dataType : "json",
 		success  : function( json, status ) {
 			if ( json.master_code != 0 ) {
-				console.error( 'Aie aie aie je m\'arrete la car j\'ai rencontré une erreur' );
+				console.error( json.master_error );
 				return;
 			}
 			

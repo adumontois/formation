@@ -8,5 +8,6 @@
  * @param id
  */
 function delete_comment(id) {
+	
 	$(".js-comment[data-id="+id+"]").remove();
 }

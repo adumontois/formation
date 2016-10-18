@@ -94,7 +94,7 @@ class NewsController extends BackController {
 					'label' => 'Modifier',
 				] );
 				$Comment->setAction_a( [
-					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
+					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
 					'label' => 'Supprimer',
 				] );
 			}
@@ -287,8 +287,8 @@ class NewsController extends BackController {
 			// On vérifie l'existence de la news
 			$News_manager = $this->managers->getManagerOf();
 			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
-				$this->app->httpResponse()
-						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'afficher les nouveaux commentaires : la news concernée n\'existe plus !' ) );
+				$this->page->addVar('master_code', 1);
+				$this->page->addVar('master_error', 'Impossible d\'ajouter le commentaire : la news n\'existe plus !');
 			}
 			
 			// Sélection des nouveaux commentaires
@@ -304,7 +304,7 @@ class NewsController extends BackController {
 						'label' => 'Modifier',
 					] );
 					$Comment->setAction_a( [
-						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => (int)$Comment->id() ) ),
+						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
 						'label' => 'Supprimer',
 					] );
 				}

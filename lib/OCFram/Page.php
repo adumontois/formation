@@ -66,8 +66,8 @@ class Page extends ApplicationComponent {
 		}
 		
 		
-		
 		switch( $this->format() ) {
+			
 			case 'json':
 				return $this->getGeneratedPageJSON();
 			default:

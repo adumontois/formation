@@ -22,9 +22,10 @@ function write_comment_header( Comment ) {
 	if ( 0 !== Comment.action_a.length ) {
 		new_comment_header.append( ' - ' );
 		for ( action in Comment.action_a ) {
-			new_comment_header.append( $( "<a></a>" )
-				.attr( "href", Comment.action_a[ action ].link )
-				.text( Comment.action_a[ action ].label + ' ' ) );
+			new_comment_header.append( $( "<button data-action="+Comment.action_a[ action ].link+"></button>" )
+				.text( Comment.action_a[ action ].label ) );
+			new_comment_header.append(' ');
+			$(new_comment_header).find("button").on('click', delete_comment_on_click);
 		}
 	}
 	return new_comment_header;
