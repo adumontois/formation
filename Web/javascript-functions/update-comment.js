@@ -23,5 +23,13 @@ function update_comment( Comment ) {
 			date_update_text.text( " modifié le " + Comment.dateupdate );
 		}
 	}
-	html_comment.find( ".js-comment-content" ).text( Comment.content.replace( '\n', '<br />' ) );
+	
+	var content_node = html_comment.find( ".js-comment-content" );
+	if (content_node.length) {
+		content_node.text( Comment.content.replace( '\n', '<br />' ) );
+	}
+	else {
+		html_comment.append( $( "<p class=\"js-comment-content\"></p>" ).html( Comment.content.replace( '\n', '<br />' ) ) );
+	}
+	
 }

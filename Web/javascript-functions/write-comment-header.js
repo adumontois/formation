@@ -10,7 +10,7 @@
 function write_comment_header( Comment ) {
 	console.log(Comment);
 	new_comment_header = $( "<legend></legend>" )
-		.append( "Posté par ", $( "<strong></strong>" )
+		.append( "Posté par ", $( "<strong class=\"js-author\"></strong>" )
 			.text( Comment.author ), ' le ', Comment.datecreation );
 
 	if ( Comment.datecreation != Comment.dateupdate ) {

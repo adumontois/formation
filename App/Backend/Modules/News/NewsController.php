@@ -333,27 +333,22 @@ class NewsController extends BackController {
 			$this->page->addVar( 'master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
 		}
 		else {
-			if ( $Request->method() == HTTPRequest::POST_METHOD ) {
+			if ( $Request->postData('content') !== null ) {
 				if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
 					$this->page->addVar( 'master_code', 2 );
 					$this->page->addVar( 'master_error', 'Le commentaire en cours d\'édition n\'existe plus !' );
 				}
-				if ( !$News_manager->existsNewscUsingNewscId( $Request->postData( 'news' ) ) ) {
-					$this->page->addVar( 'master_code', 3 );
-					$this->page->addVar( 'master_error', 'La news associée au commentaire en cours d\'édition n\'existe plus !' );
-				}
-				$Comment = new Comment( array(
-					'id'      => $Request->getData( 'id' ),
-					'content' => $Request->postData( 'content' ),
-				) );
-			}
-			else {
-				// Récupérer le commentaire en DB
-				$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
 			}
 			
+			// Récupérer le commentaire en DB
+			$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
+			if ( $Request->postData('content') !== null) {
+				$Comment->setContent($Request->postData('content'));
+			}
+			
+			
 			if (null === $Comment) {
-				$this->page->addVar( 'master_code', 4 );
+				$this->page->addVar( 'master_code', 3 );
 				$this->page->addVar( 'master_error', 'Le commentaire à éditer n\'existe pas !' );
 			}
 			else {
@@ -362,20 +357,40 @@ class NewsController extends BackController {
 				$Form_builder->build();
 				$Form = $Form_builder->form();
 				
-				// Sauvegarder avec le FormHandler
-				$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
-				if ( !$Form_handler->process() ) {
-					// On envoie les erreurs si besoin
-					foreach ( $Form->Field_a() as $Field ) {
-						$error = $Field->errorMessage();
-						if ( !empty( $error ) ) {
-							$Comment->addError_a( $Field->name(), $error );
+				if ($Request->postData('content') !== null) {
+					// Sauvegarder avec le FormHandler
+					$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
+					if ( !$Form_handler->process() ) {
+						// On envoie les erreurs si besoin
+						foreach ( $Form->Field_a() as $Field ) {
+							$error = $Field->errorMessage();
+							if ( !empty( $error ) ) {
+								$Comment->addError_a( $Field->name(), $error );
+							}
 						}
+						// Envoyer les erreurs
+						$this->page->addVar( 'form', $Form->createView() );
+					}
+					// Récupérer le nouvel état du commentaire (date d'update par exemple)
+					else {
+						$Comment = $Comments_manager->getCommentcUsingCommentcId($Request->getData('id'));
+						/*$Comment->setAction_a( [
+							'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
+							'label' => 'Modifier',
+							'js_function' => 'update_comment_on_click'
+						] );
+						$Comment->setAction_a( [
+							'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+							'label' => 'Supprimer',
+							'js_function' => 'delete_comment_on_click'
+						] );*/
 					}
 				}
-				// Envoyer les erreurs
+				else {
+					$this->page->addVar( 'form', $Form->createView() );
+				}
+				// Ne pas envoyer le form si OK
 				$this->page->addVar( 'Comment', $Comment );
-				$this->page->addVar( '')
 			}
 		}
 	}

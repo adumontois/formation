@@ -64,11 +64,13 @@ abstract class CommentsManager extends Manager {
 			throw new \BadMethodCallException('Save method expects Comment argument.');
 		}
 		if ( $Comment->isValid() ) {
+			
 			if ( $Comment->objectNew() ) {
 				$this->insertCommentc( $Comment );
 			}
 			
 			else {
+				
 				$this->updateCommentc( $Comment );
 			}
 		}

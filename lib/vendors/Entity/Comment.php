@@ -129,9 +129,7 @@ class Comment extends Entity {
 	 * @param $content string
 	 */
 	public function setContent( $content ) {
-		if ( is_string( $content ) AND !empty( $content ) ) {
-			$this->content = $content;
-		}
+		$this->content = $content;
 	}
 	
 	/**

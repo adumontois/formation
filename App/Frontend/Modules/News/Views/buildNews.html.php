@@ -43,7 +43,7 @@ $js_data_action_insert = $News[ 'action_a' ][ 0 ][ 'insert_comment_json' ]; ?>
 	<?php foreach ( $Comment_list_a as $Comment ): ?>
 		<fieldset class="js-comment" data-id=<?= $Comment['id']?>>
 			<legend>
-				Posté par <strong><?= htmlspecialchars( $Comment[ 'author' ] ) ?></strong> le <?= $Comment[ 'datecreation' ] ?>
+				Posté par <strong class="js-author"><?= htmlspecialchars( $Comment[ 'author' ] ) ?></strong> le <?= $Comment[ 'datecreation' ] ?>
 				<?php if ( $Comment[ 'datecreation' ] != $Comment[ 'dateupdate' ] ): ?>
 					- <strong class="js-edit-comment">modifié le <?= $Comment[ 'dateupdate' ] ?></strong>
 				<?php endif; ?>

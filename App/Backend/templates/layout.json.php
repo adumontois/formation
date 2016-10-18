@@ -6,4 +6,4 @@
  * Time: 11:11
  */
 
-require __DIR__ . '/../../Frontend/Templates/layout.json.php';
+return require __DIR__ . '/../../Frontend/templates/layout.json.php';

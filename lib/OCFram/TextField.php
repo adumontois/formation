@@ -31,12 +31,14 @@ class TextField extends Field {
 	 * @return string Code HTML issu de la construction de la textarea.
 	 */
 	public function buildWidget() {
-		$code = '';
 		if ( !empty( $this->errorMessage ) ) {
 			$code = $this->errorMessage . '<br />';
 		}
-		$code .= '<label for="' . $this->name() . '">' . $this->label . '</label>
-            <textarea name = "' . $this->name() . '" ';
+		$code = '<label for="' . $this->name() . '">' . $this->label . '</label>';
+		if (!empty($this->errorMessage)) {
+			$code .= '<div class="form_error">'.$this->errorMessage.'</div>';
+		}
+        $code .= '<textarea name = "' . $this->name() . '" ';
 		if ( !empty( $this->cols ) ) {
 			$code .= 'cols = "' . $this->cols . '" ';
 		}

@@ -17,7 +17,7 @@ $( '.js-form-insert-comment' ).submit( function( event ) {
 		type     : "POST",
 		data     : {
 			author  : $this.find( '[name=author]' ).val(),
-			content : $this.find( '[name=content]' ).val()
+			content : $this.find( '[name=content]' ).val(),
 		},
 		dataType : "json", // et non datatype
 		success  : function( json, status ) {

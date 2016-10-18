@@ -5,4 +5,4 @@
  * Date: 03/10/2016
  * Time: 18:19
  */
-require __DIR__ . '/../../Frontend/Templates/layout.json.php';
+require __DIR__ . '/../../Frontend/templates/layout.html.php';

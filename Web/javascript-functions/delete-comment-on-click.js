@@ -16,7 +16,7 @@ $(".js-comment button[data-function=\"delete_comment_on_click\"]").click( delete
 		type     : "POST",
 		dataType : "json",
 		success  : function( json, status ) {
-			if ( typeof json.master_code !== 'undefined' ) {
+			if (json.master_code != 0 ) {
 				console.error(json.master_error);
 			}
 			else {
