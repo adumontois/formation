@@ -9,6 +9,7 @@
 
 namespace Model;
 
+use Entity\Comment;
 use Entity\News;
 use Entity\User;
 
@@ -307,5 +308,89 @@ class NewsManagerPDO extends NewsManager {
 			] );
 		}
 		return $News_a;
+	}
+	
+	/**
+	 * Récupère toutes les infos nécessaires pour construire la page d'un membre (News du membre d'id donné, Commentaires de ce membre, News dans lesquelles le User a posté un
+	 * commentaire)
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return array
+	 */
+	public function getNewscCommentcAndUserUsingUsercIdFilterOwnNewsOwnCommentsAndNewsUserCommentedSortByNewscIdAndCommentcId( $userc_id ) {
+		$sql = 'SELECT SNC_content, SNC_fk_SUC, SNC_title, SNC_id, SNC_dateupdate, SNC_dateadd,
+					A.SUC_fk_SUE_valid news_fk_SUE_valid, A.SUC_fk_SUY news_fk_SUY, A.SUC_login news_login, A.SUC_datesubscription news_datesubscription, A.SUC_id news_id, A.SUC_login news_login, A.SUC_email news_email, A.SUC_fk_SUE_banned news_fk_SUE_banned,
+					B.SUC_fk_SUE_valid comment_fk_SUE_valid, B.SUC_fk_SUY comment_fk_SUY, B.SUC_login comment_login, B.SUC_datesubscription comment_datesubscription, B.SUC_id comment_id, B.SUC_login comment_login, B.SUC_email comment_email, B.SUC_fk_SUE_banned comment_fk_SUE_banned,
+					SCC_author, SCC_fk_SNC, SCC_content, SCC_dateupdate, SCC_datecreation, SCC_id
+				FROM t_sit_newsc
+					LEFT OUTER JOIN t_sit_userc A ON A.SUC_id = SNC_fk_SUC
+					LEFT OUTER JOIN t_sit_userc B ON B.SUC_id = :userc_id
+					LEFT OUTER JOIN t_sit_commentc ON SCC_fk_SNC = SNC_id
+					 	AND B.SUC_login = SCC_author
+				WHERE (A.SUC_id = :userc_id AND (SCC_id IS NULL OR B.SUC_id = :userc_id))
+					OR (A.SUC_id <> :userc_id AND SCC_id IS NOT NULL)
+				ORDER BY SNC_id DESC, SCC_id DESC' ;
+		
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':userc_id', (int)$userc_id, \PDO::PARAM_INT );
+		$stmt->setFetchMode( \PDO::FETCH_ASSOC );
+		$stmt->execute();
+		$Data_a = [];
+		while ($Current_object = $stmt->fetch()) {
+			// Construire la News
+			$News = new News( [
+				'id'         => (int)$Current_object[ 'SNC_id' ],
+				'fk_SUC'     => (int)$Current_object[ 'SNC_fk_SUC' ],
+				'title'      => $Current_object[ 'SNC_title' ],
+				'content'    => $Current_object[ 'SNC_content' ],
+				'dateadd'    => new \DateTime( $Current_object[ 'SNC_dateadd' ] ),
+				'dateupdate' => new \DateTime( $Current_object[ 'SNC_dateupdate' ] ),
+				'User'       => new User( [
+					'id'               => (int)$Current_object[ 'news_id' ],
+					'login'            => $Current_object[ 'news_login' ],
+					'email'            => $Current_object[ 'news_email' ],
+					'datesubscription' => new \DateTime( $Current_object[ 'news_datesubscription' ] ),
+					'fk_SUE_banned'    => (int)$Current_object[ 'news_fk_SUE_banned' ],
+					'fk_SUE_valid'     => (int)$Current_object[ 'news_fk_SUE_valid' ],
+					'fk_SUY'           => (int)$Current_object[ 'news_fk_SUY' ],
+				] ),
+			]);
+			
+			// Si la News n'est pas déjà rentrée dans la liste des News, on l'y rajoute.
+			if (!isset($Data_a[$News->id()])) {
+				$News->Comment_a = [];
+				$Data_a[$News->id()] = $News;
+				
+			}
+			
+			// On construit le commentaire s'il existe
+			if (isset($Current_object['SCC_id'])) {
+				$Comment = new Comment ( [
+					'author' => $Current_object['SCC_author'],
+					'fk_SNC' => $Current_object['SCC_fk_SNC'],
+					'content' => $Current_object['SCC_content'],
+					'dateupdate' => new \DateTime($Current_object['SCC_dateupdate']),
+					'datecreation' => new \DateTime($Current_object['SCC_datecreation']),
+					'id' => $Current_object['SCC_id'],
+				]);
+				if (isset($Current_object['comment_id'])) {
+					$Comment->User = new User( [
+						'id'               => (int)$Current_object[ 'comment_id' ],
+						'login'            => $Current_object[ 'comment_login' ],
+						'email'            => $Current_object[ 'comment_email' ],
+						'datesubscription' => new \DateTime( $Current_object[ 'comment_datesubscription' ] ),
+						'fk_SUE_banned'    => (int)$Current_object[ 'comment_fk_SUE_banned' ],
+						'fk_SUE_valid'     => (int)$Current_object[ 'comment_fk_SUE_valid' ],
+						'fk_SUY'           => (int)$Current_object[ 'comment_fk_SUY' ],
+					] );
+				}
+				
+				// Ajouter le commentaire
+				$Data_a[$News->id()]->Comment_a[] = $Comment;
+			}
+		}
+		$stmt->closeCursor();
+		return $Data_a;
 	}
 }

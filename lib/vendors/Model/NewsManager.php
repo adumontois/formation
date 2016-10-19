@@ -31,7 +31,7 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return News[]
 	 */
-	abstract public function getNewscAndUserSortByIdDesc($start = 0, $count = self::MAX_LIST_SIZE );
+	abstract public function getNewscAndUserSortByIdDesc( $start = 0, $count = self::MAX_LIST_SIZE );
 	
 	/**
 	 * Récupère la news d'id donné.
@@ -66,8 +66,8 @@ abstract class NewsManager extends Manager {
 	 *
 	 */
 	final public function save( Entity $News ) {
-		if (!$News instanceof News) {
-			throw new \BadMethodCallException('Save method expects News argument.');
+		if ( !$News instanceof News ) {
+			throw new \BadMethodCallException( 'Save method expects News argument.' );
 		}
 		if ( $News->isValid() ) {
 			if ( $News->objectNew() ) {
@@ -103,7 +103,7 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return bool
 	 */
-	abstract public function existsNewscUsingNewscId($newsc_id);
+	abstract public function existsNewscUsingNewscId( $newsc_id );
 	
 	/**
 	 * Récupère les News dont l'auteur est l'utilisateur d'id donné.
@@ -112,7 +112,7 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return News[]|[]
 	 */
-	abstract public function getNewscUsingUsercIdSortByIdDesc( $userc_id);
+	abstract public function getNewscUsingUsercIdSortByIdDesc( $userc_id );
 	
 	/**
 	 * Sélectionne toutes les news dans lesquelles l'utilisateur d'id donné a laissé un commentaire sans être l'auteur de la News
@@ -121,5 +121,15 @@ abstract class NewsManager extends Manager {
 	 *
 	 * @return News[]|[]
 	 */
-	abstract public function getNewscAndUserUsingUsercIdFilterNotAuthorButCommenterSortByIdDesc( $userc_id);
+	abstract public function getNewscAndUserUsingUsercIdFilterNotAuthorButCommenterSortByIdDesc( $userc_id );
+	
+	/**
+	 * Récupère toutes les infos nécessaires pour construire la page d'un membre (News du membre d'id donné, Commentaires de ce membre, News dans lesquelles le User a posté un
+	 * commentaire)
+	 *
+	 * @param int $userc_id
+	 *
+	 * @return News[]|[]
+	 */
+	abstract public function getNewscCommentcAndUserUsingUsercIdFilterOwnNewsOwnCommentsAndNewsUserCommentedSortByNewscIdAndCommentcId( $userc_id );
 }

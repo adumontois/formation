@@ -10,6 +10,7 @@ namespace App\Frontend\Modules\Member;
 
 
 use App\Traits\AppController;
+use Entity\Comment;
 use Entity\User;
 use Model\CommentsManager;
 use Model\NewsManager;
@@ -46,6 +47,59 @@ class MemberController extends BackController {
 		$News_manager    = $this->managers->getManagerOf( 'News' );
 		$Comment_manager = $this->managers->getManagerOf( 'Comments' );
 		
+		// Vérifier si l'User demandé existe : si oui, le récupérer et le formater
+		if ( !$User_manager->existsUsercUsingUsercId( $Request->getData( 'id' ) ) ) {
+			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \InvalidArgumentException( 'Le membre demandé n\'existe pas !' ) );
+		}
+		$User = $User_manager->getUsercUsingUsercId( $Request->getData( 'id' ) );
+		$User->formatDate();
+		$this->page->addVar( 'User', $User );
+		
+		$News_a = $News_manager->getNewscCommentcAndUserUsingUsercIdFilterOwnNewsOwnCommentsAndNewsUserCommentedSortByNewscIdAndCommentcId($Request->getData('id'));
+		foreach ($News_a as $News) {
+			$News->format();
+			if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $News->User()->id() == $this->app->user()->userId()) {
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/update.png',
+					'alternative_text' => 'Modifier',
+				] );
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/delete.png',
+					'alternative_text' => 'Supprimer',
+				] );
+			}
+			// Ajout du lien s'il modifie la page (on ne génère pas les liens qui mèneraient à la page en cours d'affichage)
+			if ($News->User()->id() != $User->id()) {
+				$News->User()->link =
+					Router::getUrlFromModuleAndAction($this->app->name(), $this->module, $this->action, array('id' => (int)$News->User()->id()));
+			}
+			
+			foreach ($News['Comment_a'] as $Comment) {
+				/**
+				 * @var $Comment Comment
+				 */
+				$Comment->formatDate();
+				if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
+					$Comment->setAction_a( [
+						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => $Comment->id() ) ),
+						'image_source'     => '/images/update.png',
+						'alternative_text' => 'Modifier',
+					] );
+					$Comment->setAction_a( [
+						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => $Comment->id() ) ),
+						'image_source'     => '/images/delete.png',
+						'alternative_text' => 'Supprimer',
+					] );
+				}
+			}
+		}
+		$this->page->addVar('News_a', $News_a);
+		
+		
+		
+		/*
 		// Vérifier si l'User demandé existe : si oui, le récupérer et le formater
 		if ( !$User_manager->existsUsercUsingUsercId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \InvalidArgumentException( 'Le membre demandé n\'existe pas !' ) );
@@ -113,5 +167,6 @@ class MemberController extends BackController {
 			}
 		}
 		$this->page->addVar('News_others_a', $News_others_a);
+		*/
 	}
 }
