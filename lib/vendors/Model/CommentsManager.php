@@ -21,13 +21,13 @@ use OCFram\Manager;
  */
 abstract class CommentsManager extends Manager {
 	/**
-	 * Récupère tous les commentaires associés à la news d'id passé en paramètre
+	 * Récupère tous les commentaires associés à la news d'id passé en paramètre. Construit aussi l'attribut User pour les commentaires écrits par des personnes inscrites.
 	 *
 	 * @param $newsc_id int ID de la news
 	 *
 	 * @return Comment[]
 	 */
-	abstract public function getCommentcUsingNewscIdSortByIdDesc( $newsc_id );
+	abstract public function getCommentcAndUsercUsingNewscIdSortByNewscIdDesc( $newsc_id );
 	
 	/**
 	 * Récupère le commentaire d'id donné.
@@ -102,7 +102,7 @@ abstract class CommentsManager extends Manager {
 	abstract public function existsCommentcUsingCommentcId($commentc_id);
 	
 	/*
-	 * Récupère tous les commentaires d'une news créés après la date demandée.
+	 * Récupère tous les commentaires d'une news créés après la date demandée. Construit aussi l'attribut User pour les commentaires écrits par des personnes inscrites.
 	 *
 	 * @param int $newsc_id
 	 * @param string $commentc_datecreation
@@ -115,7 +115,7 @@ abstract class CommentsManager extends Manager {
 	 * @param int $newsc_id
 	 * @param string $commentc_dateupdate
 	 */
-	abstract public function getCommentcUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $newsc_id, $commentc_dateupdate );
+	abstract public function getCommentcAndUsercUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $newsc_id, $commentc_dateupdate );
 	
 	/**
 	 * Filtre tous les ids de commentaires qui n'existent pas.

@@ -54,6 +54,8 @@ abstract class BackController extends ApplicationComponent {
 		$this->setAction( $action );
 		$this->setModule( $module );
 		$this->page = new Page( $app, $format );
+		// Créer la page de réponse et la relier à la page du BackController
+		$this->app()->httpResponse()->setPage($this->page);
 		$this->setView( $action );
 		
 		

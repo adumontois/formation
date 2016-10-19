@@ -119,7 +119,7 @@ class Router extends ApplicationComponent {
 			}
 		}
 		// Si on n'a pas trouvé, c'est que la route est incorrecte
-		throw new \InvalidArgumentException( 'Impossible de trouver l\'action ' . $action . ' dans le module ' . $module . ' de l\'application ' . $app );
+		throw new \InvalidArgumentException( 'Impossible de trouver l\'action ' . $action . ' dans le module ' . $module . ' de l\'application ' . $app .'. Vérifiez le nom de l\'application, du module et de l\'action, ainsi que les paramètres.' );
 	}
 	
 	/**

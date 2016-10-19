@@ -207,6 +207,7 @@ class NewsManagerPDO extends NewsManager {
 		$stmt->bindValue( ':id', (int)$newsc_id, \PDO::PARAM_INT );
 		$stmt->execute();
 		$return = (bool)$stmt->fetch();
+
 		$stmt->closeCursor();
 		
 		return (bool)$return;
@@ -278,6 +279,7 @@ class NewsManagerPDO extends NewsManager {
 				INNER JOIN t_sit_userc A ON A.SUC_id = :userc_id
 					AND A.SUC_login = SCC_author
 				INNER JOIN t_sit_userc B ON B.SUC_id = SNC_fk_SUC
+				GROUP BY SNC_id, SNC_content, SNC_dateadd, SNC_dateupdate, SNC_fk_SUC, SNC_title
 				ORDER BY SNC_id DESC ";
 		
 		$stmt = $this->dao->prepare( $sql );

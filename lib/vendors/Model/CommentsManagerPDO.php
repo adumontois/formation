@@ -9,6 +9,7 @@
 namespace Model;
 
 use Entity\Comment;
+use Entity\User;
 
 /**
  * Class CommentsManagerPDO
@@ -26,7 +27,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	protected function insertCommentc( Comment $Comment ) {
 		/**
-		 * @var $stmt   \PDOStatement
+		 * @var $stmt    \PDOStatement
 		 * @var $Comment Comment
 		 */
 		$sql = 'INSERT INTO T_SIT_commentc
@@ -49,10 +50,10 @@ class CommentsManagerPDO extends CommentsManager {
 	 */
 	protected function updateCommentc( Comment $Comment ) {
 		/**
-		 * @var $stmt   \PDOStatement
+		 * @var $stmt    \PDOStatement
 		 * @var $Comment Comment
 		 */
-		$sql   = 'UPDATE T_SIT_commentc
+		$sql  = 'UPDATE T_SIT_commentc
                 SET SCC_content = :content,
                 	SCC_dateupdate = NOW()
                 WHERE SCC_id = :id';
@@ -63,30 +64,50 @@ class CommentsManagerPDO extends CommentsManager {
 	}
 	
 	/**
-	 * Récupère tous les commentaires associés à la news d'id passé en paramètre
+	 * Récupère tous les commentaires associés à la news d'id passé en paramètre. Construit aussi l'attribut User pour les commentaires écrits par des personnes inscrites.
 	 *
 	 * @param $newsc_id int ID de la news
 	 *
 	 * @return Comment[]
 	 */
-	public function getCommentcUsingNewscIdSortByIdDesc( $newsc_id ) {
+	public function getCommentcAndUsercUsingNewscIdSortByNewscIdDesc( $newsc_id ) {
 		/**
-		 * @var $stmt            \PDOStatement
+		 * @var $stmt             \PDOStatement
 		 * @var $Liste_comments_a Comment[]
 		 */
-		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_datecreation datecreation, SCC_dateupdate dateupdate
+		$sql = 'SELECT SCC_id, SCC_fk_SNC, SCC_author, SCC_content, SCC_datecreation, SCC_dateupdate,
+					SUC_id, SUC_datesubscription, SUC_fk_SUE_banned, SUC_fk_SUE_valid, SUC_fk_SUY, SUC_login, SUC_email
                 FROM T_SIT_commentc
+                	LEFT OUTER JOIN t_sit_userc ON SCC_author = SUC_login
                 WHERE SCC_fk_SNC = :fk_SNC
                 ORDER BY SCC_id DESC';
 		
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
-		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
+		$stmt->setFetchMode( \PDO::FETCH_ASSOC );
 		$stmt->execute();
-		$Liste_comments_a = $stmt->fetchAll();
-		foreach ( $Liste_comments_a as $Comment ) {
-			$Comment->setDatecreation( new \DateTime( $Comment->datecreation() ) );
-			$Comment->setDateupdate( new \DateTime( $Comment->dateupdate() ) );
+		$Liste_comments_a = [];
+		while ( $Comment = $stmt->fetch() ) {
+			$New_comment = new Comment( [
+				'id'           => $Comment[ 'SCC_id' ],
+				'fk_SNC'       => $Comment[ 'SCC_fk_SNC' ],
+				'author'       => $Comment[ 'SCC_author' ],
+				'content'      => $Comment[ 'SCC_content' ],
+				'datecreation' => new \DateTime( $Comment[ 'SCC_datecreation' ] ),
+				'dateupdate'   => new \DateTime( $Comment[ 'SCC_dateupdate' ] ),
+			] );
+			if ( null != $Comment[ 'SUC_id' ] ) {
+				$New_comment->User = new User ( [
+					'id'               => $Comment[ 'SUC_id' ],
+					'datesubscription' => new \DateTime( $Comment[ 'SUC_datesubscription' ] ),
+					'fk_SUE_banned'    => $Comment[ 'SUC_fk_SUE_banned' ],
+					'fk_SUE_valid'     => $Comment[ 'SUC_fk_SUE_valid' ],
+					'fk_SUY'           => $Comment[ 'SUC_fk_SUY' ],
+					'login'            => $Comment[ 'SUC_login' ],
+					'email'            => $Comment[ 'SUC_email' ],
+				] );
+			}
+			$Liste_comments_a[] = $New_comment;
 		}
 		$stmt->closeCursor();
 		
@@ -105,7 +126,7 @@ class CommentsManagerPDO extends CommentsManager {
 		 * @var         $stmt \PDOStatement
 		 * @var Comment $Comment
 		 */
-		$sql   = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_datecreation datecreation, SCC_dateupdate dateupdate
+		$sql  = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_datecreation datecreation, SCC_dateupdate dateupdate
                 FROM T_SIT_commentc
                 WHERE SCC_id = :id';
 		$stmt = $this->dao->prepare( $sql );
@@ -131,7 +152,7 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $stmt \PDOStatement
 		 */
-		$sql   = 'DELETE FROM T_SIT_commentc
+		$sql  = 'DELETE FROM T_SIT_commentc
                 WHERE SCC_id = :id';
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':id', (int)$commentc_id, \PDO::PARAM_INT );
@@ -147,7 +168,7 @@ class CommentsManagerPDO extends CommentsManager {
 		/**
 		 * @var $stmt \PDOStatement
 		 */
-		$sql   = 'DELETE FROM T_SIT_commentc
+		$sql  = 'DELETE FROM T_SIT_commentc
                 WHERE SCC_fk_SNC = :fk_SNC';
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
@@ -161,7 +182,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @return bool
 	 */
-	public function existsCommentcUsingCommentcId($commentc_id) {
+	public function existsCommentcUsingCommentcId( $commentc_id ) {
 		$sql = 'SELECT *
 				FROM T_SIT_commentc
 				WHERE SCC_id = :id';
@@ -171,35 +192,56 @@ class CommentsManagerPDO extends CommentsManager {
 		$stmt->execute();
 		$return = (bool)$stmt->fetch();
 		$stmt->closeCursor();
+		
 		return (bool)$return;
 	}
 	
 	/*
-	 * Récupère tous les commentaires d'une news créés après la date demandée.
+	 * Récupère tous les commentaires d'une news créés après la date demandée. Construit aussi l'attribut User pour les commentaires écrits par des personnes inscrites.
 	 *
 	 * @param int $newsc_id
 	 * @param string $commentc_datecreation
 	 */
 	public function getCommentcUsingNewscIdFilterOverDatecreationSortByIdDesc( $newsc_id, $commentc_datecreation ) {
 		/**
-		 * @var $stmt \PDOStatement
+		 * @var $stmt      \PDOStatement
 		 * @var $Comment_a Comment[]
 		 */
-		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_datecreation datecreation, SCC_dateupdate dateupdate 
+		$sql = 'SELECT SCC_id, SCC_fk_SNC, SCC_author, SCC_content, SCC_datecreation, SCC_dateupdate,
+					SUC_id, SUC_datesubscription, SUC_fk_SUE_valid, SUC_email, SUC_login, SUC_fk_SUY, SUC_fk_SUE_banned
                 FROM T_SIT_commentc
+                	LEFT OUTER JOIN t_sit_userc ON SCC_author = SUC_login
                 WHERE SCC_fk_SNC = :fk_SNC
                 	AND SCC_datecreation > :datecreation
-				ORDER BY id DESC';
+				ORDER BY SCC_id DESC';
 		
-		$stmt = $this->dao->prepare($sql);
-		$stmt->bindValue(':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT);
-		$stmt->bindValue(':datecreation', $commentc_datecreation);
-		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
+		$stmt->bindValue( ':datecreation', $commentc_datecreation );
+		$stmt->setFetchMode( \PDO::FETCH_ASSOC );
 		$stmt->execute();
-		$Comment_a = $stmt->fetchAll();
-		foreach ( $Comment_a as $Comment ) {
-			$Comment->setDatecreation( new \DateTime( $Comment->datecreation() ) );
-			$Comment->setDateupdate( new \DateTime( $Comment->dateupdate() ) );
+		$Comment_a = [];
+		while ( $Comment = $stmt->fetch() ) {
+			$New_comment = new Comment( [
+				'id'           => $Comment[ 'SCC_id' ],
+				'fk_SNC'       => $Comment[ 'SCC_fk_SNC' ],
+				'author'       => $Comment[ 'SCC_author' ],
+				'content'      => $Comment[ 'SCC_content' ],
+				'datecreation' => new \DateTime( $Comment[ 'SCC_datecreation' ] ),
+				'dateupdate'   => new \DateTime( $Comment[ 'SCC_dateupdate' ] ),
+			] );
+			if ( null != $Comment[ 'SUC_id' ] ) {
+				$New_comment->User = new User ( [
+					'id'               => $Comment[ 'SUC_id' ],
+					'datesubscription' => new \DateTime( $Comment[ 'SUC_datesubscription' ] ),
+					'fk_SUE_banned'    => $Comment[ 'SUC_fk_SUE_banned' ],
+					'fk_SUE_valid'     => $Comment[ 'SUC_fk_SUE_valid' ],
+					'fk_SUY'           => $Comment[ 'SUC_fk_SUY' ],
+					'login'            => $Comment[ 'SUC_login' ],
+					'email'            => $Comment[ 'SUC_email' ],
+				] );
+			}
+			$Comment_a[] = $New_comment;
 		}
 		$stmt->closeCursor();
 		
@@ -212,27 +254,47 @@ class CommentsManagerPDO extends CommentsManager {
 	 * @param int $newsc_id
 	 * @param string $commentc_dateupdate
 	 */
-	public function getCommentcUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $newsc_id, $commentc_dateupdate ) {
+	public function getCommentcAndUsercUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $newsc_id, $commentc_dateupdate ) {
 		/**
-		 * @var $stmt \PDOStatement
+		 * @var $stmt      \PDOStatement
 		 * @var $Comment_a Comment[]
 		 */
-		$sql = 'SELECT SCC_id id, SCC_fk_SNC fk_SNC, SCC_author author, SCC_content content, SCC_datecreation datecreation, SCC_dateupdate dateupdate 
+		$sql = 'SELECT SCC_id, SCC_fk_SNC, SCC_author, SCC_content, SCC_datecreation, SCC_dateupdate,
+					SUC_id, SUC_datesubscription, SUC_fk_SUE_valid, SUC_email, SUC_login, SUC_fk_SUY, SUC_fk_SUE_banned
                 FROM T_SIT_commentc
+                	LEFT OUTER JOIN t_sit_userc ON SUC_login = SCC_author
                 WHERE SCC_fk_SNC = :fk_SNC
                 	AND SCC_dateupdate > :dateupdate
                 	AND SCC_datecreation <= :dateupdate
-				ORDER BY id DESC';
+				ORDER BY SCC_id DESC';
 		
-		$stmt = $this->dao->prepare($sql);
-		$stmt->bindValue(':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT);
-		$stmt->bindValue(':dateupdate', $commentc_dateupdate);
-		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' ); // OK
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
+		$stmt->bindValue( ':dateupdate', $commentc_dateupdate );
+		$stmt->setFetchMode( \PDO::FETCH_ASSOC);
 		$stmt->execute();
-		$Comment_a = $stmt->fetchAll();
-		foreach ( $Comment_a as $Comment ) {
-			$Comment->setDatecreation( new \DateTime( $Comment->datecreation() ) );
-			$Comment->setDateupdate( new \DateTime( $Comment->dateupdate() ) );
+		$Comment_a = [];
+		while ( $Comment = $stmt->fetch() ) {
+			$New_comment = new Comment( [
+				'id'           => $Comment[ 'SCC_id' ],
+				'fk_SNC'       => $Comment[ 'SCC_fk_SNC' ],
+				'author'       => $Comment[ 'SCC_author' ],
+				'content'      => $Comment[ 'SCC_content' ],
+				'datecreation' => new \DateTime( $Comment[ 'SCC_datecreation' ] ),
+				'dateupdate'   => new \DateTime( $Comment[ 'SCC_dateupdate' ] ),
+			] );
+			if ( null != $Comment[ 'SUC_id' ] ) {
+				$New_comment->User = new User ( [
+					'id'               => $Comment[ 'SUC_id' ],
+					'datesubscription' => new \DateTime( $Comment[ 'SUC_datesubscription' ] ),
+					'fk_SUE_banned'    => $Comment[ 'SUC_fk_SUE_banned' ],
+					'fk_SUE_valid'     => $Comment[ 'SUC_fk_SUE_valid' ],
+					'fk_SUY'           => $Comment[ 'SUC_fk_SUY' ],
+					'login'            => $Comment[ 'SUC_login' ],
+					'email'            => $Comment[ 'SUC_email' ],
+				] );
+			}
+			$Comment_a[] = $New_comment;
 		}
 		$stmt->closeCursor();
 		
@@ -246,25 +308,26 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @return int[]|[]
 	 */
-	public function filterCommentcUsingUnexistantCommentcId(array $commentc_id_a) {
+	public function filterCommentcUsingUnexistantCommentcId( array $commentc_id_a ) {
 		// Générer des "?" pour créer l'ensemble de nos ids sélectionnés
 		// On sélectionne tous les ids de la base qui sont dans l'ensemble des ids reçus
-		$q_marks_for_query = implode(',', array_fill(0, count($commentc_id_a), '?'));
-		$sql = 'SELECT SCC_id
+		$q_marks_for_query = implode( ',', array_fill( 0, count( $commentc_id_a ), '?' ) );
+		$sql               = 'SELECT SCC_id
 				FROM t_sit_commentc
 				WHERE SCC_id IN (' . $q_marks_for_query . ')';
-		$stmt = $this->dao->prepare($sql);
-		foreach ($commentc_id_a as $number => $id) {
-			$stmt->bindValue($number + 1, $id);
+		$stmt              = $this->dao->prepare( $sql );
+		foreach ( $commentc_id_a as $number => $id ) {
+			$stmt->bindValue( $number + 1, $id );
 		}
 		$stmt->execute();
 		
 		$existant_ids_a = [];
-		while ($id = $stmt->fetchColumn()) {
+		while ( $id = $stmt->fetchColumn() ) {
 			$existant_ids_a[] = (int)$id;
 		}
 		$stmt->closeCursor();
-		return array_diff($commentc_id_a, $existant_ids_a);
+		
+		return array_diff( $commentc_id_a, $existant_ids_a );
 	}
 	
 	/**
@@ -274,7 +337,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @return Comment[]|[]
 	 */
-	public function getCommentcUsingUsercLoginSortByFk_SNCDesc( $userc_login) {
+	public function getCommentcUsingUsercLoginSortByFk_SNCDesc( $userc_login ) {
 		/**
 		 * @var Comment $Comment
 		 */
@@ -283,16 +346,17 @@ class CommentsManagerPDO extends CommentsManager {
 				WHERE SCC_author = :login
 				ORDER BY SCC_id DESC';
 		
-		$stmt = $this->dao->prepare($sql);
-		$stmt->bindValue('login', $userc_login);
-		$stmt->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment');
+		$stmt = $this->dao->prepare( $sql );
+		$stmt->bindValue( 'login', $userc_login );
+		$stmt->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, 'Entity\Comment' );
 		$stmt->execute();
 		$Comment_a = [];
-		while ($Comment = $stmt->fetch()) {
-			$Comment->setDatecreation(new \DateTime($Comment->datecreation()));
-			$Comment->setDateupdate(new \DateTime($Comment->dateupdate()));
+		while ( $Comment = $stmt->fetch() ) {
+			$Comment->setDatecreation( new \DateTime( $Comment->datecreation() ) );
+			$Comment->setDateupdate( new \DateTime( $Comment->dateupdate() ) );
 			$Comment_a[] = $Comment;
 		}
+		
 		return $Comment_a;
 	}
 }

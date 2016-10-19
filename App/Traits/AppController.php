@@ -8,9 +8,9 @@
 
 namespace App\Traits;
 
-use Detection\MobileDetect;
 use Entity\User;
 use OCFram\BackController;
+use OCFram\HTTPResponse;
 use OCFram\Router;
 
 /**
@@ -22,26 +22,43 @@ use OCFram\Router;
  */
 trait AppController {
 	/**
+	 * @var int[] $access_authorized_to_a Liste des états utilisateur pour lesquels l'accès à l'action est autorisée.
+	 */
+	protected $access_authorized_to_a;
+	
+	/**
 	 * Génère le menu de la page courante. Doit être appelée au début de chaque contrôleur.
 	 */
 	public function run() {
 		/**
 		 * @var $this BackController
 		 */
+		
 		switch ( $this->page()->format() ) {
 			case 'html':
-				return $this->runHTML();
+				$this->runHTML();
+				break;
 			case 'json':
-				return $this->runJSON();
+				$this->runJSON();
+				break;
 			default:
 				throw new \Exception( 'Format ' . $this->page()->format() . ' has no run method defined.' );
 		}
+		
+		// Mettre fin au programme si l'utilisateur n'est pas autorisé
+		if (!$this->isAuthorized()) {
+			$this->forbiddenAccess();
+		}
+
 	}
 	
 	/**
 	 * Génère le menu d'une page HTML.
 	 */
 	private function runHTML() {
+		/**
+		 * @var $this BackController
+		 */
 		$menu_a = [
 			[
 				'label' => 'Accueil',
@@ -54,17 +71,24 @@ trait AppController {
 		];
 		if ( $this->app()->user()->isAuthenticated() ) {
 			$menu_a[] = [
-				'label' => ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ' (connecté)',
-				'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
+				'label' => $this->app()->user()->getAttribute('user_name'). ' ('. ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ', connecté)',
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Member', 'buildMember', array('id' => (int)$this->app()->user()->userId())),
 			];
+			if ($this->app()->user()->authenticationLevel() == User::USERY_SUPERADMIN) {
+				$menu_a[] = [
+					'label' => 'Admin',
+					'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
+				];
+			}
 			$menu_a[] = [
 				'label' => 'Déconnexion',
 				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'clearConnection'),
 			];
 			$menu_a[] = [
-				'label' => 'Ajouter une news',
+				'label' => 'Ajouter news',
 				'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews'),
 			];
+			
 		}
 		else {
 			$menu_a[] = [
@@ -96,4 +120,70 @@ trait AppController {
 	 */
 	private function runJSON() {
 	}
+	
+	/**
+	 * Indique si l'utilisateur est autorisé à accéder à la page du contrôleur, en fonction du contenu de access_authorized_to_a.
+	 * Si access_authorized_to_a n'est pas setté, tout le monde peut accéder à la page.
+	 * Si access_authorized_to_a est un tableau vide, seuls les utilisateurs authentifiés peuvent y accéder.
+	 * Sinon, seuls les utilisateurs authentifiés dont le status est présent dans le tableau peuvent accéder à la page.
+	 *
+	 * @return bool
+	 */
+	public function isAuthorized() {
+		/**
+		 * @var $this BackController
+		 */
+		if (!isset($this->access_authorized_to_a)) {
+			return true;
+		}
+		if ( $this->access_authorized_to_a === []) {
+			return $this->app()->user()->isAuthenticated();
+		}
+		return array_search($this->app()->user()->authenticationLevel(), $this->access_authorized_to_a) !== false;
+	}
+	
+	
+	/**
+	 * @return int[]
+	 */
+	 public function access_forbidden_to_a() {
+	    return $this->access_authorized_to_a;
+	 }
+	 
+	 /**
+	  * Setter pour l'attribut access_authorized_to_a.
+	  *
+	  * @param int[]|[]|null $access_authorized_to_a Autorise l'accès à tous les statuts de membre passés en paramètre.
+	  */
+	 public function setAccess_authorized_to_a($access_authorized_to_a) {
+	     $this->access_authorized_to_a = $access_authorized_to_a;
+	 }
+	
+	/**
+	 * Interdit l'accès au contrôleur si l'utilisateur n'a pas les autorisations nécessaires. Met fin au programme.
+	 *
+	 * @param string $master_error Erreur à afficher à l'utilisateur
+	 * @param string $master_code Code d'erreur à retourner
+	 */
+	 public function forbiddenAccess($master_error = 'Vous n\'avez pas les droits suffisants pour effectuer cette action.', $master_code = 255) {
+		 /**
+		  * @var $this BackController
+		  */
+		 switch ( $this->page()->format() ) {
+			 case 'html':
+				 $this->app()->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \RuntimeException('Vous n\'avez pas les droits suffisants pour consulter cette page.'), $this->page());
+				 break;
+			 case 'json':
+				 // On doit empêcher le traitement ultérieur en sortant de l'action du contrôleur
+				 $this->page()->addVar( 'master_code', $master_code );
+				 $this->page()->addVar( 'master_error', $master_error );
+				 $this->runJSON();
+				 // Envoyer directement le résultat
+				 $this->app()->httpResponse()->send();
+				 break;
+			 default:
+				 throw new \Exception( 'Format ' . $this->page()->format() . ' has no run method defined.' );
+		 }
+	 }
+	 
 }

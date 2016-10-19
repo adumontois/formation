@@ -14,6 +14,7 @@ use Entity\User;
 use Model\UserManager;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
+use OCFram\Router;
 
 /**
  * Class ConnectionFormHandler
@@ -42,8 +43,9 @@ class ConnectionFormHandler extends FormHandler {
 			if ($User_stored != NULL AND User::cryptWithKey( $User->password(), $User_stored->cryptKey() ) === $User_stored->password()) {
 				$this->request->app()->user()->setAuthenticationLevel((int) $User_stored->fk_SUY());
 				$this->request->app()->user()->setUserId($User_stored->id());
+				$this->request->app()->user()->setAttribute('user_name', $User->login());
 				$this->request->app()->user()->setFlash( 'Vous êtes connecté(e) en tant que ' . htmlspecialchars(User::getTextualStatus((int)$User_stored->fk_SUY())) . '.');
-				return true;
+				$this->request->app()->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->request->app()->name(), 'News', 'buildIndex') );
 			}
 			else {
 				$this->request->app()->user()->setFlash( htmlspecialchars(ConnectionController::REFUSED_CONNECTION ));

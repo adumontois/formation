@@ -24,10 +24,10 @@
 		<br />
 		<?= htmlspecialchars( $User[ 'login' ] ) ?> est un <?= lcfirst( \Entity\User::getTextualStatus( $User[ 'fk_SUY' ] ) ) ?>. Il s'est inscrit le <?= $User[ 'datesubscription' ] ?>.
 		<br />
-		Vous pouvez contacter <?= htmlspecialchars( $User[ 'login' ] ) ?> via son adresse mail : <?= htmlspecialchars( $User[ 'email' ] ) ?>.
+		Vous pouvez contacter <?= htmlspecialchars( $User[ 'login' ] ) ?> via son adresse mail : <?= htmlspecialchars( $User[ 'email' ] ) ?>
 	</p>
 </fieldset>
-
+<br />
 <!-- Affichage des news postées par le membre -->
 <?php if ( !empty( $News_owned_a ) ): ?>
 	<fieldset>
@@ -81,6 +81,7 @@
 			<br />
 		<?php endforeach; ?>
 	</fieldset>
+	<br />
 	<?php if (!empty($Comment_owned_a)): ?>
 		<fieldset>
 			<h2>
@@ -126,9 +127,12 @@
 								<?= nl2br( htmlspecialchars( $Comment[ 'content' ] ) ) ?>
 							</p>
 						</fieldset>
+						<?php // Retirer l'élément traité du tableau ?>
 						<?php unset($Comment_owned_a[$key]); ?>
 					<?php endforeach; ?>
 				</fieldset>
+				<br />
+				<br />
 			<?php endforeach; ?>
 		</fieldset>
 	<?php else: ?>

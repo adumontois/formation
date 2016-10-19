@@ -53,7 +53,8 @@ class NewsController extends BackController {
 			if ( strlen( $News->content() ) == $longueur_news ) {
 				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
 			}
-			$News->setAction_a( array( 'build' => Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id() ) ) ) );
+			$News->build_link       = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id() ) );
+			$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
@@ -73,32 +74,34 @@ class NewsController extends BackController {
 		 */
 		$News_manager = $this->managers->getManagerOf();
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
-		$News->format();
-		$News->setAction_a( [
-			'insert_comment_json'   => Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => $News->id() ) ),
-			'refresh_comments_json' => Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildRefreshCommentsFromAjax', array( 'id' => $News->id() ) ),
-		] );
 		// Si la news n'existe pas on redirige vers une erreur 404
 		if ( null == $News ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
 		}
+		$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
+		$News->format();
+		$News->link_insert_comment_json   = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => $News->id() ) );
+		$News->link_refresh_comments_json = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildRefreshCommentsFromAjax', array( 'id' => $News->id() ) );
 		
 		// Afficher les commentaires
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
-		$Liste_comments_a = $Comment_manager->getCommentcUsingNewscIdSortByIdDesc( $News->id() );
+		$Liste_comments_a = $Comment_manager->getCommentcAndUsercUsingNewscIdSortByNewscIdDesc( $News->id() );
 		foreach ( $Liste_comments_a as $Comment ) {
 			$Comment->formatDate();
 			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				$Comment->setAction_a( [
-					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label' => 'Modifier',
-					'js_function' => 'update_comment_on_click'
+					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+					'label'       => 'Modifier',
+					'js_function' => 'update_comment_on_click',
 				] );
 				$Comment->setAction_a( [
-					'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label' => 'Supprimer',
-					'js_function' => 'delete_comment_on_click'
+					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+					'label'       => 'Supprimer',
+					'js_function' => 'delete_comment_on_click',
 				] );
+			}
+			if ( isset( $Comment->User ) ) {
+				$Comment->User->link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
 			}
 		}
 		
@@ -218,12 +221,10 @@ class NewsController extends BackController {
 		 */
 		
 		// Il est important de ne faire que les vérifs et l'insertion en DB - tout le reste doit être géré en JS.
-		// gérer la redirection et le master_error
 		$News_manager = $this->managers->getManagerOf();
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
-			$this->app->httpResponse()
-					  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
+			$this->forbiddenAccess( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !', 1 );
 		}
 		$Comment = new Comment( array(
 			'fk_SNC'  => $Request->getData( 'id' ),
@@ -246,7 +247,10 @@ class NewsController extends BackController {
 		$Form = $Form_builder->form();
 		
 		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
-		if ( !$this->app->user()->isAuthenticated() && $Request->method() == HTTPRequest::POST_METHOD && $User_manager->existsUsercUsingUsercLogin( $Comment->author() ) ) {
+		if ( !$this->app->user()->hasAttribute( 'user_name' )
+			 && $Request->method() == HTTPRequest::POST_METHOD
+			 && $User_manager->existsUsercUsingUsercLogin( $Comment->author() )
+		) {
 			$Form->getFieldFromName( 'author' )
 				 ->setErrorMessage( 'Le nom d\'utilisateur ' . $Comment->author() . ' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.' );
 		}
@@ -277,7 +281,8 @@ class NewsController extends BackController {
 	 *
 	 * @param HTTPRequest $Request
 	 */
-	public function executebuildRefreshCommentsFromAjax( HTTPRequest $Request ) {
+	public function executeBuildRefreshCommentsFromAjax( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var CommentsManager $Comments_manager
 		 * @var NewsManager     $News_manager
@@ -285,59 +290,70 @@ class NewsController extends BackController {
 		 * @var Comment[]       $Update_comment_a
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		if ( $Request->postExists( 'dateupdate' ) && $Request->getExists( 'id' ) ) {
-			// On vérifie l'existence de la news
-			$News_manager = $this->managers->getManagerOf();
-			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
-				$this->page->addVar('master_code', 1);
-				$this->page->addVar('master_error', 'Impossible d\'ajouter le commentaire : la news n\'existe plus !');
-			}
-			
-			// Sélection des nouveaux commentaires
-			$New_comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDatecreationSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
-			foreach ( $New_comment_a as $Comment ) {
-				$Comment->formatDate();
+		// On vérifie l'existence de la news
+		$News_manager = $this->managers->getManagerOf();
+		if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+			$this->forbiddenAccess( 'Impossible de rafraîchir les commentaires : la news n\'existe plus !', 1 );
+		}
+		
+		// Sélection des nouveaux commentaires
+		$New_comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDatecreationSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
+		foreach ( $New_comment_a as $Comment ) {
+			$Comment->formatDate();
+			if ( isset( $Comment->User ) ) {
+				$Comment->User->build_link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
 			}
 			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
-				foreach ( $New_comment_a as $Comment ) {
-					// On ajoute les droits d'administrateur si besoin
-					$Comment->setAction_a( [
-						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
-						'label' => 'Modifier',
-						'js_function' => 'update_comment_on_click'
-					] );
-					$Comment->setAction_a( [
-						'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-						'label' => 'Supprimer',
-						'js_function' => 'delete_comment_on_click'
-					] );
-				}
+				// On ajoute les droits d'administrateur si besoin
+				$Comment->setAction_a( [
+					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+					'label'       => 'Modifier',
+					'js_function' => 'update_comment_on_click',
+				] );
+				$Comment->setAction_a( [
+					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+					'label'       => 'Supprimer',
+					'js_function' => 'delete_comment_on_click',
+				] );
 			}
-			$this->page->addVar( 'New_comment_a', $New_comment_a );
-			
-			// Sélection des commentaires édités
-			// Pas besoin de regénérer les droits, il n'y a pas de raison qu'ils changent
-			$Update_comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
-			
-			foreach ( $Update_comment_a as $Comment ) {
-				$Comment->formatDate();
+		}
+		$this->page->addVar( 'New_comment_a', $New_comment_a );
+		
+		// Sélection des commentaires édités
+		// Pas besoin de regénérer les droits, il n'y a pas de raison qu'ils changent
+		$Update_comment_a = $Comments_manager->getCommentcAndUsercUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
+		
+		foreach ( $Update_comment_a as $Comment ) {
+			$Comment->formatDate();
+			if ( isset( $Comment->User ) ) {
+				$Comment->User->build_link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
 			}
-			$this->page->addVar( 'Update_comment_a', $Update_comment_a );
-			
-			// Sélection des ids supprimés
-			if ($Request->postExists('displayed_comments_ids_a')) {
-				$delete_ids_a = $Comments_manager->filterCommentcUsingUnexistantCommentcId(explode(',', $Request->postData('displayed_comments_ids_a')));
+			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+				// On ajoute les droits d'administrateur si besoin
+				$Comment->setAction_a( [
+					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+					'label'       => 'Modifier',
+					'js_function' => 'update_comment_on_click',
+				] );
+				$Comment->setAction_a( [
+					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
+					'label'       => 'Supprimer',
+					'js_function' => 'delete_comment_on_click',
+				] );
 			}
-			else {
-				$delete_ids_a = [];
-			}
-			$this->page->addVar('delete_ids_a', $delete_ids_a);
-			
-			// Générer la date du refresh
-			$this->page->addVar( 'dateupdate', (new \DateTime())->format( 'Y-m-d H:i:s.u' ));
+		}
+		$this->page->addVar( 'Update_comment_a', $Update_comment_a );
+		
+		// Sélection des ids supprimés
+		if ( $Request->postExists( 'displayed_comments_ids_a' ) ) {
+			$delete_ids_a = $Comments_manager->filterCommentcUsingUnexistantCommentcId( explode( ',', $Request->postData( 'displayed_comments_ids_a' ) ) );
 		}
 		else {
-			throw new \RuntimeException( 'Can\'t determine last update date !' );
+			$delete_ids_a = [];
 		}
+		$this->page->addVar( 'delete_ids_a', $delete_ids_a );
+		
+		// Générer la date du refresh
+		$this->page->addVar( 'dateupdate', ( new \DateTime() )->format( 'Y-m-d H:i:s.u' ) );
 	}
 }

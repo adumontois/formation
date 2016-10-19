@@ -36,6 +36,7 @@ class ConnectionController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executeGetConnection( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $User_manager UserManager
 		 */
@@ -61,14 +62,10 @@ class ConnectionController extends BackController {
 		
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new ConnectionFormHandler( $Form, $User_manager, $Request );
-		if ( $Form_handler->process() ) {
-			$this->app->user()->setAttribute('user_name', $User->login());
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
-		}
+		$Form_handler->process();
 		
 		$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 		$this->page->addVar( 'form', $Form->createView() );
-		$this->run();
 	}
 	
 	/**
@@ -77,6 +74,7 @@ class ConnectionController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executePutUser( HTTPRequest $Request ) {
+		$this->run();
 		/**
 		 * @var $User_manager UserManager
 		 */
@@ -113,18 +111,17 @@ class ConnectionController extends BackController {
 			$this->page->addVar( 'header', 'Formulaire d\'inscription' );
 			$this->page->addVar( 'form', $Form->createView() );
 		}
-		
-		$this->run();
 	}
 	
 	/**
 	 * Déconnecte un utilisateur adminstrateur et redirige vers l'accueil du site
 	 */
 	public function executeClearConnection() {
+		$this->access_authorized_to_a = [];
+		$this->run();
 		$this->app->user()->unsetAuthentication();
 		$this->app->user()->setFlash( htmlspecialchars( self::DISCONNECTION_SUCCESSFUL ) );
 		// On redirige vers la racine
 		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
-		$this->run();
 	}
 }

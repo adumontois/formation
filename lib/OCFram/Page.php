@@ -153,4 +153,11 @@ class Page extends ApplicationComponent {
 	public function format() {
 		return $this->format;
 	}
+	
+	/**
+	 * @return array
+	 */
+	 public function vars() {
+	    return $this->vars;
+	 }
 }

@@ -39,6 +39,7 @@ class NewsController extends BackController {
 	 * Récupère toutes les news disponibles en DB.
 	 */
 	public function executeBuildIndex() {
+		$this->access_authorized_to_a = [ User::USERY_SUPERADMIN ];
 		$this->run();
 		/**
 		 * @var NewsManager $News_manager
@@ -51,20 +52,17 @@ class NewsController extends BackController {
 			$News_list_a = $News_manager->getNewscAndUserSortByIdDesc();
 			foreach ( $News_list_a as $News ) {
 				$News->format();
-				$News->User()['link'] = Router::getUrlFromModuleAndAction('Frontend', 'Member', 'buildMember', array('id' => (int)$News->User()->id()));
-				// On génère le lien si l'utilisateur a les droits de modification et de suppression
-				if ( $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $this->app->user()->userId() == $News->User()->id() ) {
-					$News->setAction_a( [
-						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
-						'image_source'     => '/images/update.png',
-						'alternative_text' => 'Modifier',
-					] );
-					$News->setAction_a( [
-						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
-						'image_source'     => '/images/delete.png',
-						'alternative_text' => 'Supprimer',
-					] );
-				}
+				$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/update.png',
+					'alternative_text' => 'Modifier',
+				] );
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/delete.png',
+					'alternative_text' => 'Supprimer',
+				] );
 			}
 			$this->page->addVar( 'News_list_a', $News_list_a );
 			$this->page->addVar( 'news_count', $News_manager->countNewsc() );
@@ -82,6 +80,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	protected function executePutNews( HTTPRequest $Request ) {
+		$this->access_authorized_to_a = [];
 		$this->run();
 		/**
 		 * @var $News_manager NewsManager
@@ -93,6 +92,7 @@ class NewsController extends BackController {
 				'title'   => $Request->postData( 'title' ),
 				'content' => $Request->postData( 'content' ),
 			) );
+			
 			// S'il s'agit d'un update, il faut connaître l'id de la news qui est donné dans l'url
 			if ( $Request->getExists( 'id' ) ) {
 				// On vérifie si la news correspondante existe
@@ -105,9 +105,12 @@ class NewsController extends BackController {
 		else {
 			if ( $Request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
+				if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
+					$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news à modifier n\'existe plus !' ) );
+				}
 				$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 				// Seul un superadmin peut modifier les news des autres
-				if ( $this->app->user()->userId() != $News->fk_SUC() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
+				if ($this->app->user()->userId() != $News->fk_SUC() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
 					$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas modifier la news de quelqu\'un d\'autre !' ) );
 				}
 			}
@@ -129,7 +132,7 @@ class NewsController extends BackController {
 			else {
 				$this->app->user()->setFlash( 'La news a été correctement modifiée.' );
 			};
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' ) );
 		}
 		
 		
@@ -173,6 +176,7 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executeClearNews( HTTPRequest $Request ) {
+		$this->access_authorized_to_a = [];
 		$this->run();
 		/**
 		 * @var $News_manager     NewsManager
@@ -184,7 +188,7 @@ class NewsController extends BackController {
 		if ( null == $News ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
 		}
-		if ( $News->fk_SUC() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN ) {
+		if ( $News->fk_SUC() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas supprimer la news de quelqu\'un d\'autre !' ) );
 		}
 		
@@ -207,15 +211,12 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executePutUpdateComment( HTTPRequest $Request ) {
+		$this->access_authorized_to_a = [ User::USERY_SUPERADMIN ];
 		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 * @var $News_manager     NewsManager
 		 */
-		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->app->httpResponse()
-					  ->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour éditer les commentaires.' ) );
-		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		$News_manager     = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
@@ -270,14 +271,11 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executeClearComment( HTTPRequest $Request ) {
+		$this->access_authorized_to_a = [ User::USERY_SUPERADMIN ];
 		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 */
-		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->app->httpResponse()
-					  ->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' ) );
-		}
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
 			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
@@ -294,23 +292,18 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executeClearCommentFromAjax( HTTPRequest $Request ) {
+		$this->access_authorized_to_a = [ User::USERY_SUPERADMIN ];
 		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->page->addVar( 'master_code', 1 );
-			$this->page->addVar( 'master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
+		
+		if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+			$this->forbiddenAccess( 'Le commentaire à supprimer n\'existe pas !', 2 );
 		}
 		else {
-			if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
-				$this->page->addVar( 'master_code', 2 );
-				$this->page->addVar( 'master_error', 'Le commentaire à supprimer n\'existe pas !' );
-			}
-			else {
-				$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
-			}
+			$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
 		}
 	}
 	
@@ -322,77 +315,58 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $Request
 	 */
 	public function executePutUpdateCommentFromAjax( HTTPRequest $Request ) {
+		$this->access_authorized_to_a = [ User::USERY_SUPERADMIN ];
 		$this->run();
 		/**
 		 * @var $Comments_manager CommentsManager
 		 * @var $News_manager     NewsManager
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
-		$News_manager     = $this->managers->getManagerOf();
-		if ( $this->app->user()->authenticationLevel() != User::USERY_SUPERADMIN ) {
-			$this->page->addVar( 'master_code', 1 );
-			$this->page->addVar( 'master_error', 'Vous devez être ' . User::getTextualStatus( User::USERY_SUPERADMIN ) . ' pour supprimer les commentaires.' );
+		if ( $Request->postData( 'content' ) !== null AND !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
+			$this->forbiddenAccess( 'Le commentaire en cours d\'édition n\'existe plus !', 1 );
 		}
+		
+		// Récupérer le commentaire en DB
+		$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
+		if ( $Request->postData( 'content' ) !== null ) {
+			$Comment->setContent( $Request->postData( 'content' ) );
+		}
+		
+		if ( null === $Comment ) {
+			$this->forbiddenAccess( 'Le commentaire à éditer n\'existe pas !', 2 );
+		}
+		// Pas besoin de vérifier l'existence de la news, elle est garantie en base par la clé étrangère
+		
 		else {
-			if ( $Request->postData('content') !== null ) {
-				if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
-					$this->page->addVar( 'master_code', 2 );
-					$this->page->addVar( 'master_error', 'Le commentaire en cours d\'édition n\'existe plus !' );
-				}
-			}
+			// Construire le formulaire
+			$Form_builder = new CommentFormBuilder( $Comment );
+			$Form_builder->build();
+			$Form = $Form_builder->form();
 			
-			// Récupérer le commentaire en DB
-			$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
-			if ( $Request->postData('content') !== null) {
-				$Comment->setContent($Request->postData('content'));
-			}
-			
-			
-			if (null === $Comment) {
-				$this->page->addVar( 'master_code', 3 );
-				$this->page->addVar( 'master_error', 'Le commentaire à éditer n\'existe pas !' );
-			}
-			else {
-				// Construire le formulaire
-				$Form_builder = new CommentFormBuilder( $Comment );
-				$Form_builder->build();
-				$Form = $Form_builder->form();
-				
-				if ($Request->postData('content') !== null) {
-					// Sauvegarder avec le FormHandler
-					$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
-					if ( !$Form_handler->process() ) {
-						// On envoie les erreurs si besoin
-						foreach ( $Form->Field_a() as $Field ) {
-							$error = $Field->errorMessage();
-							if ( !empty( $error ) ) {
-								$Comment->addError_a( $Field->name(), $error );
-							}
+			if ( $Request->postData( 'content' ) !== null ) {
+				// Sauvegarder avec le FormHandler
+				$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
+				if ( !$Form_handler->process() ) {
+					// On envoie les erreurs si besoin
+					foreach ( $Form->Field_a() as $Field ) {
+						$error = $Field->errorMessage();
+						if ( !empty( $error ) ) {
+							$Comment->addError_a( $Field->name(), $error );
 						}
-						// Envoyer les erreurs
-						$this->page->addVar( 'form', $Form->createView() );
 					}
-					// Récupérer le nouvel état du commentaire (date d'update par exemple)
-					else {
-						$Comment = $Comments_manager->getCommentcUsingCommentcId($Request->getData('id'));
-						/*$Comment->setAction_a( [
-							'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => (int)$Comment->id() ) ),
-							'label' => 'Modifier',
-							'js_function' => 'update_comment_on_click'
-						] );
-						$Comment->setAction_a( [
-							'link'  => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-							'label' => 'Supprimer',
-							'js_function' => 'delete_comment_on_click'
-						] );*/
-					}
-				}
-				else {
+					// Envoyer les erreurs
 					$this->page->addVar( 'form', $Form->createView() );
 				}
-				// Ne pas envoyer le form si OK
-				$this->page->addVar( 'Comment', $Comment );
+				// Récupérer le nouvel état du commentaire (date d'update par exemple)
+				else {
+					$Comment = $Comments_manager->getCommentcUsingCommentcId( $Request->getData( 'id' ) );
+				}
 			}
+			else {
+				$this->page->addVar( 'form', $Form->createView() );
+			}
+			// Ne pas envoyer le form si OK
+			$this->page->addVar( 'Comment', $Comment );
 		}
 	}
 }

@@ -262,8 +262,8 @@ class User extends Entity {
 	 * @param $fk_SUY int Tinyint associé à un type de user existant.
 	 */
 	public function setFk_SUY( $fk_SUY ) {
-		if ( !is_int( $fk_SUY ) OR $fk_SUY < 0 OR $fk_SUY > 255 ) {
-			throw new \InvalidArgumentException( 'Le type d\'un User doit être une entier entre 0 et 255' );
+		if ( (int)$fk_SUY < 1 OR (int)$fk_SUY > 255 ) {
+			throw new \InvalidArgumentException( 'Le type d\'un User doit être une entier entre 1 et 255' );
 		}
 		$this->fk_SUY = $fk_SUY;
 	}
@@ -274,10 +274,10 @@ class User extends Entity {
 	 * @param $fk_SUE_banned int Tinyint associé à un état de bannissement existant.
 	 */
 	public function setFk_SUE_banned( $fk_SUE_banned ) {
-		if ( !is_int( $fk_SUE_banned ) OR $fk_SUE_banned < 1 OR $fk_SUE_banned > 19 ) {
+		if ( (int)$fk_SUE_banned < 1 OR (int)$fk_SUE_banned > 19 ) {
 			throw new \BadMethodCallException( 'L\'état de bannissement d\'un User doit être une entier entre 1 et 19' );
 		}
-		$this->fk_SUE_banned = $fk_SUE_banned;
+		$this->fk_SUE_banned = (int)$fk_SUE_banned;
 	}
 	
 	/**
@@ -286,10 +286,10 @@ class User extends Entity {
 	 * @param $fk_SUE_valid int Tinyint associé à un état de validation existant.
 	 */
 	public function setFk_SUE_valid( $fk_SUE_valid ) {
-		if ( !is_int( $fk_SUE_valid ) OR $fk_SUE_valid < 21 OR $fk_SUE_valid > 39 ) {
+		if ( (int)$fk_SUE_valid < 21 OR (int)$fk_SUE_valid > 39 ) {
 			throw new \InvalidArgumentException( 'L\'état de validation d\'un User doit être une entier entre 21 et 39' );
 		}
-		$this->fk_SUE_valid = $fk_SUE_valid;
+		$this->fk_SUE_valid = (int)$fk_SUE_valid;
 	}
 	
 	/**
