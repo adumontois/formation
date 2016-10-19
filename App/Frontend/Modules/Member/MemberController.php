@@ -98,6 +98,7 @@ class MemberController extends BackController {
 		
 		foreach($News_others_a as $News) {
 			$News->format();
+			$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
 			if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
 				$News->setAction_a( [
 					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),

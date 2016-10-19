@@ -91,7 +91,7 @@
 				<fieldset>
 					<!-- Afficher la News -->
 					<p>
-						"<?= htmlspecialchars( $News[ 'title' ] ) ?>", par <strong><?= htmlspecialchars( $News[ 'User' ] ) ?></strong>
+						"<?= htmlspecialchars( $News[ 'title' ] ) ?>", par <strong><a href="<?= $News['User']['link'] ?>"><?= htmlspecialchars( $News[ 'User' ] ) ?></a></strong>
 						<br />
 						News publiée le <?= $News[ 'dateadd' ] ?>
 						<?php if ( $News[ 'dateadd' ] != $News[ 'dateupdate' ] ): ?>

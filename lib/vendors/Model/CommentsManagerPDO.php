@@ -10,6 +10,7 @@ namespace Model;
 
 use Entity\Comment;
 use Entity\User;
+use OCFram\Router;
 
 /**
  * Class CommentsManagerPDO
@@ -92,7 +93,7 @@ class CommentsManagerPDO extends CommentsManager {
 				'id'           => $Comment[ 'SCC_id' ],
 				'fk_SNC'       => $Comment[ 'SCC_fk_SNC' ],
 				'author'       => $Comment[ 'SCC_author' ],
-				'content'      => $Comment[ 'SCC_content' ],
+				'content'      => $Comment[ 'SCC_author' ],
 				'datecreation' => new \DateTime( $Comment[ 'SCC_datecreation' ] ),
 				'dateupdate'   => new \DateTime( $Comment[ 'SCC_dateupdate' ] ),
 			] );
@@ -226,7 +227,7 @@ class CommentsManagerPDO extends CommentsManager {
 				'id'           => $Comment[ 'SCC_id' ],
 				'fk_SNC'       => $Comment[ 'SCC_fk_SNC' ],
 				'author'       => $Comment[ 'SCC_author' ],
-				'content'      => $Comment[ 'SCC_content' ],
+				'content'      => $Comment[ 'SCC_author' ],
 				'datecreation' => new \DateTime( $Comment[ 'SCC_datecreation' ] ),
 				'dateupdate'   => new \DateTime( $Comment[ 'SCC_dateupdate' ] ),
 			] );
@@ -266,7 +267,7 @@ class CommentsManagerPDO extends CommentsManager {
                 WHERE SCC_fk_SNC = :fk_SNC
                 	AND SCC_dateupdate > :dateupdate
                 	AND SCC_datecreation <= :dateupdate
-				ORDER BY SCC_id DESC';
+				ORDER BY SCC_u DESC';
 		
 		$stmt = $this->dao->prepare( $sql );
 		$stmt->bindValue( ':fk_SNC', (int)$newsc_id, \PDO::PARAM_INT );
@@ -279,7 +280,7 @@ class CommentsManagerPDO extends CommentsManager {
 				'id'           => $Comment[ 'SCC_id' ],
 				'fk_SNC'       => $Comment[ 'SCC_fk_SNC' ],
 				'author'       => $Comment[ 'SCC_author' ],
-				'content'      => $Comment[ 'SCC_content' ],
+				'content'      => $Comment[ 'SCC_author' ],
 				'datecreation' => new \DateTime( $Comment[ 'SCC_datecreation' ] ),
 				'dateupdate'   => new \DateTime( $Comment[ 'SCC_dateupdate' ] ),
 			] );
@@ -331,7 +332,7 @@ class CommentsManagerPDO extends CommentsManager {
 	}
 	
 	/**
-	 * Récupère toues les commentaires d'un User donné par son login
+	 * Récupère tous les commentaires d'un User donné par son login
 	 *
 	 * @param string $userc_login
 	 *
