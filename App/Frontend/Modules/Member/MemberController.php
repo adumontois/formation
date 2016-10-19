@@ -10,12 +10,14 @@ namespace App\Frontend\Modules\Member;
 
 
 use App\Traits\AppController;
+use Entity\User;
 use Model\CommentsManager;
 use Model\NewsManager;
 use Model\UserManager;
 use OCFram\BackController;
 use OCFram\HTTPRequest;
 use OCFram\HTTPResponse;
+use OCFram\Router;
 
 /**
  * Class MemberController
@@ -57,6 +59,18 @@ class MemberController extends BackController {
 		foreach ( $News_owned_a as $News ) {
 			$News->format();
 			$News->setUser($User);
+			if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $News->User()->id() == $this->app->user()->userId()) {
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/update.png',
+					'alternative_text' => 'Modifier',
+				] );
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/delete.png',
+					'alternative_text' => 'Supprimer',
+				] );
+			}
 		}
 		$this->page->addVar( 'News_owned_a', $News_owned_a );
 		
@@ -64,6 +78,18 @@ class MemberController extends BackController {
 		$Comment_owned_a = $Comment_manager->getCommentcUsingUsercLoginSortByFk_SNCDesc( $User->login() );
 		foreach ( $Comment_owned_a as $Comment ) {
 			$Comment->formatDate();
+			if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
+				$Comment->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => $Comment->id() ) ),
+					'image_source'     => '/images/update.png',
+					'alternative_text' => 'Modifier',
+				] );
+				$Comment->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => $Comment->id() ) ),
+					'image_source'     => '/images/delete.png',
+					'alternative_text' => 'Supprimer',
+				] );
+			}
 		}
 		$this->page->addVar( 'Comment_owned_a', $Comment_owned_a );
 		
@@ -72,6 +98,18 @@ class MemberController extends BackController {
 		
 		foreach($News_others_a as $News) {
 			$News->format();
+			if ($this->app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/update.png',
+					'alternative_text' => 'Modifier',
+				] );
+				$News->setAction_a( [
+					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+					'image_source'     => '/images/delete.png',
+					'alternative_text' => 'Supprimer',
+				] );
+			}
 		}
 		$this->page->addVar('News_others_a', $News_others_a);
 	}
