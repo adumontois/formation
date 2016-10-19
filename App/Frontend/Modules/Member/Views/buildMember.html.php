@@ -12,7 +12,7 @@
  */
 ?>
 	
-	<!-- Affichage des infos membre -->
+	<?php // Affichage des infos membre ?>
 	<fieldset>
 		<h2>
 			Fiche de <?= htmlspecialchars( $User[ 'login' ] ) ?>
@@ -34,7 +34,7 @@
 		</h2>
 		<?php foreach ( $News_a as $News ): ?>
 		<fieldset>
-			<!-- Afficher la News -->
+			<?php // Afficher la News ?>
 			<p>
 				"<?= htmlspecialchars( $News[ 'title' ] ) ?>", par <strong>
 					<?php if ( $News[ 'User' ][ 'id' ] != $User[ 'id' ] ): ?>
