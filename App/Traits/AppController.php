@@ -188,5 +188,4 @@ trait AppController {
 				 throw new \Exception( 'Format ' . $this->page()->format() . ' has no run method defined.' );
 		 }
 	 }
-	 
 }

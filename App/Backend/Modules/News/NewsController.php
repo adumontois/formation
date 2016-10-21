@@ -8,6 +8,7 @@
 
 namespace App\Backend\Modules\News;
 
+use App\Frontend\Modules\Member\MemberController;
 use App\Traits\AppController;
 use Entity\Comment;
 use Entity\News;
@@ -35,9 +36,6 @@ class NewsController extends BackController {
 	 */
 	use AppController;
 	
-	
-	
-	
 	/**
 	 * Récupère toutes les news disponibles en DB.
 	 */
@@ -55,14 +53,14 @@ class NewsController extends BackController {
 			$News_list_a = $News_manager->getNewscAndUserSortByIdDesc();
 			foreach ( $News_list_a as $News ) {
 				$News->format();
-				$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
+				$News->User()[ 'link' ] = MemberController::getLinkToBuildMember($News->User());
 				$News->setAction_a( [
-					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
+					'action_link'      => self::getLinkToPutUpdateNews($News),
 					'image_source'     => '/images/update.png',
 					'alternative_text' => 'Modifier',
 				] );
 				$News->setAction_a( [
-					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
+					'action_link'      => self::getLinkToClearNews($News),
 					'image_source'     => '/images/delete.png',
 					'alternative_text' => 'Supprimer',
 				] );
@@ -135,7 +133,7 @@ class NewsController extends BackController {
 			else {
 				self::$app->user()->setFlash( 'La news a été correctement modifiée.' );
 			};
-			self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' ) );
+			self::$app->httpResponse()->redirect( \App\Frontend\Modules\News\NewsController::getLinkToBuildIndex() );
 		}
 		
 		
@@ -203,7 +201,7 @@ class NewsController extends BackController {
 		
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
 		self::$app->user()->setFlash( 'La news a été correctement supprimée.' );
-		self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildIndex' ) );
+		self::$app->httpResponse()->redirect( \App\Frontend\Modules\News\NewsController::getLinkToBuildIndex() );
 	}
 	
 	/**
@@ -259,7 +257,7 @@ class NewsController extends BackController {
 		if ( $Form_handler->process() ) {
 			self::$app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
 			// Redirection vers l'accueil d'administration
-			self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildIndex' ) );
+			self::$app->httpResponse()->redirect( NewsController::getLinkToBuildIndex() );
 		}
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		$this->page->addVar( 'form', $Form->createView() );
@@ -286,7 +284,7 @@ class NewsController extends BackController {
 		$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
 		self::$app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
-		self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildIndex' ) );
+		self::$app->httpResponse()->redirect( self::getLinkToBuildIndex() );
 	}
 	
 	/**
@@ -371,5 +369,74 @@ class NewsController extends BackController {
 			// Ne pas envoyer le form si OK
 			$this->page->addVar( 'Comment', $Comment );
 		}
+	}
+	
+	/**
+	 * Renvoie le lien de la page de mise à jour d'une News
+	 *
+	 * @param News $News
+	 *
+	 * @return string
+	 */
+	static public function getLinkToPutUpdateNews(News $News) {
+		$id = $News->id();
+		if (empty($id)) {
+			throw new \RuntimeException('Impossible de créer le lien de la News : L\'id de la News n\'est pas renseigné !');
+		}
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array('id' => (int)$News->id()) );
+	}
+	
+	/**
+	 * Renvoie le lien de la page de suppression d'une News
+	 *
+	 * @param News $News
+	 *
+	 * @return string
+	 */
+	static public function getLinkToClearNews(News $News) {
+		$id = $News->id();
+		if (empty($id)) {
+			throw new \RuntimeException('Impossible de créer le lien de la News : L\'id de la News n\'est pas renseigné !');
+		}
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array('id' => (int)$News->id()) );
+	}
+	
+	/**
+	 * Renvoie le lien de la page d'accueil Backend
+	 *
+	 * @return string
+	 */
+	static public function getLinkToBuildIndex() {
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'buildIndex' );
+	}
+	
+	/**
+	 * Renvoie le lien de la page de mise à jour d'un Comment
+	 *
+	 * @param Comment $Comment
+	 *
+	 * @return string
+	 */
+	static public function getLinkToPutUpdateComment(Comment $Comment) {
+		$id = $Comment->id();
+		if (empty($id)) {
+			throw new \RuntimeException('Impossible de créer le lien du Comment : L\'id du Comment n\'est pas renseigné !');
+		}
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array('id' => (int)$Comment->id()) );
+	}
+	
+	/**
+	 * Renvoie le lien de la page de suppression d'un Comment
+	 *
+	 * @param Comment $Comment
+	 *
+	 * @return string
+	 */
+	static public function getLinkToClearComment(Comment $Comment) {
+		$id = $Comment->id();
+		if (empty($id)) {
+			throw new \RuntimeException('Impossible de créer le lien du Comment : L\'id du Comment n\'est pas renseigné !');
+		}
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array('id' => (int)$Comment->id()) );
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace App\Frontend\Modules\News;
 
+use App\Frontend\Modules\Member\MemberController;
 use App\Traits\AppController;
 use Entity\Comment;
 use Entity\News;
@@ -54,7 +55,7 @@ class NewsController extends BackController {
 				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
 			}
 			$News->build_link       = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id() ) );
-			$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
+			$News->User()[ 'link' ] = MemberController::getLinkToBuildMember( $News->User() );
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
 		$this->page->addVar( 'News_list_a', $Liste_news_a );
@@ -355,5 +356,29 @@ class NewsController extends BackController {
 		
 		// Générer la date du refresh
 		$this->page->addVar( 'dateupdate', ( new \DateTime() )->format( 'Y-m-d H:i:s.u' ) );
+	}
+	
+	/**
+	 * Renvoie le lien de la page d'accueil Frontend
+	 *
+	 * @return string
+	 */
+	static public function getLinkToBuildIndex() {
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' );
+	}
+	
+	/**
+	 * Renvoie le lien de la page d'affichage d'une News
+	 *
+	 * @param News $News
+	 *
+	 * @return string
+	 */
+	static public function getLinkToBuildNews(News $News) {
+		$id = $News->id();
+		if (empty($id)) {
+			throw new \RuntimeException('Impossible de créer le lien de la News : L\'id de la News n\'est pas renseigné !');
+		}
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array('id' => (int)$News->id()) );
 	}
 }

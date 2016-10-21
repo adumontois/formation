@@ -140,4 +140,20 @@ abstract class BackController extends ApplicationComponent {
 		$this->view = $view;
 		$this->page->setContentFile( __DIR__ . '/../../App/' . self::$app->name() . '/Modules/' . $this->module . '/Views/' . $this->view . '.' . $this->page->format() . '.php' );
 	}
+	
+	/**
+	 * Donne le nom du module associé au contôleur appelant.
+	 *
+	 * @return string
+	 */
+	static public function getModuleName() {
+		// On construit dynamiquement le nom de la classe
+		$real_class = get_called_class();
+		$short_class_name_without_controller = preg_replace("/Controller$/", "", substr(strrchr($real_class, '\\'), 1));
+		if ($short_class_name_without_controller === NULL) {
+			throw new \RuntimeException('Illegal Controller name '.$real_class);
+		}
+		return $short_class_name_without_controller;
+	}
+	
 }

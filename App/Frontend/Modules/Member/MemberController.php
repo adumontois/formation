@@ -9,6 +9,7 @@
 namespace App\Frontend\Modules\Member;
 
 
+use App\Backend\Modules\News\NewsController;
 use App\Traits\AppController;
 use Entity\Comment;
 use Entity\User;
@@ -97,12 +98,19 @@ class MemberController extends BackController {
 		$this->page->addVar('News_a', $News_a);
 	}
 	
+	
 	/**
-	 * Renvoie le lien d'affichage de la page membre du User passé en paramètre
+	 * Renvoie le lien de la page membre du User passé en paramètre
 	 *
 	 * @param User $Member
+	 *
+	 * @return string
 	 */
-	/*static public function linkBuildMember(User $Member) {
-		return Router::getUrlFromModuleAndAction('Frontend', )
-	}*/
+	static public function getLinkToBuildMember(User $Member) {
+		$id = $Member->id();
+		if (empty($id)) {
+			throw new \RuntimeException('Impossible de créer le lien de la fiche membre : L\'id du membre n\'est pas renseigné !');
+		}
+		return Router::getUrlFromModuleAndAction( 'Frontend' , 'Member' , 'buildMember', array('id' => (int)$Member->id()) );
+	}
 }

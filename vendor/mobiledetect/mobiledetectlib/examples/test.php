@@ -3,8 +3,6 @@ require_once '../Mobile_Detect.php';
 /*
 $detect = new Mobile_Detect;
 $detect->setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) CriOS/38.0.2125.59 Mobile/12A405 Safari/600.1.4');
-var_dump($detect->version('Chrome'));
-var_dump($detect->version('iPhone'));
 */
 
 /*
@@ -18,12 +16,9 @@ $mobile_detect = new Mobile_Detect;
 foreach($user_agents as $user_agent)
 {
     $mobile_detect->setUserAgent($user_agent);
-    var_dump($mobile_detect->isAndroidOS());
 }
 */
 
 $detect = new Mobile_Detect;
 //$detect->setUserAgent('Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko');
-//var_dump($detect->version('IE'));
 $detect->setUserAgent('Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko');
-var_dump($detect->version('IE'));

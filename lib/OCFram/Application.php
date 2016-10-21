@@ -51,12 +51,6 @@ abstract class Application {
 	 * @throws \RuntimeException
 	 */
 	public function __construct() {
-		// On construit dynamiquement le nom de l'application
-		$real_class = get_called_class();
-		$short_class_name_without_application = preg_replace("/Application$/", "", substr(strrchr($real_class, '\\'), 1));
-		if (($this->name = $short_class_name_without_application)  === NULL) {
-			throw new \RuntimeException('Illegal class name '.$real_class);
-		}
 
 		// On vérifie si l'instance d'application existe déjà : pour cela on regarde un attribut différent du name qu'on vient de set
 		if (!isset ($this->httpRequest)) {
@@ -66,6 +60,7 @@ abstract class Application {
 			$this->user         = new User( $this );
 			$this->config       = new Config( $this );
 			$this->Router       = new Router( $this );
+			$this->name = static::getAppName();
 		}
 		return $this;
 	}
@@ -146,5 +141,20 @@ abstract class Application {
 	 */
 	public function config() {
 		return $this->config;
+	}
+	
+	/**
+	 * Donne le nom de l'application associée à la méthode appelante.
+	 *
+	 * @return string
+	 */
+	static public function getAppName() {
+		// On construit dynamiquement le nom de l'application
+		$real_class = get_called_class();
+		$short_class_name_without_application = preg_replace("/Application$/", "", substr(strrchr($real_class, '\\'), 1));
+		if ($short_class_name_without_application  === NULL) {
+			throw new \RuntimeException('Illegal class name '.$real_class);
+		}
+		return $short_class_name_without_application;
 	}
 }

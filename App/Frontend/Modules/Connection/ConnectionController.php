@@ -9,6 +9,7 @@
 namespace App\Frontend\Modules\Connection;
 
 
+use App\Frontend\Modules\News\NewsController;
 use App\Traits\AppController;
 use Entity\User;
 use FormBuilder\ConnectionFormBuilder;
@@ -104,7 +105,7 @@ class ConnectionController extends BackController {
 		$Form_handler = new FormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
 			self::$app->user()->setFlash( 'Vous avez été correctement inscrit.' );
-			self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction(self::$app->name(), 'News', 'buildIndex') );
+			self::$app->httpResponse()->redirect( NewsController::getLinkToBuildIndex() );
 		}
 		else {
 			$this->page->addVar( 'user_count', $User_manager->countUsercUsingUsercId() );
@@ -122,6 +123,6 @@ class ConnectionController extends BackController {
 		self::$app->user()->unsetAuthentication();
 		self::$app->user()->setFlash( htmlspecialchars( self::DISCONNECTION_SUCCESSFUL ) );
 		// On redirige vers la racine
-		self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction(self::$app->name(), 'News', 'buildIndex') );
+		self::$app->httpResponse()->redirect( NewsController::getLinkToBuildIndex());
 	}
 }
