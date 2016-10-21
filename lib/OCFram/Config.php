@@ -33,7 +33,7 @@ class Config extends ApplicationComponent {
 		if ( empty( $vars ) ) // Fulfill $vars by parsing XML
 		{
 			$xml = new \DOMDocument();
-			$xml->load( __DIR__ . '/../../App/' . $this->app()->name() . '/Config/app.xml' );
+			$xml->load( __DIR__ . '/../../App/' . self::$app->name() . '/Config/app.xml' );
 			$data = $xml->getElementsByTagName( 'define' );
 			foreach ( $data as $value ) {
 				/**

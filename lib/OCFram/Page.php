@@ -84,7 +84,7 @@ class Page extends ApplicationComponent {
 		/*
 		 * @var User $User utilisée dans les vues
 		 */
-		$User = $this->app->user();
+		$User = self::$app->user();
 		
 		extract( $this->vars );
 		
@@ -100,7 +100,7 @@ class Page extends ApplicationComponent {
 		
 		ob_start();
 		
-		require __DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php'; // Construction dynamique du chemin de layout OK
+		require __DIR__ . '/../../App/' . self::$app->name() . '/templates/layout.' . $this->format . '.php'; // Construction dynamique du chemin de layout OK
 		
 		return ob_get_clean();
 	}
@@ -112,7 +112,7 @@ class Page extends ApplicationComponent {
 		/*
 	 * @var User $User utilisée dans les vues
 	 */
-		$User = $this->app->user();
+		$User = self::$app->user();
 		
 //		if ( $this->format == 'json' ) {
 //			// On serialize toutes les Entity passées en paramètre
@@ -131,7 +131,7 @@ class Page extends ApplicationComponent {
 		 * @var $content string utilisée dans les vues
 		 */
 		
-		return json_encode(require(__DIR__ . '/../../App/' . $this->app->name() . '/templates/layout.' . $this->format . '.php')) ;
+		return json_encode(require(__DIR__ . '/../../App/' . self::$app->name() . '/templates/layout.' . $this->format . '.php')) ;
 	}
 	
 	

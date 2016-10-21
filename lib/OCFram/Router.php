@@ -10,7 +10,10 @@ namespace OCFram;
 
 /**
  * Class Router
+ *
  * Modélise le routeur, chargé de la gestion des routes et de rediriger le client vers la bonne route pour récupérer la page souhaitée.
+ *
+ * Il n'y a qu'un seul routeur (singleton)
  *
  * @package OCFram
  */
@@ -139,7 +142,7 @@ class Router extends ApplicationComponent {
 	 */
 	public function getRoute( $url ) {
 		// Trouver la route qui matche l'url fournie
-		foreach ( self::$routes[ $this->app->name() ] as $route ) {
+		foreach ( self::$routes[ self::$app->name() ] as $route ) {
 			$varsValues = $route->match( $url );
 			if ( $varsValues !== false AND $route->hasVars() ) // Si on a des variables, on doit les récupérer pour les faire transiter dans l'URL
 			{
@@ -166,6 +169,6 @@ class Router extends ApplicationComponent {
 	
 	public function resetRouter() {
 		self::$routes = array();
-		self::generateRoutes( $this->app->name() );
+		self::generateRoutes( self::$app->name() );
 	}
 }

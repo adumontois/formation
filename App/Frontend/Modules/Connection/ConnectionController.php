@@ -41,8 +41,8 @@ class ConnectionController extends BackController {
 		 * @var $User_manager UserManager
 		 */
 		// Si l'utilisateur est connecté, on le déconnecte
-		if ( $this->app->user()->isAuthenticated() ) {
-			$this->app->user()->unsetAuthentication();
+		if ( self::$app->user()->isAuthenticated() ) {
+			self::$app->user()->unsetAuthentication();
 		}
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
@@ -78,8 +78,8 @@ class ConnectionController extends BackController {
 		/**
 		 * @var $User_manager UserManager
 		 */
-		if ( $this->app->user()->isAuthenticated() ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::FORBIDDEN, new \Exception( 'Vous devez vous déconnecter avant de pouvoir inscrire un compte.' ) );
+		if ( self::$app->user()->isAuthenticated() ) {
+			self::$app->httpResponse()->redirectError( HTTPResponse::FORBIDDEN, new \Exception( 'Vous devez vous déconnecter avant de pouvoir inscrire un compte.' ) );
 		}
 		$User_manager = $this->managers->getManagerOf( 'User' );
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
@@ -103,8 +103,8 @@ class ConnectionController extends BackController {
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new FormHandler( $Form, $User_manager, $Request );
 		if ( $Form_handler->process() ) {
-			$this->app->user()->setFlash( 'Vous avez été correctement inscrit.' );
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
+			self::$app->user()->setFlash( 'Vous avez été correctement inscrit.' );
+			self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction(self::$app->name(), 'News', 'buildIndex') );
 		}
 		else {
 			$this->page->addVar( 'user_count', $User_manager->countUsercUsingUsercId() );
@@ -119,9 +119,9 @@ class ConnectionController extends BackController {
 	public function executeClearConnection() {
 		$this->access_authorized_to_a = [];
 		$this->run();
-		$this->app->user()->unsetAuthentication();
-		$this->app->user()->setFlash( htmlspecialchars( self::DISCONNECTION_SUCCESSFUL ) );
+		self::$app->user()->unsetAuthentication();
+		self::$app->user()->setFlash( htmlspecialchars( self::DISCONNECTION_SUCCESSFUL ) );
 		// On redirige vers la racine
-		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->app->name(), 'News', 'buildIndex') );
+		self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction(self::$app->name(), 'News', 'buildIndex') );
 	}
 }

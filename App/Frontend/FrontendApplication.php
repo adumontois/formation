@@ -19,15 +19,6 @@ use OCFram\Application;
  */
 class FrontendApplication extends Application {
 	/**
-	 * FrontendApplication constructor.
-	 * Ajoute au constructeur parent le nom de l'application.
-	 */
-	function __construct() {
-		parent::__construct();
-		$this->name = 'Frontend';
-	}
-	
-	/**
 	 *  Lance l'application Frontend
 	 */
 	function run() {

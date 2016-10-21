@@ -9,6 +9,7 @@
 namespace App\Traits;
 
 use Entity\User;
+use OCFram\ApplicationComponent;
 use OCFram\BackController;
 use OCFram\HTTPResponse;
 use OCFram\Router;
@@ -69,12 +70,12 @@ trait AppController {
 				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Device', 'buildDevice'),
 			],
 		];
-		if ( $this->app()->user()->isAuthenticated() ) {
+		if ( ApplicationComponent::app()->user()->isAuthenticated() ) {
 			$menu_a[] = [
-				'label' => $this->app()->user()->getAttribute('user_name'). ' ('. ucfirst( User::getTextualStatus( $this->app()->user()->authenticationLevel() ) ) . ', connecté)',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Member', 'buildMember', array('id' => (int)$this->app()->user()->userId())),
+				'label' => ApplicationComponent::app()->user()->getAttribute('user_name'). ' ('. ucfirst( User::getTextualStatus( ApplicationComponent::app()->user()->authenticationLevel() ) ) . ', connecté)',
+				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Member', 'buildMember', array('id' => (int)ApplicationComponent::app()->user()->userId())),
 			];
-			if ($this->app()->user()->authenticationLevel() == User::USERY_SUPERADMIN) {
+			if (ApplicationComponent::app()->user()->authenticationLevel() == User::USERY_SUPERADMIN) {
 				$menu_a[] = [
 					'label' => 'Admin',
 					'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
@@ -103,8 +104,8 @@ trait AppController {
 		$this->page()->addVar( 'menu_a', $menu_a );
 		
 		// Générer le flash
-		if ( $this->app()->user()->hasFlash() ) {
-			$flash = $this->app()->user()->getFlash();
+		if ( ApplicationComponent::app()->user()->hasFlash() ) {
+			$flash = ApplicationComponent::app()->user()->getFlash();
 			$this->page()->addVar( 'flash', $flash );
 		}
 		
@@ -137,9 +138,9 @@ trait AppController {
 			return true;
 		}
 		if ( $this->access_authorized_to_a === []) {
-			return $this->app()->user()->isAuthenticated();
+			return ApplicationComponent::app()->user()->isAuthenticated();
 		}
-		return array_search($this->app()->user()->authenticationLevel(), $this->access_authorized_to_a) !== false;
+		return array_search(ApplicationComponent::app()->user()->authenticationLevel(), $this->access_authorized_to_a) !== false;
 	}
 	
 	
@@ -163,7 +164,9 @@ trait AppController {
 	 * Interdit l'accès au contrôleur si l'utilisateur n'a pas les autorisations nécessaires. Met fin au programme.
 	 *
 	 * @param string $master_error Erreur à afficher à l'utilisateur
-	 * @param string $master_code Code d'erreur à retourner
+	 * @param int $master_code Code d'erreur à retourner
+	 *
+	 * @throws \Exception
 	 */
 	 public function forbiddenAccess($master_error = 'Vous n\'avez pas les droits suffisants pour effectuer cette action.', $master_code = 255) {
 		 /**
@@ -171,7 +174,7 @@ trait AppController {
 		  */
 		 switch ( $this->page()->format() ) {
 			 case 'html':
-				 $this->app()->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \RuntimeException('Vous n\'avez pas les droits suffisants pour consulter cette page.'), $this->page());
+				 ApplicationComponent::app()->httpResponse()->redirectError(HTTPResponse::ACCESS_DENIED, new \RuntimeException('Vous n\'avez pas les droits suffisants pour consulter cette page.'));
 				 break;
 			 case 'json':
 				 // On doit empêcher le traitement ultérieur en sortant de l'action du contrôleur
@@ -179,7 +182,7 @@ trait AppController {
 				 $this->page()->addVar( 'master_error', $master_error );
 				 $this->runJSON();
 				 // Envoyer directement le résultat
-				 $this->app()->httpResponse()->send();
+				 ApplicationComponent::app()->httpResponse()->send();
 				 break;
 			 default:
 				 throw new \Exception( 'Format ' . $this->page()->format() . ' has no run method defined.' );

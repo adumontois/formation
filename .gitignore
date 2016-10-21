@@ -1,5 +1,5 @@
 
 .idea/
-composer.json
-composer.lock
-composer.phar
+/composer.json
+/composer.phar
+/composer.lock

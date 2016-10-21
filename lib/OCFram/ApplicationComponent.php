@@ -19,19 +19,19 @@ abstract class ApplicationComponent {
 	/**
 	 * @var $app Application
 	 */
-	protected $app;
+	static protected $app;
 	
 	/**
 	 * @param Application $app
 	 */
 	public function __construct( Application $app ) {
-		$this->app = $app;
+		self::$app = $app;
 	}
 	
 	/**
 	 * @return Application
 	 */
-	public function app() {
-		return $this->app;
+	static public function app() {
+		return self::$app;
 	}
 }

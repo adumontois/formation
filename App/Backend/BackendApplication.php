@@ -13,11 +13,6 @@ use OCFram\Application;
 use OCFram\HTTPResponse;
 
 class BackendApplication extends Application {
-	public function __construct() {
-		parent::__construct();
-		$this->name = 'Backend';
-	}
-	
 	/**
 	 * Lance l'application Backend
 	 */

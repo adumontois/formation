@@ -55,7 +55,7 @@ abstract class BackController extends ApplicationComponent {
 		$this->setModule( $module );
 		$this->page = new Page( $app, $format );
 		// Créer la page de réponse et la relier à la page du BackController
-		$this->app()->httpResponse()->setPage($this->page);
+		self::$app->httpResponse()->setPage($this->page);
 		$this->setView( $action );
 		
 		
@@ -79,7 +79,7 @@ abstract class BackController extends ApplicationComponent {
 		) {
 			throw new \RuntimeException( 'Undefined action "' . $this->action . '" on this module' );
 		}
-		$this->$method( $this->app->httpRequest() );
+		$this->$method( self::$app->httpRequest() );
 	}
 	
 	/**
@@ -138,6 +138,6 @@ abstract class BackController extends ApplicationComponent {
 			throw new \InvalidArgumentException( 'View must be a valid string' );
 		}
 		$this->view = $view;
-		$this->page->setContentFile( __DIR__ . '/../../App/' . $this->app->name() . '/Modules/' . $this->module . '/Views/' . $this->view . '.' . $this->page->format() . '.php' );
+		$this->page->setContentFile( __DIR__ . '/../../App/' . self::$app->name() . '/Modules/' . $this->module . '/Views/' . $this->view . '.' . $this->page->format() . '.php' );
 	}
 }

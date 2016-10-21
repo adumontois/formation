@@ -37,8 +37,8 @@ class NewsController extends BackController {
 		 * @var $Liste_news_a News[]
 		 */
 		// Récupérer la config
-		$nombre_news   = $this->app()->config()->get( 'nombre_news' );
-		$longueur_news = $this->app()->config()->get( 'longueur_news' );
+		$nombre_news   = self::$app->config()->get( 'nombre_news' );
+		$longueur_news = self::$app->config()->get( 'longueur_news' );
 		
 		// Récupérer le manager des news
 		
@@ -76,7 +76,7 @@ class NewsController extends BackController {
 		$News         = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		// Si la news n'existe pas on redirige vers une erreur 404
 		if ( null == $News ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
+			self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
 		}
 		$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
 		$News->format();
@@ -88,7 +88,7 @@ class NewsController extends BackController {
 		$Liste_comments_a = $Comment_manager->getCommentcAndUsercUsingNewscIdSortByNewscIdDesc( $News->id() );
 		foreach ( $Liste_comments_a as $Comment ) {
 			$Comment->formatDate();
-			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				$Comment->setAction_a( [
 					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
 					'label'       => 'Modifier',
@@ -110,11 +110,11 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
 		// On rajoute les données dont la méthode d'obtention varie
-		if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+		if ( !self::$app->user()->hasAttribute( 'user_name' ) ) {
 			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
 		}
 		else {
-			$Comment->setAuthor( $this->app->user()->getAttribute( 'user_name' ) );
+			$Comment->setAuthor( self::$app->user()->getAttribute( 'user_name' ) );
 			$Form_builder = new CommentFormBuilder( $Comment );
 		}
 		
@@ -124,7 +124,7 @@ class NewsController extends BackController {
 		$this->page->addVar( 'title', $News->title() );
 		$this->page->addVar( 'News', $News );
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
-		$this->page->addVar( 'User', $this->app->user() );
+		$this->page->addVar( 'User', self::$app->user() );
 		$this->page->addVar( 'form', $Form->createView() );
 		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$News->id() ) ) );
 		
@@ -152,7 +152,7 @@ class NewsController extends BackController {
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			// La news doit exister
 			if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
-				$this->app->httpResponse()
+				self::$app->httpResponse()
 						  ->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Impossible d\'insérer votre commentaire : la news associée à votre commentaire n\'existe plus !' ) );
 			}
 			
@@ -169,12 +169,12 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
 		// On rajoute les données dont la méthode d'obtention varie
-		if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+		if ( !self::$app->user()->hasAttribute( 'user_name' ) ) {
 			$Comment->setAuthor( $Request->postData( 'author' ) );
 			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
 		}
 		else {
-			$Comment->setAuthor( $this->app->user()->getAttribute( 'user_name' ) );
+			$Comment->setAuthor( self::$app->user()->getAttribute( 'user_name' ) );
 			$Form_builder = new CommentFormBuilder( $Comment );
 		}
 		
@@ -183,7 +183,7 @@ class NewsController extends BackController {
 		$Form = $Form_builder->form();
 		
 		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
-		if ( $Request->method() == HTTPRequest::POST_METHOD && !$this->app->user()->isAuthenticated() && $User_manager->existsUsercUsingUsercLogin( $Comment->author() ) ) {
+		if ( $Request->method() == HTTPRequest::POST_METHOD && !self::$app->user()->isAuthenticated() && $User_manager->existsUsercUsingUsercLogin( $Comment->author() ) ) {
 			$Form->getFieldFromName( 'author' )
 				 ->setErrorMessage( 'Le nom d\'utilisateur ' . $Comment->author() . ' est déjà utilisé par un utilisateur enregistré. Choisissez un autre nom.' );
 		}
@@ -192,12 +192,12 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $this->managers->getManagerOf( 'Comments' ), $Request );
 		if ( $Form_handler->process() ) {
 			// Setter le login de l'utilisateur pour la session s'il n'avait pas été entré.
-			if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
-				$this->app->user()->setAttribute( 'user_name', $Comment->author() );
+			if ( !self::$app->user()->hasAttribute( 'user_name' ) ) {
+				self::$app->user()->setAttribute( 'user_name', $Comment->author() );
 			}
-			$this->app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			$this->app->httpResponse()
-					  ->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			self::$app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
+			self::$app->httpResponse()
+					  ->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
@@ -233,12 +233,12 @@ class NewsController extends BackController {
 		
 		// Construction du formulaire : dépend de si l'utilisateur est connu ou pas
 		// On rajoute les données dont la méthode d'obtention varie
-		if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
+		if ( !self::$app->user()->hasAttribute( 'user_name' ) ) {
 			$Comment->setAuthor( $Request->postData( 'author' ) );
 			$Form_builder = new CommentFormBuilderWithAuthor( $Comment );
 		}
 		else {
-			$Comment->setAuthor( $this->app->user()->getAttribute( 'user_name' ) );
+			$Comment->setAuthor( self::$app->user()->getAttribute( 'user_name' ) );
 			$Form_builder = new CommentFormBuilder( $Comment );
 		}
 		
@@ -247,7 +247,7 @@ class NewsController extends BackController {
 		$Form = $Form_builder->form();
 		
 		// On vérifie que le nom d'auteur n'est pas déjà pris par un utilisateur enregistré si l'utilisateur n'est pas connecté
-		if ( !$this->app->user()->hasAttribute( 'user_name' )
+		if ( !self::$app->user()->hasAttribute( 'user_name' )
 			 && $Request->method() == HTTPRequest::POST_METHOD
 			 && $User_manager->existsUsercUsingUsercLogin( $Comment->author() )
 		) {
@@ -260,8 +260,8 @@ class NewsController extends BackController {
 		
 		if ( $Form_handler->process() ) {
 			// Setter le login de l'utilisateur pour la session s'il n'avait pas été entré.
-			if ( !$this->app->user()->hasAttribute( 'user_name' ) ) {
-				$this->app->user()->setAttribute( 'user_name', $Comment->author() );
+			if ( !self::$app->user()->hasAttribute( 'user_name' ) ) {
+				self::$app->user()->setAttribute( 'user_name', $Comment->author() );
 			}
 		}
 		else {
@@ -303,7 +303,7 @@ class NewsController extends BackController {
 			if ( isset( $Comment->User ) ) {
 				$Comment->User->build_link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
 			}
-			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				// On ajoute les droits d'administrateur si besoin
 				$Comment->setAction_a( [
 					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
@@ -328,7 +328,7 @@ class NewsController extends BackController {
 			if ( isset( $Comment->User ) ) {
 				$Comment->User->build_link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
 			}
-			if ( $this->app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
 				// On ajoute les droits d'administrateur si besoin
 				$Comment->setAction_a( [
 					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),

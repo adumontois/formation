@@ -13,6 +13,8 @@ namespace OCFram;
  *
  * Classe modélisant une des applications du site.
  *
+ * Une seule application est lancée à la fois (singleton)
+ *
  * @package OCFram
  */
 abstract class Application {
@@ -43,14 +45,29 @@ abstract class Application {
 	
 	/**
 	 * Construit un objet application en initialisant httpRequest et httpResponse
+	 *
+	 * @return Application
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function __construct() {
-		$this->httpRequest  = new HTTPRequest( $this );
-		$this->httpResponse = new HTTPResponse( $this );
-		$this->name         = '';
-		$this->user         = new User( $this );
-		$this->config       = new Config( $this );
-		$this->Router    = new Router($this);
+		// On construit dynamiquement le nom de l'application
+		$real_class = get_called_class();
+		$short_class_name_without_application = preg_replace("/Application$/", "", substr(strrchr($real_class, '\\'), 1));
+		if (($this->name = $short_class_name_without_application)  === NULL) {
+			throw new \RuntimeException('Illegal class name '.$real_class);
+		}
+
+		// On vérifie si l'instance d'application existe déjà : pour cela on regarde un attribut différent du name qu'on vient de set
+		if (!isset ($this->httpRequest)) {
+			// On construit l'instance unique
+			$this->httpRequest  = new HTTPRequest( $this );
+			$this->httpResponse = new HTTPResponse( $this );
+			$this->user         = new User( $this );
+			$this->config       = new Config( $this );
+			$this->Router       = new Router( $this );
+		}
+		return $this;
 	}
 	
 	/**

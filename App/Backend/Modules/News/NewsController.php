@@ -35,6 +35,9 @@ class NewsController extends BackController {
 	 */
 	use AppController;
 	
+	
+	
+	
 	/**
 	 * Récupère toutes les news disponibles en DB.
 	 */
@@ -68,7 +71,7 @@ class NewsController extends BackController {
 			$this->page->addVar( 'news_count', $News_manager->countNewsc() );
 		}
 		catch ( \PDOException $Db_error ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
+			self::$app->httpResponse()->redirectError( HTTPResponse::SERVICE_TEMPORARY_UNAVAILABLE, $Db_error );
 		}
 	}
 	
@@ -88,7 +91,7 @@ class NewsController extends BackController {
 		$News_manager = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			$News = new News( array(
-				'fk_SUC'  => $this->app->user()->userId(),
+				'fk_SUC'  => self::$app->user()->userId(),
 				'title'   => $Request->postData( 'title' ),
 				'content' => $Request->postData( 'content' ),
 			) );
@@ -97,7 +100,7 @@ class NewsController extends BackController {
 			if ( $Request->getExists( 'id' ) ) {
 				// On vérifie si la news correspondante existe
 				if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
-					$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news à modifier n\'existe plus !' ) );
+					self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news à modifier n\'existe plus !' ) );
 				}
 				$News->setId( $Request->getData( 'id' ) );
 			}
@@ -106,12 +109,12 @@ class NewsController extends BackController {
 			if ( $Request->getExists( 'id' ) ) {
 				// Afficher le commentaire en update
 				if ( !$News_manager->existsNewscUsingNewscId( $Request->getData( 'id' ) ) ) {
-					$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news à modifier n\'existe plus !' ) );
+					self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news à modifier n\'existe plus !' ) );
 				}
 				$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 				// Seul un superadmin peut modifier les news des autres
-				if ($this->app->user()->userId() != $News->fk_SUC() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
-					$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas modifier la news de quelqu\'un d\'autre !' ) );
+				if (self::$app->user()->userId() != $News->fk_SUC() AND self::$app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
+					self::$app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas modifier la news de quelqu\'un d\'autre !' ) );
 				}
 			}
 			else {
@@ -127,12 +130,12 @@ class NewsController extends BackController {
 		$Form_handler = new FormHandler( $Form, $News_manager, $Request );
 		if ( $Form_handler->process() ) {
 			if ( $News->objectNew() ) {
-				$this->app->user()->setFlash( 'La news a été correctement ajoutée.' );
+				self::$app->user()->setFlash( 'La news a été correctement ajoutée.' );
 			}
 			else {
-				$this->app->user()->setFlash( 'La news a été correctement modifiée.' );
+				self::$app->user()->setFlash( 'La news a été correctement modifiée.' );
 			};
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' ) );
+			self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' ) );
 		}
 		
 		
@@ -186,10 +189,10 @@ class NewsController extends BackController {
 		
 		$News = $News_manager->getNewscUsingNewscId( $Request->getData( 'id' ) );
 		if ( null == $News ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
+			self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news à supprimer n\'existe pas !' ) );
 		}
-		if ( $News->fk_SUC() !== $this->app->user()->userId() AND $this->app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas supprimer la news de quelqu\'un d\'autre !' ) );
+		if ( $News->fk_SUC() !== self::$app->user()->userId() AND self::$app->user()->authenticationLevel() !== User::USERY_SUPERADMIN ) {
+			self::$app->httpResponse()->redirectError( HTTPResponse::ACCESS_DENIED, new \Exception( 'Vous ne pouvez pas supprimer la news de quelqu\'un d\'autre !' ) );
 		}
 		
 		// Suppression des commentaires associés à la news
@@ -199,8 +202,8 @@ class NewsController extends BackController {
 		$News_manager->deleteNewscUsingNewscId( $Request->getData( 'id' ) );
 		
 		$this->page->addVar( 'title', 'Suppression d\'une news' );
-		$this->app->user()->setFlash( 'La news a été correctement supprimée.' );
-		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+		self::$app->user()->setFlash( 'La news a été correctement supprimée.' );
+		self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildIndex' ) );
 	}
 	
 	/**
@@ -221,13 +224,13 @@ class NewsController extends BackController {
 		$News_manager     = $this->managers->getManagerOf();
 		if ( $Request->method() == HTTPRequest::POST_METHOD ) {
 			if ( !ctype_digit( $Request->postData( 'news' ) ) ) {
-				$this->app->httpResponse()->redirectError( HTTPResponse::BAD_REQUEST, new \Exception( 'Le champ de news caché a été modifié par l\'utilisateur. Bien essayé !' ) );
+				self::$app->httpResponse()->redirectError( HTTPResponse::BAD_REQUEST, new \Exception( 'Le champ de news caché a été modifié par l\'utilisateur. Bien essayé !' ) );
 			}
 			if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
-				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Le commentaire en cours d\'édition n\'existe plus !' ) );
+				self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'Le commentaire en cours d\'édition n\'existe plus !' ) );
 			}
 			if ( !$News_manager->existsNewscUsingNewscId( $Request->postData( 'news' ) ) ) {
-				$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news associée au commentaire en cours d\'édition n\'existe pas !' ) );
+				self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \Exception( 'La news associée au commentaire en cours d\'édition n\'existe pas !' ) );
 			}
 			$Comment = new Comment( array(
 				'id'      => $Request->getData( 'id' ),
@@ -243,7 +246,7 @@ class NewsController extends BackController {
 		
 		// News qui n'existe pas : on redirige vers une erreur 404
 		if ( null === $Comment ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à éditer n\'existe pas !' ) );
+			self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à éditer n\'existe pas !' ) );
 		}
 		
 		// Construire le formulaire
@@ -254,9 +257,9 @@ class NewsController extends BackController {
 		// Sauvegarder avec le FormHandler
 		$Form_handler = new FormHandler( $Form, $Comments_manager, $Request );
 		if ( $Form_handler->process() ) {
-			$this->app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
+			self::$app->user()->setFlash( 'Le commentaire a été correctement modifié.' );
 			// Redirection vers l'accueil d'administration
-			$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+			self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildIndex' ) );
 		}
 		$this->page->addVar( 'title', 'Edition d\'un commentaire' );
 		$this->page->addVar( 'form', $Form->createView() );
@@ -278,12 +281,12 @@ class NewsController extends BackController {
 		 */
 		$Comments_manager = $this->managers->getManagerOf( 'Comments' );
 		if ( !$Comments_manager->existsCommentcUsingCommentcId( $Request->getData( 'id' ) ) ) {
-			$this->app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
+			self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'Le commentaire à supprimer n\'existe pas !' ) );
 		}
 		$Comments_manager->deleteCommentcUsingCommentcId( $Request->getData( 'id' ) );
-		$this->app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
+		self::$app->user()->setFlash( 'Le commentaire a été correctement supprimé.' );
 		$this->page->addVar( 'title', 'Suppression d\'un commentaire' );
-		$this->app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( $this->app->name(), $this->module, 'buildIndex' ) );
+		self::$app->httpResponse()->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildIndex' ) );
 	}
 	
 	/**
