@@ -9,7 +9,7 @@
  * @var $content string Contenu de la page générée
  * @var $menu_a array[] Panneau menu personnalisé en fonction de l'authentification
  * @var $flash string Affichage du flash (message à l'utilisateur)
- * @var $layout_link_a string[] Liste des liens à afficher
+ * @var $h1_link_a string[] Liste des liens à afficher
  */
 
 ?>
@@ -29,14 +29,16 @@
 	<body>
 		<div id="wrap">
 			<header>
-				<h1><a href="<?= $layout_link_a['Frontend-buildIndex']?>">Mon super site</a></h1>
+				<?php foreach ($h1_link_a as $element_a): ?>
+					<h1><a href="<?= $element_a['url']?>"><?= $element_a['label'] ?></a></h1>
+				<?php endforeach; ?>
 				<p>Comment ça, il n'y a presque rien ?</p>
 			</header>
 			
 			<nav>
 				<ul>
 					<?php foreach ($menu_a as $element_a): ?>
-						<li><a href="<?= $element_a['link'] ?>"><?= $element_a['label']?></a></li>
+						<li><a href="<?= $element_a['url'] ?>"><?= $element_a['label']?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			</nav>

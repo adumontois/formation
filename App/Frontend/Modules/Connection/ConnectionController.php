@@ -16,7 +16,6 @@ use FormBuilder\ConnectionFormBuilder;
 use FormBuilder\SubscriptionFormBuilder;
 use FormHandler\ConnectionFormHandler;
 use Model\UserManager;
-use OCFram\Application;
 use OCFram\BackController;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;

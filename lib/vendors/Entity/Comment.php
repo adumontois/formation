@@ -9,6 +9,8 @@
 namespace Entity;
 
 
+use App\Backend\Modules\News\NewsController;
+use Helpers\LinkHelper;
 use OCFram\Entity;
 
 /**
@@ -39,12 +41,6 @@ class Comment extends Entity {
 	 * @var $dateupdate \DateTime
 	 */
 	protected $dateupdate;
-	/**
-	 * Liste des liens donnant les actions possibles sur l'entité
-	 *
-	 * @var $action_a array[]
-	 */
-	protected $action_a = [];
 	
 	public function __construct( array $values = array() ) {
 		parent::__construct( $values );
@@ -92,13 +88,6 @@ class Comment extends Entity {
 	 */
 	public function dateupdate() {
 		return $this->dateupdate;
-	}
-	
-	/**
-	 * @return array[]|array array si vide.
-	 */
-	public function action_a() {
-		return $this->action_a;
 	}
 	
 	/**
@@ -159,14 +148,50 @@ class Comment extends Entity {
 	}
 	
 	/**
-	 * Ajoute une UNIQUE action à afficher au commentaire.
+	 * Adds admin modification links into link_a dynamic attribute
+	 * The controller must check if admin rights are OK
 	 *
-	 * @param array $action
+	 * @param string $format Format of admin actions : html or json (html by default)
 	 */
-	public function setAction_a(array $action) {
-		if (!in_array($action, $this->action_a)) {
-			$this->action_a[] = $action;
+	public function setAdminLinks($format = 'html') {
+		if (!isset($this->link_a)) {
+			$this->link_a = [];
+		}
+		switch($format) {
+			case 'json':
+				LinkHelper::addLink(
+					LinkHelper::addLink(
+						$this->link_a,
+						\App\Frontend\Modules\News\NewsController::getLinkToPutUpdateCommentFromAjax( $this ),
+						'Modifier',
+						null,
+						'',
+						'update_comment_on_click'
+					),
+					\App\Frontend\Modules\News\NewsController::getLinkToClearCommentFromAjax( $this ),
+					'Supprimer',
+					null,
+					'',
+					'delete_comment_on_click'
+				);
+				break;
+			case 'html':
+				LinkHelper::addLink(
+					LinkHelper::addLink(
+						$this->link_a,
+						NewsController::getLinkToPutUpdateComment( $this ),
+						'',
+						'/images/update.png',
+						'Modifier'
+					),
+					NewsController::getLinkToClearComment( $this ),
+					'',
+					'/images/delete.png',
+					'Supprimer'
+				);
+				break;
+			default:
+				throw new \InvalidArgumentException($format.' format doesn\'t exists !');
 		}
 	}
-	
 }

@@ -35,7 +35,8 @@ a:hover {
 
 /* headers */
 h1, h2, h3 {
-	font-family: 'Trebuchet MS', Tahoma, Sans-serif;	 		
+				/*noinspection CssNoGenericFontName*/
+	font-family : 'Trebuchet MS', Tahoma, Sans-serif;
 }
 h1 {
 	font-size: 150%;	
@@ -57,10 +58,10 @@ img {
    border: none;
 }
 img.float-right {
-  margin: 5px 0px 10px 10px;  
+  margin: 5px 0 10px 10px;
 }
 img.float-left {
-  margin: 5px 10px 10px 0px;
+  margin: 5px 10px 10px 0;
 }
 
 h1, h2, h3, p {
@@ -147,7 +148,7 @@ form td {
     text-align: left;
 }
 td.first,th.first {
-	border-left: 0px;
+	border-left: 0;
 }
 tr.row-a {
 	background: #F8F8F8;
@@ -436,11 +437,10 @@ footer a {
 
 /* Div added dynamically in json forms for errors */
 .form_error {
-	color: #f55;
-	display: inline-block;
-	font-size: 12px;
-	border-style: double;
-	border-width: 2px;
-	padding: 10px;
-	margin-right: 10px;
+	color        : #f55;
+	display      : inline-block;
+	font-size    : 12px;
+	border       : 2px double;
+	padding      : 10px;
+	margin-right : 10px;
 }

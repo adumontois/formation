@@ -18,4 +18,3 @@ return [
 	'delete_ids_a'     => $delete_ids_a,
 	'dateupdate'       => $dateupdate,
 ];
-?>

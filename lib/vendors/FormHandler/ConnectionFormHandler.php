@@ -10,11 +10,11 @@ namespace FormHandler;
 
 
 use App\Frontend\Modules\Connection\ConnectionController;
+use App\Frontend\Modules\News\NewsController;
 use Entity\User;
 use Model\UserManager;
 use OCFram\FormHandler;
 use OCFram\HTTPRequest;
-use OCFram\Router;
 
 /**
  * Class ConnectionFormHandler
@@ -45,7 +45,7 @@ class ConnectionFormHandler extends FormHandler {
 				$this->request->app()->user()->setUserId($User_stored->id());
 				$this->request->app()->user()->setAttribute('user_name', $User->login());
 				$this->request->app()->user()->setFlash( 'Vous êtes connecté(e) en tant que ' . htmlspecialchars(User::getTextualStatus((int)$User_stored->fk_SUY())) . '.');
-				$this->request->app()->httpResponse()->redirect( Router::getUrlFromModuleAndAction($this->request->app()->name(), 'News', 'buildIndex') );
+				$this->request->app()->httpResponse()->redirect( NewsController::getLinkToBuildIndex());
 			}
 			else {
 				$this->request->app()->user()->setFlash( htmlspecialchars(ConnectionController::REFUSED_CONNECTION ));

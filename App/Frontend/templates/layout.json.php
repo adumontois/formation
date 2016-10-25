@@ -7,11 +7,15 @@
  */
 
 ?>
-
+<?php
+/**
+ * @var array $content Data set in json content page
+ */
+?>
 
 <?php
-$layout['master_code'] = isset($master_code)?$master_code:0;
-$layout['master_error'] = isset($master_error)?$master_error:'';
-$layout['content'] = $content;
+$layout[ 'master_code' ]  = isset( $master_code ) ? $master_code : 0;
+$layout[ 'master_error' ] = isset( $master_error ) ? $master_error : '';
+$layout[ 'content' ]      = $content;
 return $layout;
 ?>

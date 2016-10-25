@@ -41,6 +41,8 @@ $formBuilderLoader->register();
 $MobileDeviceLoader = new SplClassLoader( 'Detection', __DIR__ . '\..\vendor\mobiledetect\mobiledetectlib\namespaced');
 $MobileDeviceLoader->register();
 
+$HelpersLoader = new SplClassLoader( 'Helpers', __DIR__ . '\..\lib');
+$HelpersLoader->register();
 
 $appClass = 'App\\' . $_GET[ 'app' ] . '\\' . $_GET[ 'app' ] . 'Application';
 $app      = new $appClass;

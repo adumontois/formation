@@ -11,4 +11,3 @@
  */
 
 return ['error_a' => $error_a];
-?>

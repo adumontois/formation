@@ -54,16 +54,7 @@ class NewsController extends BackController {
 			foreach ( $News_list_a as $News ) {
 				$News->format();
 				$News->User()[ 'link' ] = MemberController::getLinkToBuildMember($News->User());
-				$News->setAction_a( [
-					'action_link'      => self::getLinkToPutUpdateNews($News),
-					'image_source'     => '/images/update.png',
-					'alternative_text' => 'Modifier',
-				] );
-				$News->setAction_a( [
-					'action_link'      => self::getLinkToClearNews($News),
-					'image_source'     => '/images/delete.png',
-					'alternative_text' => 'Supprimer',
-				] );
+				$News->setAdminLinks();
 			}
 			$this->page->addVar( 'News_list_a', $News_list_a );
 			$this->page->addVar( 'news_count', $News_manager->countNewsc() );
@@ -446,6 +437,6 @@ class NewsController extends BackController {
 	 * @return string
 	 */
 	 static public function getLinkToPutInsertNews() {
-	    return Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews', array());
+	    return Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews');
 	 }
 }

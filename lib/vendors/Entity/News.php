@@ -9,6 +9,9 @@
 
 namespace Entity;
 
+use App\Backend\Modules\News\NewsController;
+use Helpers\LinkHelper;
+use OCFram\ApplicationComponent;
 use \OCFram\Entity;
 
 /**
@@ -19,6 +22,7 @@ use \OCFram\Entity;
  * @package Entity
  */
 class News extends Entity {
+	use LinkHelper;
 	/**
 	 * @var $User User
 	 */
@@ -48,14 +52,7 @@ class News extends Entity {
 	 *
 	 * @var $action_a array[]
 	 */
-	protected $action_a;
-	
-	public function __construct( array $values = array() ) {
-		parent::__construct( $values );
-		if (!isset($this->action_a)) {
-			$this->action_a = [];
-		}
-	}
+	protected $action_a = [];
 	
 	/**
 	 * Vérifie si la news est valide.
@@ -149,17 +146,6 @@ class News extends Entity {
 	}
 	
 	/**
-	 * Ajoute une UNIQUE action à afficher à la news.
-	 *
-	 * @param array $action
-	 */
-	public function setAction_a(array $action = array()) {
-		if (!in_array($action, $this->action_a)) {
-			$this->action_a[] = $action;
-		}
-	}
-	
-	/**
 	 * @return User
 	 */
 	public function User() {
@@ -199,9 +185,13 @@ class News extends Entity {
 	}
 	
 	/**
-	 * @return array[]|array array si vide.
+	 * Adds admin modification links into link_a dynamic attribute
+	 * The controller must check if admin rights are OK
 	 */
-	public function action_a() {
-		return $this->action_a;
+	public function setAdminLinks() {
+		if (!isset($this->link_a)) {
+			$this->link_a = [];
+		}
+		LinkHelper::addLink( LinkHelper::addLink( $this->link_a, NewsController::getLinkToPutUpdateNews( $this ), '', '/images/update.png', 'Modifier' ), NewsController::getLinkToClearNews( $this ), '', '/images/delete.png', 'Supprimer' );
 	}
 }

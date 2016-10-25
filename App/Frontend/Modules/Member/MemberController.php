@@ -9,7 +9,6 @@
 namespace App\Frontend\Modules\Member;
 
 
-use App\Backend\Modules\News\NewsController;
 use App\Traits\AppController;
 use Entity\Comment;
 use Entity\User;
@@ -45,8 +44,8 @@ class MemberController extends BackController {
 		 * @var NewsManager     $News_manager
 		 */
 		
-		$User_manager    = $this->managers->getManagerOf( 'User' );
-		$News_manager    = $this->managers->getManagerOf( 'News' );
+		$User_manager = $this->managers->getManagerOf( 'User' );
+		$News_manager = $this->managers->getManagerOf( 'News' );
 		
 		// Vérifier si l'User demandé existe : si oui, le récupérer et le formater
 		if ( !$User_manager->existsUsercUsingUsercId( $Request->getData( 'id' ) ) ) {
@@ -56,49 +55,29 @@ class MemberController extends BackController {
 		$User->formatDate();
 		$this->page->addVar( 'User', $User );
 		
-		$News_a = $News_manager->getNewscCommentcAndUserUsingUsercIdFilterOwnNewsOwnCommentsAndNewsUserCommentedSortByNewscIdAndCommentcId($Request->getData('id'));
-		foreach ($News_a as $News) {
+		$News_a = $News_manager->getNewscCommentcAndUserUsingUsercIdFilterOwnNewsOwnCommentsAndNewsUserCommentedSortByNewscIdAndCommentcId( $Request->getData( 'id' ) );
+		foreach ( $News_a as $News ) {
 			$News->format();
-			if (self::$app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $News->User()->id() == self::$app->user()->userId()) {
-				$News->setAction_a( [
-					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateNews', array( 'id' => $News->id() ) ),
-					'image_source'     => '/images/update.png',
-					'alternative_text' => 'Modifier',
-				] );
-				$News->setAction_a( [
-					'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearNews', array( 'id' => $News->id() ) ),
-					'image_source'     => '/images/delete.png',
-					'alternative_text' => 'Supprimer',
-				] );
+			if ( self::$app->user()->authenticationLevel() === User::USERY_SUPERADMIN OR $News->User()->id() == self::$app->user()->userId() ) {
+				$News->setAdminLinks();
 			}
 			// Ajout du lien s'il modifie la page (on ne génère pas les liens qui mèneraient à la page en cours d'affichage)
-			if ($News->User()->id() != $User->id()) {
-				$News->User()->link =
-					Router::getUrlFromModuleAndAction(self::$app->name(), $this->module, $this->action, array('id' => (int)$News->User()->id()));
+			if ( $News->User()->id() != $User->id() ) {
+				$News->User()->link = MemberController::getLinkToBuildMember( $News->User() );
 			}
 			
-			foreach ($News['Comment_a'] as $Comment) {
+			foreach ( $News[ 'Comment_a' ] as $Comment ) {
 				/**
 				 * @var $Comment Comment
 				 */
 				$Comment->formatDate();
-				if (self::$app->user()->authenticationLevel() === User::USERY_SUPERADMIN) {
-					$Comment->setAction_a( [
-						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateComment', array( 'id' => $Comment->id() ) ),
-						'image_source'     => '/images/update.png',
-						'alternative_text' => 'Modifier',
-					] );
-					$Comment->setAction_a( [
-						'action_link'      => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array( 'id' => $Comment->id() ) ),
-						'image_source'     => '/images/delete.png',
-						'alternative_text' => 'Supprimer',
-					] );
+				if ( self::$app->user()->authenticationLevel() === User::USERY_SUPERADMIN ) {
+					$Comment->setAdminLinks();
 				}
 			}
 		}
-		$this->page->addVar('News_a', $News_a);
+		$this->page->addVar( 'News_a', $News_a );
 	}
-	
 	
 	/**
 	 * Renvoie le lien de la page membre du User passé en paramètre
@@ -108,16 +87,17 @@ class MemberController extends BackController {
 	 *
 	 * @return string
 	 */
-	static public function getLinkToBuildMember(User $Member = null) {
-		if (null === $Member) {
+	static public function getLinkToBuildMember( User $Member = null ) {
+		if ( null === $Member ) {
 			$id = ApplicationComponent::app()->user()->userId();
 		}
 		else {
 			$id = $Member->id();
 		}
-		if (empty($id)) {
-			throw new \RuntimeException('Impossible de créer le lien de la fiche membre : L\'id du membre n\'est pas renseigné !');
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Impossible de créer le lien de la fiche membre : L\'id du membre n\'est pas renseigné !' );
 		}
-		return Router::getUrlFromModuleAndAction( 'Frontend' , 'Member' , 'buildMember', array('id' => (int)$Member->id()) );
+		
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$id ) );
 	}
 }

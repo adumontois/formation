@@ -84,6 +84,7 @@ class Page extends ApplicationComponent {
 		/*
 		 * @var User $User utilisée dans les vues
 		 */
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$User = self::$app->user();
 		
 		extract( $this->vars );
@@ -96,6 +97,7 @@ class Page extends ApplicationComponent {
 		 * @var $content string utilisée dans les vues
 		 */
 		
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$content = ob_get_clean(); // Injecter le contenu de la page interne dans le layout
 		
 		ob_start();
@@ -112,6 +114,7 @@ class Page extends ApplicationComponent {
 		/*
 	 * @var User $User utilisée dans les vues
 	 */
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$User = self::$app->user();
 		
 //		if ( $this->format == 'json' ) {
@@ -125,6 +128,7 @@ class Page extends ApplicationComponent {
 		extract( $this->vars );
 				
 		// Créer la page en bufferisation
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		$content = require $this->contentFile; // Existence du fichier vérifiée
 		
 		/**

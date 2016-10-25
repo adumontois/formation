@@ -30,14 +30,15 @@ class DeviceController extends BackController {
 		$this->run();
 		$detector = new MobileDetect();
 		if ($detector->isMobile()) {
-			$this->page->addVar('device', 'un mobile');
+			$device = 'un mobile';
 		}
 		else if ($detector->isTablet()) {
-			$this->page->addVar('device', 'une tablette');
+			$device = 'une tablette';
 		}
 		else {
-			$this->page->addVar('device', 'un ordinateur');
+			$device = 'un ordinateur';
 		}
+		$this->page->addVar('device', $device);
 	}
 	
 	/**
@@ -46,6 +47,6 @@ class DeviceController extends BackController {
 	 * @return string
 	 */
 	 static public function getLinkToBuildDevice() {
-	    return Router::getUrlFromModuleAndAction('Frontend', 'Device', 'buildDevice', array());
+	    return Router::getUrlFromModuleAndAction('Frontend', 'Device', 'buildDevice');
 	 }
 }

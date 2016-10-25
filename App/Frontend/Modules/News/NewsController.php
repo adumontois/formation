@@ -54,7 +54,7 @@ class NewsController extends BackController {
 			if ( strlen( $News->content() ) == $longueur_news ) {
 				$News->setContent( substr( $News->content(), 0, strrpos( $News->content(), ' ' ) ) . '...' );
 			}
-			$News->build_link       = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array( 'id' => (int)$News->id() ) );
+			$News->build_link       = self::getLinkToBuildNews( $News );
 			$News->User()[ 'link' ] = MemberController::getLinkToBuildMember( $News->User() );
 		}
 		$this->page->addVar( 'title', 'Liste des ' . $nombre_news . ' dernières news' );
@@ -79,10 +79,10 @@ class NewsController extends BackController {
 		if ( null == $News ) {
 			self::$app->httpResponse()->redirectError( HTTPResponse::NOT_FOUND, new \RuntimeException( 'La news demandée n\'existe pas !' ) );
 		}
-		$News->User()[ 'link' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$News->User()->id() ) );
+		$News->User()->link = MemberController::getLinkToBuildMember( $News->User() );
 		$News->format();
-		$News->link_insert_comment_json   = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => $News->id() ) );
-		$News->link_refresh_comments_json = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildRefreshCommentsFromAjax', array( 'id' => $News->id() ) );
+		$News->link_insert_comment_json   = self::getLinkToPutInsertCommentFromAjax( $News );
+		$News->link_refresh_comments_json = self::getLinkToBuildRefreshCommentsFromAjax( $News );
 		
 		// Afficher les commentaires
 		$Comment_manager  = $this->managers->getManagerOf( 'Comments' );
@@ -90,19 +90,10 @@ class NewsController extends BackController {
 		foreach ( $Liste_comments_a as $Comment ) {
 			$Comment->formatDate();
 			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
-				$Comment->setAction_a( [
-					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label'       => 'Modifier',
-					'js_function' => 'update_comment_on_click',
-				] );
-				$Comment->setAction_a( [
-					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label'       => 'Supprimer',
-					'js_function' => 'delete_comment_on_click',
-				] );
+				$Comment->setAdminLinks('json');
 			}
 			if ( isset( $Comment->User ) ) {
-				$Comment->User->link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
+				$Comment->User->link = MemberController::getLinkToBuildMember( $Comment->User );
 			}
 		}
 		
@@ -127,13 +118,10 @@ class NewsController extends BackController {
 		$this->page->addVar( 'Comment_list_a', $Liste_comments_a );
 		$this->page->addVar( 'User', self::$app->user() );
 		$this->page->addVar( 'form', $Form->createView() );
-		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$News->id() ) ) );
+		$this->page->addVar( 'form_action', self::getLinkToPutInsertComment($News ));
 		
 		// Ajouter la date et heure
-		$dateupdate = new \DateTime();
-		$dateupdate->setTimezone( new \DateTimeZone( 'Europe/Paris' ) );
-		$dateupdate->format( 'Y-m-d H:i:s.u' );
-		$this->page->addVar( 'dateupdate', $dateupdate->format( 'Y-m-d H:i:s.u' ) );
+		$this->page->addVar( 'dateupdate', (new \DateTime())->format( 'Y-m-d H:i:s.u' ) );
 	}
 	
 	/**
@@ -197,14 +185,13 @@ class NewsController extends BackController {
 				self::$app->user()->setAttribute( 'user_name', $Comment->author() );
 			}
 			self::$app->user()->setFlash( 'Votre commentaire a bien été ajouté.' );
-			self::$app->httpResponse()
-					  ->redirect( Router::getUrlFromModuleAndAction( self::$app->name(), $this->module, 'buildNews', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+			self::$app->httpResponse()->redirect( self::getLinkToBuildNews( null, (int)$Request->getData( 'id' ) ) );
 		}
 		$this->page->addVar( 'title', 'Ajout d\'un commentaire' );
 		// Passer le formulaire à la vue
 		$this->page->addVar( 'form', $Form_builder->form()->createView() );
 		// Rajouter le lien d'action du formulaire
-		$this->page->addVar( 'form_action', Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$Request->getData( 'id' ) ) ) );
+		$this->page->addVar( 'form_action', self::getLinkToPutInsertComment(null, (int)$Request->getData( 'id' ) ) );
 	}
 	
 	/**
@@ -299,50 +286,12 @@ class NewsController extends BackController {
 		
 		// Sélection des nouveaux commentaires
 		$New_comment_a = $Comments_manager->getCommentcUsingNewscIdFilterOverDatecreationSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
-		foreach ( $New_comment_a as $Comment ) {
-			$Comment->formatDate();
-			if ( isset( $Comment->User ) ) {
-				$Comment->User->build_link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
-			}
-			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
-				// On ajoute les droits d'administrateur si besoin
-				$Comment->setAction_a( [
-					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label'       => 'Modifier',
-					'js_function' => 'update_comment_on_click',
-				] );
-				$Comment->setAction_a( [
-					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label'       => 'Supprimer',
-					'js_function' => 'delete_comment_on_click',
-				] );
-			}
-		}
+		self::formatCommentsForJson($New_comment_a);
 		$this->page->addVar( 'New_comment_a', $New_comment_a );
 		
 		// Sélection des commentaires édités
-		// Pas besoin de regénérer les droits, il n'y a pas de raison qu'ils changent
 		$Update_comment_a = $Comments_manager->getCommentcAndUsercUsingNewscIdFilterOverEditedAfterDateupdateAndCreatedBeforeDateupdateSortByIdDesc( $Request->getData( 'id' ), $Request->postData( 'dateupdate' ) );
-		
-		foreach ( $Update_comment_a as $Comment ) {
-			$Comment->formatDate();
-			if ( isset( $Comment->User ) ) {
-				$Comment->User->build_link = Router::getUrlFromModuleAndAction( 'Frontend', 'Member', 'buildMember', array( 'id' => (int)$Comment->User->id() ) );
-			}
-			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
-				// On ajoute les droits d'administrateur si besoin
-				$Comment->setAction_a( [
-					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label'       => 'Modifier',
-					'js_function' => 'update_comment_on_click',
-				] );
-				$Comment->setAction_a( [
-					'link'        => Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$Comment->id() ) ),
-					'label'       => 'Supprimer',
-					'js_function' => 'delete_comment_on_click',
-				] );
-			}
-		}
+		self::formatCommentsForJson($Update_comment_a);
 		$this->page->addVar( 'Update_comment_a', $Update_comment_a );
 		
 		// Sélection des ids supprimés
@@ -369,16 +318,129 @@ class NewsController extends BackController {
 	
 	/**
 	 * Renvoie le lien de la page d'affichage d'une News
+	 * Si la News n'est pas connue, on regarde l'id de News passé en paramètre.
+	 *
+	 * @param News $News
+	 * @param int $News_id
+	 *
+	 * @return string
+	 */
+	static public function getLinkToBuildNews( News $News = null, $News_id = null) {
+		if (null === $News) {
+			$id = $News_id;
+		}
+		else {
+			$id = $News->id();
+		}
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create News link : News id is unknown !' );
+		}
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array( 'id' => (int)$id ) );
+	}
+	
+	/**
+	 * Renvoie le lien de la page d'affichage du formulaire HTML d'insertion de commentaire à une News.
+	 * Si la News n'est pas connue, on regarde l'id de News passé en paramètre.
+	 *
+	 * @param News $News
+	 * @param int $News_id
+	 *
+	 * @return string
+	 */
+	static public function getLinkToPutInsertComment( News $News = null, $News_id = null) {
+		if (null === $News) {
+			$id = $News_id;
+		}
+		else {
+			$id = $News->id();
+		}
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create News link : News id is unknown !' );
+		}
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertComment', array( 'id' => (int)$id ) );
+	}
+	
+	/**
+	 * Génère le lien d'insertion d'un commentaire en Ajax
 	 *
 	 * @param News $News
 	 *
 	 * @return string
 	 */
-	static public function getLinkToBuildNews(News $News) {
+	static public function getLinkToPutInsertCommentFromAjax( News $News ) {
 		$id = $News->id();
-		if (empty($id)) {
-			throw new \RuntimeException('Impossible de créer le lien de la News : L\'id de la News n\'est pas renseigné !');
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create News link : News id is unknown !' );
 		}
-		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildNews', array('id' => (int)$News->id()) );
+		
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putInsertCommentFromAjax', array( 'id' => (int)$id ) );
+	}
+	
+	/**
+	 * Génère le lien de rafraîchissement des commentaires en Ajax
+	 *
+	 * @param News $News
+	 *
+	 * @return string
+	 */
+	static public function getLinkToBuildRefreshCommentsFromAjax( News $News ) {
+		$id = $News->id();
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create News link : News id is unknown !' );
+		}
+		
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildRefreshCommentsFromAjax', array( 'id' => (int)$id) );
+	}
+	
+	/**
+	 * Génère le lien de mise à jour d'un commentaire en Ajax
+	 *
+	 * @param Comment $Comment
+	 *
+	 * @return string
+	 */
+	static public function getLinkToPutUpdateCommentFromAjax( Comment $Comment ) {
+		$id = $Comment->id();
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create Comment link : Comment id is unknown !' );
+		}
+		
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$id ) );
+	}
+	
+	/**
+	 * Génère le lien de suppression d'un commentaire en Ajax
+	 *
+	 * @param Comment $Comment
+	 *
+	 * @return string
+	 */
+	static public function getLinkToClearCommentFromAjax( Comment $Comment ) {
+		$id = $Comment->id();
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create Comment link : Comment id is unknown !' );
+		}
+		
+		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'ClearCommentFromAjax', array( 'id' => (int)$id ) );
+	}
+	
+	/**
+	 * Format comments to be displayed in Json on buildNews.
+	 *
+	 * @param Comment[] $Comment_a Comment list to format
+	 *
+	 * @return Comment[] edited (reference return)
+	 */
+	static public function &formatCommentsForJson(array &$Comment_a ) {
+		foreach ( $Comment_a as $Comment ) {
+			$Comment->formatDate();
+			if ( isset( $Comment->User ) ) {
+				$Comment->User->build_link = MemberController::getLinkToBuildMember($Comment->User());
+			}
+			if ( self::$app->user()->authenticationLevel() == User::USERY_SUPERADMIN ) {
+				$Comment->setAdminLinks('json');
+			}
+		}
+		return $Comment_a;
 	}
 }
