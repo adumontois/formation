@@ -16,6 +16,7 @@ use Entity\User;
 use Model\CommentsManager;
 use Model\NewsManager;
 use Model\UserManager;
+use OCFram\ApplicationComponent;
 use OCFram\BackController;
 use OCFram\HTTPRequest;
 use OCFram\HTTPResponse;
@@ -101,13 +102,19 @@ class MemberController extends BackController {
 	
 	/**
 	 * Renvoie le lien de la page membre du User passé en paramètre
+	 * Si le paramètre n'est pas renseigné, on récupère l'id User de la session en cours.
 	 *
-	 * @param User $Member
+	 * @param User|null $Member
 	 *
 	 * @return string
 	 */
-	static public function getLinkToBuildMember(User $Member) {
-		$id = $Member->id();
+	static public function getLinkToBuildMember(User $Member = null) {
+		if (null === $Member) {
+			$id = ApplicationComponent::app()->user()->userId();
+		}
+		else {
+			$id = $Member->id();
+		}
 		if (empty($id)) {
 			throw new \RuntimeException('Impossible de créer le lien de la fiche membre : L\'id du membre n\'est pas renseigné !');
 		}

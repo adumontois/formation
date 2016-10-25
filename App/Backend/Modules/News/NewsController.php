@@ -439,4 +439,13 @@ class NewsController extends BackController {
 		}
 		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearComment', array('id' => (int)$Comment->id()) );
 	}
+	
+	/**
+	 * Génère le lien de création d'une News
+	 *
+	 * @return string
+	 */
+	 static public function getLinkToPutInsertNews() {
+	    return Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews', array());
+	 }
 }

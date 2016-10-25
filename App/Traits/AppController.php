@@ -8,6 +8,10 @@
 
 namespace App\Traits;
 
+use App\Frontend\Modules\Connection\ConnectionController;
+use App\Frontend\Modules\Device\DeviceController;
+use App\Frontend\Modules\Member\MemberController;
+use App\Frontend\Modules\News\NewsController;
 use Entity\User;
 use OCFram\ApplicationComponent;
 use OCFram\BackController;
@@ -63,42 +67,42 @@ trait AppController {
 		$menu_a = [
 			[
 				'label' => 'Accueil',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'News', 'buildIndex'),
+				'link'  => NewsController::getLinkToBuildIndex(),
 			],
 			[
 				'label' => 'Votre appareil',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Device', 'buildDevice'),
+				'link'  => DeviceController::getLinkToBuildDevice(),
 			],
 		];
 		if ( ApplicationComponent::app()->user()->isAuthenticated() ) {
 			$menu_a[] = [
 				'label' => ApplicationComponent::app()->user()->getAttribute('user_name'). ' ('. ucfirst( User::getTextualStatus( ApplicationComponent::app()->user()->authenticationLevel() ) ) . ', connecté)',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Member', 'buildMember', array('id' => (int)ApplicationComponent::app()->user()->userId())),
+				'link'  => MemberController::getLinkToBuildMember(),
 			];
 			if (ApplicationComponent::app()->user()->authenticationLevel() == User::USERY_SUPERADMIN) {
 				$menu_a[] = [
 					'label' => 'Admin',
-					'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'buildIndex'),
+					'link'  => \App\Backend\Modules\News\NewsController::getLinkToBuildIndex(),
 				];
 			}
 			$menu_a[] = [
 				'label' => 'Déconnexion',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'clearConnection'),
+				'link'  => ConnectionController::getLinkToClearConnection(),
 			];
 			$menu_a[] = [
 				'label' => 'Ajouter news',
-				'link'  => Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews'),
+				'link'  => \App\Backend\Modules\News\NewsController::getLinkToPutInsertNews(),
 			];
 			
 		}
 		else {
 			$menu_a[] = [
 				'label' => 'Inscription',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'putUser'),
+				'link'  => ConnectionController::getLinkToPutUser(),
 			];
 			$menu_a[] = [
 				'label' => 'Connexion',
-				'link'  => Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'getConnection'),
+				'link'  => ConnectionController::getLinkToGetConnection(),
 			];
 		}
 		$this->page()->addVar( 'menu_a', $menu_a );
@@ -111,8 +115,7 @@ trait AppController {
 		
 		// Générer les liens
 		$layout_link_a                          = [];
-		$layout_link_a[ 'Frontend-buildIndex' ] = Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'buildIndex' );
-		
+		$layout_link_a[ 'Frontend-buildIndex' ] = NewsController::getLinkToBuildIndex();
 		$this->page()->addVar( 'layout_link_a', $layout_link_a );
 	}
 	

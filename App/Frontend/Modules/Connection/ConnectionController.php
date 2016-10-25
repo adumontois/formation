@@ -125,4 +125,31 @@ class ConnectionController extends BackController {
 		// On redirige vers la racine
 		self::$app->httpResponse()->redirect( NewsController::getLinkToBuildIndex());
 	}
+	
+	/**
+	 * Génère le lien de déconnexion
+	 *
+	 * @return string
+	 */
+	 static public function getLinkToClearConnection() {
+	    return Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'clearConnection');
+	 }
+	 
+	 /**
+	  * Génère le lien d'inscription d'un nouveau membre
+	  *
+	  * @return string
+	  */
+	  static public function getLinkToPutUser() {
+	     return Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'putUser');
+	  }
+	  
+	  /**
+	   * Génère le lien de la page de connexion au site
+	   *
+	   * @return string
+	   */
+	   static public function getLinkToGetConnection() {
+	      return Router::getUrlFromModuleAndAction('Frontend', 'Connection', 'getConnection'); 
+	   }
 }

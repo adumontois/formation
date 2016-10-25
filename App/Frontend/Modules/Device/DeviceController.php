@@ -12,6 +12,7 @@ namespace App\Frontend\Modules\Device;
 use App\Traits\AppController;
 use Detection\MobileDetect;
 use OCFram\BackController;
+use OCFram\Router;
 
 /**
  * Class DeviceController
@@ -38,4 +39,13 @@ class DeviceController extends BackController {
 			$this->page->addVar('device', 'un ordinateur');
 		}
 	}
+	
+	/**
+	 * Génère le lien de l'affichage du device de l'utilisateur.
+	 *
+	 * @return string
+	 */
+	 static public function getLinkToBuildDevice() {
+	    return Router::getUrlFromModuleAndAction('Frontend', 'Device', 'buildDevice', array());
+	 }
 }
