@@ -73,8 +73,8 @@ $js_data_action_insert = $News[ 'link_insert_comment_json' ]; ?>
 $js_data_action_insert = $News[ 'link_insert_comment_json' ]; ?>
 <?php require "form/insert_comment.html.php" ?>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<!--<script src="/jQuery/jquery.min.js"></script>
 <script src="/javascript-functions/insert-comment-to-news.js"></script>
 <script src="/javascript-functions/refresh-comments-on-news.js"></script>
 <script src="/javascript-functions/delete-comment-on-click.js"></script>
-<script src="/javascript-functions/update-comment-on-click.js"></script>
+<script src="/javascript-functions/update-comment-on-click.js"></script>-->

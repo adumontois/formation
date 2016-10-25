@@ -393,38 +393,6 @@ class NewsController extends BackController {
 	}
 	
 	/**
-	 * Génère le lien de mise à jour d'un commentaire en Ajax
-	 *
-	 * @param Comment $Comment
-	 *
-	 * @return string
-	 */
-	static public function getLinkToPutUpdateCommentFromAjax( Comment $Comment ) {
-		$id = $Comment->id();
-		if ( empty( $id ) ) {
-			throw new \RuntimeException( 'Can\'t create Comment link : Comment id is unknown !' );
-		}
-		
-		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$id ) );
-	}
-	
-	/**
-	 * Génère le lien de suppression d'un commentaire en Ajax
-	 *
-	 * @param Comment $Comment
-	 *
-	 * @return string
-	 */
-	static public function getLinkToClearCommentFromAjax( Comment $Comment ) {
-		$id = $Comment->id();
-		if ( empty( $id ) ) {
-			throw new \RuntimeException( 'Can\'t create Comment link : Comment id is unknown !' );
-		}
-		
-		return Router::getUrlFromModuleAndAction( 'Frontend', 'News', 'ClearCommentFromAjax', array( 'id' => (int)$id ) );
-	}
-	
-	/**
 	 * Format comments to be displayed in Json on buildNews.
 	 *
 	 * @param Comment[] $Comment_a Comment list to format

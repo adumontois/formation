@@ -162,13 +162,13 @@ class Comment extends Entity {
 				LinkHelper::addLink(
 					LinkHelper::addLink(
 						$this->link_a,
-						\App\Frontend\Modules\News\NewsController::getLinkToPutUpdateCommentFromAjax( $this ),
+						NewsController::getLinkToPutUpdateCommentFromAjax( $this ),
 						'Modifier',
 						null,
 						'',
 						'update_comment_on_click'
 					),
-					\App\Frontend\Modules\News\NewsController::getLinkToClearCommentFromAjax( $this ),
+					NewsController::getLinkToClearCommentFromAjax( $this ),
 					'Supprimer',
 					null,
 					'',

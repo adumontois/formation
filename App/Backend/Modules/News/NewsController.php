@@ -439,4 +439,36 @@ class NewsController extends BackController {
 	 static public function getLinkToPutInsertNews() {
 	    return Router::getUrlFromModuleAndAction('Backend', 'News', 'putInsertNews');
 	 }
+	
+	/**
+	 * Génère le lien de mise à jour d'un commentaire en Ajax
+	 *
+	 * @param Comment $Comment
+	 *
+	 * @return string
+	 */
+	static public function getLinkToPutUpdateCommentFromAjax( Comment $Comment ) {
+		$id = $Comment->id();
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create Comment link : Comment id is unknown !' );
+		}
+		
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'putUpdateCommentFromAjax', array( 'id' => (int)$id ) );
+	}
+	
+	/**
+	 * Génère le lien de suppression d'un commentaire en Ajax
+	 *
+	 * @param Comment $Comment
+	 *
+	 * @return string
+	 */
+	static public function getLinkToClearCommentFromAjax( Comment $Comment ) {
+		$id = $Comment->id();
+		if ( empty( $id ) ) {
+			throw new \RuntimeException( 'Can\'t create Comment link : Comment id is unknown !' );
+		}
+		
+		return Router::getUrlFromModuleAndAction( 'Backend', 'News', 'clearCommentFromAjax', array( 'id' => (int)$id ) );
+	}
 }
